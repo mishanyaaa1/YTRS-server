@@ -1,0 +1,34 @@
+/* Импорт глобальных стилей для полей ввода */
+@import '../global-input-styles.css';
+
+/* Импорт стилей каталога для популярных товаров */
+@import '../Catalog.css';
+
+.popular-products .catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Адаптивность для популярных товаров */
+@media (max-width: 1200px) {
+  .popular-products .catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .popular-products .catalog-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  /* Скрытие иконок корзины на мобильных устройствах */
+  .product-button svg,
+  .product-button .fa-shopping-cart,
+  .product-button .FaShoppingCart {
+    display: none !important;
+  }
+}
+
+

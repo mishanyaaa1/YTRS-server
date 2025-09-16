@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database - отключен, используем внешнюю БД
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: ytorsweb_postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: ytorsweb
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #     - ./server/postgres_schema.sql:/docker-entrypoint-initdb.d/init.sql
+  #   ports:
+  #     - "5433:5432"
+  #   networks:
+  #     - ytorsweb_network
+
+  # Redis для кэширования (опционально)
+  redis:
+    image: redis:7-alpine
+    container_name: ytorsweb_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - ytorsweb_network
+
+  # Основное приложение
+  app:
+    build: .
+    container_name: ytorsweb_app
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_TYPE: postgres
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ytorsweb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    depends_on:
+      - redis
+    volumes:
+      - ./server/uploads:/app/uploads
+      - ./server/backups:/app/backups
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: ytorsweb_nginx
+    restart: unless-stopped
+    network_mode: "host"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./ssl:/etc/nginx/ssl
+      - ./server/uploads:/var/www/uploads
+    depends_on:
+      - app
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  ytorsweb_network:
+    driver: bridge

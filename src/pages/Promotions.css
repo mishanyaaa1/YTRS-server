@@ -1,0 +1,737 @@
+/* Импорт глобальных стилей для полей ввода */
+@import '../global-input-styles.css';
+
+/* Стили для страницы промоакций */
+/* UPDATED: Fixing promotion cards background - FORCED UPDATE */
+.promotions-page {
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+/* Hero секция */
+.promotions-hero {
+  padding: 6rem 0 4rem 0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  text-align: left;
+}
+
+/* Анимированный фон только для hero секции */
+.promotions-hero {
+	position: relative;
+	overflow: hidden;
+}
+
+.promotions-hero .container {
+	position: relative;
+	z-index: 1;
+}
+
+.promotions-hero::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: -10%;
+	right: -10%;
+	bottom: 0;
+	background:
+		repeating-linear-gradient(-30deg, rgba(230, 163, 74, 0.05) 0 2px, transparent 2px 180px),
+		radial-gradient(circle at 10% 20%, rgba(230, 163, 74, 0.10), transparent 40%),
+		radial-gradient(circle at 90% 80%, rgba(0, 204, 102, 0.08), transparent 40%);
+	animation: hero-sweep 26s linear infinite;
+	filter: blur(0.2px);
+	pointer-events: none;
+	z-index: 0;
+}
+
+.promotions-hero::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(circle, rgba(230,163,74,0.16) 0.5px, transparent 0.8px) 0 0 / 70px 70px,
+		radial-gradient(circle, rgba(0,204,102,0.12) 0.5px, transparent 0.8px) 35px 35px / 110px 110px;
+	animation: particles-shift 52s linear infinite;
+	opacity: 0.35;
+	pointer-events: none;
+	z-index: 0;
+}
+
+/* Убираем анимации для остальных секций */
+.featured-promotions,
+.all-promotions,
+.how-to-use {
+	position: relative;
+}
+
+.featured-promotions .container,
+.all-promotions .container,
+.how-to-use .container {
+	position: relative;
+	z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.promotions-hero::before,
+	.promotions-hero::after {
+		animation: none !important;
+	}
+}
+
+.promotions-hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, #e6a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.promotions-hero p {
+  font-size: 1.2rem;
+  color: #cccccc;
+  max-width: 600px;
+  margin: 0;
+  line-height: 1.8;
+}
+
+/* Секции */
+.featured-promotions,
+.all-promotions,
+.how-to-use {
+  padding: 4rem 0;
+}
+
+.featured-promotions {
+  background: #111111;
+}
+
+.all-promotions {
+  background: #0a0a0a;
+}
+
+.how-to-use {
+  background: #111111;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, #ffffff 0%, #e6a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Горячие предложения */
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.featured-card {
+  background: linear-gradient(135deg, rgba(255, 87, 34, 0.1) 0%, rgba(255, 193, 7, 0.1) 100%);
+  border: 2px solid #ff5722;
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  /* allow full height so content is not cut */
+  max-height: none;
+}
+
+.featured-card:hover {
+  box-shadow: 0 25px 50px rgba(255, 87, 34, 0.2);
+  border-color: #ff9800;
+}
+
+.featured-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ff5722, #ff9800, #ffc107);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.featured-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: linear-gradient(45deg, #ff5722, #ff9800);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.promo-image {
+  text-align: center;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+}
+
+.promo-icon {
+  font-size: 5rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Segoe UI Symbol", Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: scale(1);
+  transform-origin: center;
+}
+
+/* Принудительно одинаковый размер для всех эмодзи */
+.promo-icon:has(span),
+.promo-icon span {
+  font-size: inherit !important;
+  line-height: inherit !important;
+  display: inline-block !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Принудительное увеличение всех иконок */
+.promo-icon * {
+  font-size: inherit !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Стили для React Icons */
+.promo-icon svg {
+  width: 1.2em !important;
+  height: 1.2em !important;
+  font-size: inherit !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+}
+
+.promo-content h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  color: #ffffff;
+}
+
+.promo-content p {
+  color: #cccccc;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.discount-badge {
+  background: linear-gradient(45deg, #ff1744, #ff5722);
+  color: #ffffff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 5px 15px rgba(255, 23, 68, 0.3);
+}
+
+.promo-details {
+  margin-bottom: 1.5rem;
+}
+
+.promo-code,
+.promo-expires,
+.days-left {
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  min-height: 20px;
+}
+
+.promo-code {
+  color: #e6a34a;
+  font-weight: 600;
+}
+
+.promo-expires {
+  color: #cccccc;
+}
+
+.days-left {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+.promo-button {
+  background: linear-gradient(135deg, #e6a34a 0%, #c97c1a 100%);
+  color: #000000;
+  text-decoration: none;
+  padding: 0.7rem 1.3rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  min-height: 44px;
+}
+
+.promo-button svg {
+  color: #ffffff !important;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.promo-button:hover svg {
+  color: #ffffff !important;
+  transform: scale(1.1);
+  transition: all 0.3s ease;
+}
+
+.promo-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(230, 163, 74, 0.3);
+}
+
+/* Фильтры категорий */
+.category-filters {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.7rem 1.3rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-weight: 500;
+  min-height: 44px;
+}
+
+.filter-btn svg {
+  color: #e6a34a !important;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover svg,
+.filter-btn.active svg {
+  color: #000000 !important;
+  transform: scale(1.1);
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: linear-gradient(135deg, #e6a34a 0%, #c97c1a 100%);
+  color: #000000;
+  border-color: #e6a34a;
+}
+
+/* Все акции */
+.promotions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.promotions-page .promotion-card {
+  background: rgba(40, 40, 40, 0.8) !important;
+  border: 1px solid rgba(230, 163, 74, 0.3) !important;
+  border-radius: 15px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.promotions-page .promotion-card:hover {
+  border-color: #e6a34a !important;
+  background: rgba(230, 163, 74, 0.1) !important;
+  box-shadow: 0 10px 25px rgba(230, 163, 74, 0.2);
+}
+
+.promotions-page .promo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.promotions-page .promo-image-small {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  position: relative;
+  background: linear-gradient(135deg, rgba(230, 163, 74, 0.08) 0%, rgba(201, 124, 26, 0.08) 100%);
+  border-radius: 14px;
+  border: 1px solid rgba(230, 163, 74, 0.15);
+  margin-right: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.promotions-page .promo-image-small .promo-icon {
+  font-size: 2.8rem !important;
+  line-height: 1;
+  color: #e6a34a;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiSymbols", "EmojiOne Mozilla", "Twemoji Mozilla", "Segoe UI Symbol", Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Стили для React Icons в маленьких карточках */
+.promotions-page .promo-image-small .promo-icon svg {
+  width: 1.2em !important;
+  height: 1.2em !important;
+  font-size: inherit !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+
+.discount-badge-small {
+  background: linear-gradient(45deg, #ff1744, #ff5722);
+  color: #ffffff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.promotions-page .promo-info h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: #ffffff !important;
+}
+
+.promotions-page .promo-info p {
+  color: #cccccc !important;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.promotions-page .promo-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.promo-code-small,
+.promo-expires-small {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  min-height: 20px;
+}
+
+.promo-code-small {
+  color: #e6a34a;
+  font-weight: 600;
+}
+
+.promo-expires-small {
+  color: #ff9800;
+}
+
+.min-purchase {
+  color: #cccccc;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.promo-link {
+  color: #e6a34a;
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.25rem;
+  transition: color 0.3s ease;
+  min-height: 24px;
+}
+
+.promo-link:hover {
+  color: #ffffff;
+}
+
+/* Как воспользоваться */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.step-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.step-card:hover {
+  border-color: #e6a34a;
+  background: rgba(230, 163, 74, 0.05);
+}
+
+.step-number {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #e6a34a 0%, #c97c1a 100%);
+  color: #000000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 auto 1rem;
+}
+
+.step-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.step-card p {
+  color: #cccccc;
+  line-height: 1.6;
+}
+
+/* Сообщения о пустых акциях */
+.promotions-page .no-promotions {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 40px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+  border-radius: 20px;
+  border: 2px dashed rgba(230, 163, 74, 0.3);
+  margin: 20px 0;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.promotions-page .no-promotions.featured-empty {
+  background: linear-gradient(135deg, rgba(255, 100, 0, 0.15), rgba(255, 140, 0, 0.05)) !important;
+  border-color: rgba(255, 100, 0, 0.4);
+}
+
+.promotions-page .no-promotions.category-empty {
+  background: linear-gradient(135deg, rgba(230, 163, 74, 0.15), rgba(0, 200, 100, 0.05)) !important;
+  border-color: rgba(230, 163, 74, 0.4);
+}
+
+.empty-content {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+  animation: float 3s ease-in-out infinite;
+}
+
+.no-promotions h3 {
+  color: #ffffff !important;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.no-promotions p {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 1.1rem;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.no-promotions small {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.view-all-btn {
+  background: linear-gradient(135deg, #e6a34a, #c97c1a);
+  color: #000000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(230, 163, 74, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+}
+
+.view-all-btn svg {
+  color: #ffffff !important;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.view-all-btn:hover svg {
+  color: #ffffff !important;
+  transform: scale(1.1);
+  transition: all 0.3s ease;
+}
+
+.view-all-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(230, 163, 74, 0.4);
+  background: linear-gradient(135deg, #c97c1a, #a56312);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.no-promotions strong {
+  color: #e6a34a;
+}
+
+.no-promotions button {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #e6a34a 0%, #c97c1a 100%);
+  color: #000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+}
+
+.no-promotions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(230, 163, 74, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .promotions-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .featured-grid,
+  .promotions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .category-filters {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .filter-btn {
+    white-space: nowrap;
+  }
+  
+  .promo-meta {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .featured-promotions,
+  .all-promotions,
+  .how-to-use {
+    padding: 2rem 0;
+  }
+  
+  .featured-card,
+  .promotion-card,
+  .step-card {
+    padding: 1.5rem;
+  }
+  
+  .promo-icon {
+    font-size: 4rem !important;
+  }
+  
+  .promotions-page .promo-image-small .promo-icon {
+    font-size: 3.5rem !important;
+  }
+}

@@ -1,0 +1,335 @@
+/* Импорт глобальных стилей для полей ввода */
+@import '../global-input-styles.css';
+
+/* Стили для модального окна транспортного средства */
+.vehicle-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.vehicle-modal {
+  background: linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 100%);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+/* Заголовок модального окна */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.modal-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.close-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cccccc;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Основное содержимое */
+.modal-content {
+  padding: 0;
+}
+
+/* Изображение и основная информация */
+.vehicle-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.vehicle-image-large {
+  position: relative;
+  height: 160px;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.vehicle-image-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vehicle-placeholder-large {
+  font-size: 3rem;
+  color: #666;
+}
+
+.vehicle-badge-large {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(230, 163, 74, 0.9);
+  color: #000000;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+}
+
+.vehicle-info-summary {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vehicle-price-large {
+  margin-bottom: 0.75rem;
+}
+
+.price-large {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e6a34a;
+}
+
+.vehicle-terrain-large {
+  margin-bottom: 1rem;
+}
+
+.terrain-badge-large {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: #cccccc;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.terrain-badge-large svg {
+  color: #e6a34a;
+  font-size: 1rem;
+}
+
+.vehicle-description-large {
+  color: #cccccc;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Технические характеристики */
+.vehicle-specs-detailed {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vehicle-specs-detailed h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.spec-item-detailed {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.spec-icon {
+  color: #e6a34a;
+  font-size: 1rem;
+  min-width: 1.5rem;
+}
+
+.spec-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.spec-label {
+  font-size: 0.8rem;
+  color: #999;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.spec-value {
+  font-size: 0.9rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Дополнительная информация */
+.vehicle-additional-info {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+.info-value {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.info-value.available {
+  color: #10b981;
+}
+
+.info-value.unavailable {
+  color: #ef4444;
+}
+
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .vehicle-modal-overlay {
+    padding: 1rem;
+  }
+  
+  .vehicle-modal {
+    max-height: 95vh;
+    max-width: 100%;
+  }
+  
+  .modal-header {
+    padding: 1rem 1.25rem;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .vehicle-image-large {
+    height: 140px;
+  }
+  
+  .vehicle-placeholder-large {
+    font-size: 2.5rem;
+  }
+  
+  .price-large {
+    font-size: 1.25rem;
+  }
+  
+  .vehicle-info-summary,
+  .vehicle-specs-detailed,
+  .vehicle-additional-info {
+    padding: 1rem;
+  }
+  
+}
+
+@media (max-width: 480px) {
+  .vehicle-modal-overlay {
+    padding: 0.25rem;
+  }
+  
+  .modal-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .modal-header h2 {
+    font-size: 1rem;
+  }
+  
+  .vehicle-image-large {
+    height: 120px;
+  }
+  
+  .vehicle-placeholder-large {
+    font-size: 2rem;
+  }
+  
+  .price-large {
+    font-size: 1.1rem;
+  }
+  
+  .vehicle-info-summary,
+  .vehicle-specs-detailed,
+  .vehicle-additional-info {
+    padding: 0.75rem;
+  }
+}

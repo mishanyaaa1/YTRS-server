@@ -1,0 +1,93 @@
+/* Импорт глобальных стилей для полей ввода */
+@import '../global-input-styles.css';
+
+/* Стили для страницы каталога в стиле сайта */
+.catalog-page {
+  padding: 6rem 0 60px;
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Красивый статичный фон */
+.catalog-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(230, 163, 74, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(230, 163, 74, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(0, 204, 102, 0.05) 0%, transparent 60%);
+  z-index: 0;
+}
+
+/* Дополнительный слой для глубины */
+.catalog-page::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(90deg, rgba(230, 163, 74, 0.08) 0%, rgba(230, 163, 74, 0.04) 30%, transparent 70%);
+  z-index: 0;
+}
+
+/* Контейнер */
+.catalog-page .container {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px; /* Увеличиваю максимальную ширину для объема */
+  margin: 0 auto;
+  padding: 0 2rem; /* Добавляю отступы по бокам */
+}
+
+.catalog-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.catalog-header h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #e6a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.catalog-header p {
+  font-size: 1.2rem;
+  color: #cccccc;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .catalog-page {
+    padding: 100px 0 40px;
+  }
+  
+  .catalog-page .container {
+    padding: 0 1rem; /* Уменьшаю отступы на мобильных */
+  }
+  
+  .catalog-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .catalog-header p {
+    font-size: 1rem;
+  }
+}

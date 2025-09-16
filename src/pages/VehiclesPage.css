@@ -1,0 +1,712 @@
+/* Импорт глобальных стилей для полей ввода */
+@import '../global-input-styles.css';
+
+/* Стили для страницы транспортных средств */
+.vehicles-page {
+  padding: 6rem 0 60px;
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Красивый статичный фон */
+.vehicles-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(230, 163, 74, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(230, 163, 74, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(0, 204, 102, 0.05) 0%, transparent 60%);
+  z-index: 0;
+}
+
+/* Дополнительный слой для глубины */
+.vehicles-page::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(90deg, rgba(230, 163, 74, 0.08) 0%, rgba(230, 163, 74, 0.04) 30%, transparent 70%);
+  z-index: 0;
+}
+
+.vehicles-page .container {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.vehicles-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.vehicles-header h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #e6a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.vehicles-header p {
+  font-size: 1.2rem;
+  color: #cccccc;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+.vehicles-controls {
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.search-section {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #cccccc;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border: 2px solid #333;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: #1a1a1a;
+  color: #ffffff;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #e6a34a;
+  box-shadow: 0 0 0 3px rgba(230, 163, 74, 0.2);
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.filter-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #e6a34a 0%, #d97706 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(230, 163, 74, 0.2);
+}
+
+.filter-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(230, 163, 74, 0.3);
+}
+
+.filters-panel {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+  overflow: hidden;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #333;
+}
+
+.filters-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.close-filters-btn {
+  background: none;
+  border: none;
+  color: #cccccc;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.close-filters-btn:hover {
+  background: #333;
+  color: #ffffff;
+}
+
+.filters-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+.filter-group select {
+  padding: 0.75rem;
+  border: 2px solid #333;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #1a1a1a;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #e6a34a;
+}
+
+.filter-group select::placeholder,
+.filter-group input::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.price-inputs input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #333;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.price-inputs input:focus {
+  outline: none;
+  border-color: #e6a34a;
+}
+
+.price-inputs input::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.price-inputs span {
+  color: #cccccc;
+  font-weight: 600;
+}
+
+.reset-filters-btn {
+  grid-column: 1 / -1;
+  padding: 1rem 2rem;
+  background: #333;
+  color: #ffffff;
+  border: 2px solid #444;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.reset-filters-btn:hover {
+  background: #444;
+  color: #ffffff;
+  border-color: #555;
+}
+
+/* Сетка и карточки используют стили из Catalog.css */
+
+.vehicle-placeholder {
+  font-size: 3.5rem;
+  color: #e6a34a;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  z-index: 2;
+  position: relative;
+}
+
+.vehicle-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #e6a34a 0%, #d97706 100%);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  z-index: 4;
+  box-shadow: 0 4px 12px rgba(230, 163, 74, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Все стили контента карточек теперь используются из Catalog.css */
+
+.no-vehicles {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #cccccc;
+}
+
+.no-vehicles svg {
+  font-size: 4rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.no-vehicles h3 {
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.no-vehicles p {
+  margin-bottom: 2rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pagination-btn {
+  padding: 0.75rem 1.5rem;
+  background: #1a1a1a;
+  color: #cccccc;
+  border: 2px solid #333;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #ffffff;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-numbers {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pagination-number {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  color: #cccccc;
+  border: 2px solid #333;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination-number:hover {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #ffffff;
+}
+
+.pagination-number.active {
+  background: linear-gradient(135deg, #e6a34a 0%, #d97706 100%);
+  color: white;
+  border-color: #e6a34a;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .vehicles-page {
+    padding: 100px 0 40px;
+  }
+  
+  .vehicles-page .container {
+    padding: 0 1rem;
+  }
+  
+  .vehicles-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .vehicles-header p {
+    font-size: 1rem;
+  }
+  
+  .search-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-input-wrapper {
+    min-width: auto;
+  }
+  
+  .filters-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .vehicles-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .vehicle-specs {
+    grid-template-columns: 1fr;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .pagination-numbers {
+    order: -1;
+  }
+  
+   .vehicle-placeholder {
+     font-size: 3rem;
+     color: #e6a34a;
+     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+   }
+   
+   .vehicle-badge {
+     top: 6px;
+     right: 6px;
+     padding: 0.25rem 0.5rem;
+     font-size: 0.55rem;
+     border-radius: 6px;
+   }
+}
+
+@media (max-width: 480px) {
+  .vehicles-page {
+    padding: 80px 0 30px;
+  }
+  
+  .vehicles-header {
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+  }
+  
+  .vehicles-header h1 {
+    font-size: 2rem;
+  }
+  
+  .vehicles-header p {
+    font-size: 0.9rem;
+  }
+  
+  .vehicle-content {
+    padding: 1rem;
+  }
+  
+  .vehicle-name {
+    font-size: 1.25rem;
+  }
+  
+     .vehicle-placeholder {
+    font-size: 2.4rem;
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 1px 2px rgba(230, 163, 74, 0.3);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+   
+   .vehicle-badge {
+     top: 5px;
+     right: 5px;
+     padding: 0.2rem 0.4rem;
+     font-size: 0.5rem;
+     border-radius: 5px;
+   }
+}
+
+/* Дополнительные стили для очень маленьких экранов */
+@media (max-width: 320px) {
+  .vehicles-page {
+    padding: 60px 0 20px;
+  }
+  
+  .vehicles-page .container {
+    padding: 0 0.5rem;
+  }
+  
+  .vehicles-header h1 {
+    font-size: 1.6rem;
+  }
+  
+  .vehicles-header p {
+    font-size: 0.8rem;
+  }
+  
+  .search-section {
+    margin-bottom: 1rem;
+  }
+  
+  .search-input {
+    padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .filter-toggle-btn {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  .filters-panel {
+    padding: 1rem;
+  }
+  
+  .filters-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .filter-group label {
+    font-size: 0.8rem;
+  }
+  
+  .filter-group select {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+  
+  .price-inputs input {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+  
+  .reset-filters-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .vehicle-placeholder {
+    font-size: 2.2rem;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  }
+  
+     .vehicle-badge {
+     top: 4px;
+     right: 4px;
+     padding: 0.15rem 0.3rem;
+     font-size: 0.45rem;
+     border-radius: 4px;
+   }
+   
+   .pagination {
+     margin-top: 1.5rem;
+   }
+   
+   .pagination-btn {
+     padding: 0.6rem 1.2rem;
+     font-size: 0.9rem;
+   }
+   
+   .pagination-number {
+     width: 2.5rem;
+     height: 2.5rem;
+     font-size: 0.9rem;
+   }
+}
+
+/* Дополнительные стили для экранов 400px */
+@media (max-width: 400px) {
+  .vehicles-page {
+    padding: 70px 0 25px;
+  }
+  
+  .vehicles-page .container {
+    padding: 0 0.8rem;
+  }
+  
+  .vehicles-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .vehicles-header p {
+    font-size: 0.85rem;
+  }
+  
+  .search-section {
+    margin-bottom: 1.2rem;
+  }
+  
+  .search-input {
+    padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+    font-size: 0.95rem;
+  }
+  
+  .filter-toggle-btn {
+    padding: 0.9rem 1.3rem;
+    font-size: 0.95rem;
+  }
+  
+  .filters-panel {
+    padding: 1.2rem;
+  }
+  
+  .filters-header h3 {
+    font-size: 1.15rem;
+  }
+  
+  .filter-group label {
+    font-size: 0.85rem;
+  }
+  
+  .filter-group select {
+    padding: 0.7rem;
+    font-size: 0.95rem;
+  }
+  
+  .price-inputs input {
+    padding: 0.7rem;
+    font-size: 0.95rem;
+  }
+  
+  .reset-filters-btn {
+    padding: 0.9rem 1.6rem;
+    font-size: 0.95rem;
+  }
+  
+  .vehicle-placeholder {
+    font-size: 1.8rem;
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.4),
+      0 1px 2px rgba(230, 163, 74, 0.3);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+  
+  .vehicle-badge {
+    top: 5px;
+    right: 5px;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.48rem;
+    border-radius: 5px;
+  }
+  
+  .pagination {
+    margin-top: 1.8rem;
+  }
+  
+  .pagination-btn {
+    padding: 0.7rem 1.3rem;
+    font-size: 0.95rem;
+  }
+  
+     .pagination-number {
+     width: 2.8rem;
+     height: 2.8rem;
+     font-size: 0.95rem;
+   }
+}
+
+/* АГРЕССИВНОЕ скрытие иконок корзины на мобильных устройствах */
+@media (max-width: 768px) {
+  .add-to-cart-btn svg,
+  .add-to-cart-btn i,
+  .add-to-cart-btn .fa-shopping-cart,
+  .add-to-cart-btn .FaShoppingCart,
+  .add-to-cart-btn [class*="shopping-cart"],
+  .add-to-cart-btn [class*="cart"],
+  .add-to-cart-btn [class*="Cart"],
+  .add-to-cart-btn [class*="shopping"],
+  .add-to-cart-btn [class*="react-icons"],
+  .add-to-cart-btn [data-testid="icon"],
+  .add-to-cart-btn [data-icon="shopping-cart"],
+  .add-to-cart-btn * {
+    display: none !important;
+  }
+  
+  /* Дополнительные правила для всех возможных иконок */
+  button[class*="cart"] svg,
+  button[class*="Cart"] svg,
+  button[class*="shopping"] svg,
+  button[class*="add-to"] svg,
+  button[class*="product"] svg,
+  button[class*="buy"] svg {
+    display: none !important;
+  }
+  
+  /* Скрываем все иконки в кнопках с текстом "В корзину" */
+  button:contains("В корзину") svg,
+  button:contains("В корзину") i,
+  button:contains("В корзину") * {
+    display: none !important;
+  }
+}
