@@ -12,6 +12,27 @@ dist
 dist-ssr
 *.local
 
+# Environment files
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads and backups
+server/uploads/*
+!server/uploads/.gitkeep
+server/backups/*
+!server/backups/.gitkeep
+
+# SSL certificates
+ssl/*
+!ssl/.gitkeep
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +43,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
