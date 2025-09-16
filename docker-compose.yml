@@ -1,22 +1,22 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database - отключен, используем внешнюю БД
-  # postgres:
-  #   image: postgres:15-alpine
-  #   container_name: ytorsweb_postgres
-  #   restart: unless-stopped
-  #   environment:
-  #     POSTGRES_DB: ytorsweb
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #     - ./server/postgres_schema.sql:/docker-entrypoint-initdb.d/init.sql
-  #   ports:
-  #     - "5433:5432"
-  #   networks:
-  #     - ytorsweb_network
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ytorsweb_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ytorsweb
+      POSTGRES_USER: ytors
+      POSTGRES_PASSWORD: Thereisnospoon31827
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/postgres_schema.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - ytorsweb_network
 
   # Redis для кэширования (опционально)
   redis:
@@ -35,24 +35,26 @@ services:
     build: .
     container_name: ytorsweb_app
     restart: unless-stopped
-    network_mode: "host"
     environment:
       NODE_ENV: production
       PORT: 3001
       DATABASE_TYPE: postgres
-      POSTGRES_HOST: localhost
+      POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: ytorsweb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
-      ADMIN_USERNAME: ${ADMIN_USERNAME}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      POSTGRES_USER: ytors
+      POSTGRES_PASSWORD: Thereisnospoon31827
+      JWT_SECRET: 9d1e1f947ac74f8a7f57f3897de43a1a3fc5086ad91662fc87bb048dec235b38114edb0f654468eb720012d4d071deb5e62d5cfa13661c533df14d92f1174e8d
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin31827
     depends_on:
+      - postgres
       - redis
     volumes:
       - ./server/uploads:/app/uploads
       - ./server/backups:/app/backups
+    networks:
+      - ytorsweb_network
 
   # Nginx reverse proxy
   nginx:
