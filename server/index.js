@@ -1567,16 +1567,7 @@ app.post('/api/admin/bot/test', requireAdmin, async (req, res) => {
   }
 });
 
-// Orders endpoint (public for now)
-app.get('/api/orders', async (req, res) => {
-  try {
-    const orders = await all('SELECT * FROM orders ORDER BY created_at DESC');
-    res.json(orders);
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    res.status(500).json({ error: 'Failed to fetch orders' });
-  }
-});
+// Удален дублирующийся endpoint /api/orders - используется только защищенный версия выше
 
 // Popular products API endpoints
 app.get('/api/admin/popular-products', requireAdmin, async (req, res) => {
