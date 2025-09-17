@@ -728,7 +728,7 @@ app.put('/api/promotions/:id', requireAdmin, async (req, res) => {
 app.delete('/api/promotions/:id', requireAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
-    await run( `DELETE FROM promotions WHERE id=?`, [id]);
+    await run( `DELETE FROM promotions WHERE id=$1?`, [id]);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -775,7 +775,7 @@ app.get('/api/orders', requireAdmin, async (req, res) => {
 
     const result = [];
     for (const o of orders) {
-      const customer = o.customer_id ? await get( `SELECT * FROM customers WHERE id = ?`, [o.customer_id]) : null;
+      const customer = o.customer_id ? await get( `SELECT * FROM customers WHERE id = $1?`, [o.customer_id]) : null;
       result.push({
         id: o.id,
         orderNumber: o.order_number,
