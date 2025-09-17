@@ -694,7 +694,7 @@ app.get('/api/promotions', async (req, res) => {
 app.post('/api/promotions', requireAdmin, async (req, res) => {
   try {
     const { title, description, discount, category, validUntil, active = true, featured = false, minPurchase } = req.body;
-    const catId = category ? (await get( `SELECT id FROM categories WHERE name = ?`, [category]))?.id : null;
+    const catId = category ? (await get( `SELECT id FROM categories WHERE name = $1`, [category]))?.id : null;
     const r = await run(
       db,
       `INSERT INTO promotions (title, description, discount, category_id, valid_until, active, featured, min_purchase)
@@ -712,7 +712,7 @@ app.put('/api/promotions/:id', requireAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { title, description, discount, category, validUntil, active, featured, minPurchase } = req.body;
-    const catId = category ? (await get( `SELECT id FROM categories WHERE name = ?`, [category]))?.id : null;
+    const catId = category ? (await get( `SELECT id FROM categories WHERE name = $1`, [category]))?.id : null;
     await run(
       db,
       `UPDATE promotions SET title=?, description=?, discount=?, category_id=?, valid_until=?, active=?, featured=?, min_purchase=? WHERE id=?`,
@@ -728,7 +728,7 @@ app.put('/api/promotions/:id', requireAdmin, async (req, res) => {
 app.delete('/api/promotions/:id', requireAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
-    await run( `DELETE FROM promotions WHERE id=$1?`, [id]);
+    await run( `DELETE FROM promotions WHERE id=?`, [id]);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -775,7 +775,7 @@ app.get('/api/orders', requireAdmin, async (req, res) => {
 
     const result = [];
     for (const o of orders) {
-      const customer = o.customer_id ? await get( `SELECT * FROM customers WHERE id = $1?`, [o.customer_id]) : null;
+      const customer = o.customer_id ? await get( `SELECT * FROM customers WHERE id = $1`, [o.customer_id]) : null;
       result.push({
         id: o.id,
         orderNumber: o.order_number,
@@ -804,7 +804,7 @@ app.post('/api/orders', async (req, res) => {
     if (orderForm) {
       const r = await run(
         db,
-        `INSERT INTO customers (name, phone, email, address) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO customers (name, phone, email, address) VALUES ($1, $2, $3, $4)`,
         [orderForm.name, orderForm.phone, orderForm.email ?? null, orderForm.address ?? null]
       );
       customerId = r.lastID;
@@ -813,7 +813,7 @@ app.post('/api/orders', async (req, res) => {
     const id = String(orderNumber);
     await run(
       db,
-      `INSERT INTO orders (id, order_number, customer_id, status, pricing_json) VALUES (?, ?, ?, 'new', ?)` ,
+      `INSERT INTO orders (id, order_number, customer_id, status, pricing_json) VALUES ($1, $2, $3, 'new', $4)` ,
       [id, String(orderNumber), customerId, JSON.stringify(priceCalculation)]
     );
 
@@ -821,7 +821,7 @@ app.post('/api/orders', async (req, res) => {
       for (const it of cartItems) {
         await run(
           db,
-          `INSERT INTO order_items (order_id, product_id, title, price, quantity) VALUES (?, ?, ?, ?, ?)`,
+          `INSERT INTO order_items (order_id, product_id, title, price, quantity) VALUES ($1, $2, $3, $4, $5)`,
           [id, it.id ?? null, it.title, it.price, it.quantity]
         );
       }
@@ -852,7 +852,7 @@ app.post('/api/orders/:id/notes', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { text, type = 'note' } = req.body;
-    const r = await run( `INSERT INTO order_notes (order_id, text, type) VALUES (?, ?, ?)`, [id, text, type]);
+    const r = await run( `INSERT INTO order_notes (order_id, text, type) VALUES ($1, $2, $3)`, [id, text, type]);
     res.status(201).json({ id: r.lastID });
   } catch (err) {
     console.error(err);
@@ -867,7 +867,7 @@ app.delete('/api/orders/:id', requireAdmin, async (req, res) => {
     // Удаляем связанные записи явно, чтобы не зависеть от PRAGMA foreign_keys
     await run( `DELETE FROM order_items WHERE order_id = ?`, [id]);
     await run( `DELETE FROM order_notes WHERE order_id = ?`, [id]);
-    await run( `DELETE FROM orders WHERE id = ?`, [id]);
+    await run( `DELETE FROM orders WHERE id = $1`, [id]);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -1328,7 +1328,7 @@ app.post('/api/content', requireAdmin, async (req, res) => {
     
     await run(
       db,
-      `INSERT INTO site_content (content_key, content_data, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)`,
+      `INSERT INTO site_content (content_key, content_data, updated_at) VALUES ($1, $2, CURRENT_TIMESTAMP)`,
       [key, contentData]
     );
     
@@ -1403,7 +1403,7 @@ app.post('/api/promocodes', requireAdmin, async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [code, description, discount_type || 'percentage', discount_value, min_purchase || 0, max_uses, valid_from, valid_until, active !== undefined ? active : 1]);
     
-    const newPromocode = await get( `SELECT * FROM promocodes WHERE id = ?`, [result.lastID]);
+    const newPromocode = await get( `SELECT * FROM promocodes WHERE id = $1`, [result.lastID]);
     res.status(201).json(newPromocode);
   } catch (err) {
     console.error(err);
@@ -1419,14 +1419,14 @@ app.put('/api/promocodes/:id', requireAdmin, async (req, res) => {
     const result = await run( `
       UPDATE promocodes 
       SET code = ?, description = ?, discount_type = ?, discount_value = ?, min_purchase = ?, max_uses = ?, valid_from = ?, valid_until = ?, active = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
+      WHERE id = $1
     `, [code, description, discount_type, discount_value, min_purchase, max_uses, valid_from, valid_until, active, id]);
     
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Promocode not found' });
     }
     
-    const updatedPromocode = await get( `SELECT * FROM promocodes WHERE id = ?`, [id]);
+    const updatedPromocode = await get( `SELECT * FROM promocodes WHERE id = $1`, [id]);
     res.json(updatedPromocode);
   } catch (err) {
     console.error(err);
@@ -1437,7 +1437,7 @@ app.put('/api/promocodes/:id', requireAdmin, async (req, res) => {
 app.delete('/api/promocodes/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await run( `DELETE FROM promocodes WHERE id = ?`, [id]);
+    const result = await run( `DELETE FROM promocodes WHERE id = $1`, [id]);
     
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Promocode not found' });
@@ -1453,13 +1453,13 @@ app.delete('/api/promocodes/:id', requireAdmin, async (req, res) => {
 app.post('/api/promocodes/:id/toggle', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await run( `UPDATE promocodes SET active = NOT active, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, [id]);
+    const result = await run( `UPDATE promocodes SET active = NOT active, updated_at = CURRENT_TIMESTAMP WHERE id = $1`, [id]);
     
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Promocode not found' });
     }
     
-    const updatedPromocode = await get( `SELECT * FROM promocodes WHERE id = ?`, [id]);
+    const updatedPromocode = await get( `SELECT * FROM promocodes WHERE id = $1`, [id]);
     res.json(updatedPromocode);
   } catch (err) {
     console.error(err);
@@ -1505,14 +1505,14 @@ app.post('/api/admin/bot', requireAdmin, async (req, res) => {
       // Обновляем существующие настройки, сохраняя текущий chat_id
       await run(
         db,
-        `UPDATE bot_settings SET bot_token = ?, enabled = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        `UPDATE bot_settings SET bot_token = ?, enabled = ?, updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
         [bot_token, enabled ? 1 : 0, existing.id]
       );
     } else {
       // Создаем новые настройки с пустым chat_id
       await run(
         db,
-        `INSERT INTO bot_settings (bot_token, chat_id, enabled) VALUES (?, ?, ?)`,
+        `INSERT INTO bot_settings (bot_token, chat_id, enabled) VALUES ($1, $2, $3)`,
         [bot_token, '', enabled ? 1 : 0]
       );
     }
