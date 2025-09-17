@@ -18,7 +18,7 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const JWT_SECRET = process.env.JWT_SECRET || '9d1e1f947ac74f8a7f57f3897de43a1a3fc5086ad91662fc87bb048dec235b38114edb0f654468eb720012d4d071deb5e62d5cfa13661c533df14d92f1174e8d';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 app.set('trust proxy', 1);
 
@@ -600,7 +600,7 @@ app.post('/api/products', requireAdmin, async (req, res) => {
     const r = await run(
       db,
       `INSERT INTO products (title, price, category_id, subcategory_id, brand_id, available, quantity, description, specifications_json, features_json)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [title, price, categoryId, subcategoryId, brandId, available ? 1 : 0, quantity, description, specJson, featJson]
     );
 
@@ -633,7 +633,7 @@ app.put('/api/products/:id', requireAdmin, async (req, res) => {
 
     await run(
       db,
-      `UPDATE products SET title=?, price=?, category_id=?, subcategory_id=?, brand_id=?, available=?, quantity=?, description=?, specifications_json=?, features_json=?, updated_at = CURRENT_TIMESTAMP WHERE id=?`,
+      `UPDATE products SET title=$1, price=$2, category_id=$3, subcategory_id=$4, brand_id=$5, available=$6, quantity=$7, description=$8, specifications_json=$9, features_json=$10, updated_at = CURRENT_TIMESTAMP WHERE id=$11`,
       [title, price, categoryId, subcategoryId, brandId, available ? 1 : 0, quantity, description, specJson, featJson, id]
     );
 
@@ -698,7 +698,7 @@ app.post('/api/promotions', requireAdmin, async (req, res) => {
     const r = await run(
       db,
       `INSERT INTO promotions (title, description, discount, category_id, valid_until, active, featured, min_purchase)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [title, description ?? null, discount, catId ?? null, validUntil ?? null, active ? 1 : 0, featured ? 1 : 0, minPurchase ?? null]
     );
     res.status(201).json({ id: r.lastID });
@@ -715,7 +715,7 @@ app.put('/api/promotions/:id', requireAdmin, async (req, res) => {
     const catId = category ? (await get( `SELECT id FROM categories WHERE name = $1`, [category]))?.id : null;
     await run(
       db,
-      `UPDATE promotions SET title=?, description=?, discount=?, category_id=?, valid_until=?, active=?, featured=?, min_purchase=? WHERE id=?`,
+      `UPDATE promotions SET title=$1, description=$2, discount=$3, category_id=$4, valid_until=$5, active=$6, featured=$7, min_purchase=$8 WHERE id=$9`,
       [title, description ?? null, discount, catId ?? null, validUntil ?? null, active ? 1 : 0, featured ? 1 : 0, minPurchase ?? null, id]
     );
     res.json({ ok: true });
@@ -728,7 +728,7 @@ app.put('/api/promotions/:id', requireAdmin, async (req, res) => {
 app.delete('/api/promotions/:id', requireAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
-    await run( `DELETE FROM promotions WHERE id=?`, [id]);
+    await run( `DELETE FROM promotions WHERE id=$1`, [id]);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -839,7 +839,7 @@ app.patch('/api/orders/:id/status', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    await run( `UPDATE orders SET status=?, updated_at = CURRENT_TIMESTAMP WHERE id=?`, [status, id]);
+    await run( `UPDATE orders SET status=$1, updated_at = CURRENT_TIMESTAMP WHERE id=$2`, [status, id]);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -865,8 +865,8 @@ app.delete('/api/orders/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     // Удаляем связанные записи явно, чтобы не зависеть от PRAGMA foreign_keys
-    await run( `DELETE FROM order_items WHERE order_id = ?`, [id]);
-    await run( `DELETE FROM order_notes WHERE order_id = ?`, [id]);
+    await run( `DELETE FROM order_items WHERE order_id = $1`, [id]);
+    await run( `DELETE FROM order_notes WHERE order_id = $1`, [id]);
     await run( `DELETE FROM orders WHERE id = $1`, [id]);
     res.json({ ok: true });
   } catch (err) {
@@ -910,7 +910,7 @@ app.post('/api/_admin/normalize/products', requireAdmin, async (req, res) => {
       const r = await run(
         db,
         `INSERT INTO products_tmp (title, price, category_id, subcategory_id, brand_id, available, quantity, description, specifications_json, features_json, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
         [
           p.title,
           p.price,
@@ -934,7 +934,7 @@ app.post('/api/_admin/normalize/products', requireAdmin, async (req, res) => {
     for (const img of imgs) {
       const newId = idMap.get(img.product_id);
       if (newId) {
-        await run( `UPDATE product_images SET product_id=? WHERE id=?`, [newId, img.id]);
+        await run( `UPDATE product_images SET product_id=$1 WHERE id=$2`, [newId, img.id]);
       }
     }
 
@@ -943,7 +943,7 @@ app.post('/api/_admin/normalize/products', requireAdmin, async (req, res) => {
     for (const it of orderItems) {
       const newId = idMap.get(it.product_id);
       if (newId) {
-        await run( `UPDATE order_items SET product_id=? WHERE id=?`, [newId, it.id]);
+        await run( `UPDATE order_items SET product_id=$1 WHERE id=$2`, [newId, it.id]);
       }
     }
 
@@ -1007,7 +1007,7 @@ app.post('/api/admin/advertising', requireAdmin, async (req, res) => {
         
         await run(
           db,
-          `UPDATE advertising_settings SET enabled = ?, settings_json = ?, updated_at = CURRENT_TIMESTAMP WHERE platform = ?`,
+          `UPDATE advertising_settings SET enabled = $1, settings_json = $2, updated_at = CURRENT_TIMESTAMP WHERE platform = $3`,
           [enabled ? 1 : 0, settingsJson, platform.name]
         );
       }
@@ -1230,7 +1230,7 @@ app.post('/api/vehicles', requireAdmin, async (req, res) => {
     const r = await run(
       db,
       `INSERT INTO vehicles (name, type, terrain, price, image, description, specs_json, available, quantity)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity]
     );
     
@@ -1250,7 +1250,7 @@ app.put('/api/vehicles/:id', requireAdmin, async (req, res) => {
     
     await run(
       db,
-      `UPDATE vehicles SET name=?, type=?, terrain=?, price=?, image=?, description=?, specs_json=?, available=?, quantity=?, updated_at = CURRENT_TIMESTAMP WHERE id=?`,
+      `UPDATE vehicles SET name=$1, type=$2, terrain=$3, price=$4, image=$5, description=$6, specs_json=$7, available=$8, quantity=$9, updated_at = CURRENT_TIMESTAMP WHERE id=$10`,
       [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity, id]
     );
     
@@ -1264,7 +1264,7 @@ app.put('/api/vehicles/:id', requireAdmin, async (req, res) => {
 app.delete('/api/vehicles/:id', requireAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
-    await run( `DELETE FROM vehicles WHERE id=?`, [id]);
+    await run( `DELETE FROM vehicles WHERE id=$1`, [id]);
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -1297,7 +1297,7 @@ app.get('/api/content', async (req, res) => {
 app.get('/api/content/:key', async (req, res) => {
   try {
     const { key } = req.params;
-    const row = await get( `SELECT content_data FROM site_content WHERE content_key = ?`, [key]);
+    const row = await get( `SELECT content_data FROM site_content WHERE content_key = $1`, [key]);
     
     if (!row) {
       return res.status(404).json({ error: 'Content not found' });
@@ -1352,7 +1352,7 @@ app.put('/api/content/:key', requireAdmin, async (req, res) => {
     
     const result = await run(
       db,
-      `UPDATE site_content SET content_data = ?, updated_at = CURRENT_TIMESTAMP WHERE content_key = ?`,
+      `UPDATE site_content SET content_data = $1, updated_at = CURRENT_TIMESTAMP WHERE content_key = $2`,
       [contentData, key]
     );
     
@@ -1370,7 +1370,7 @@ app.put('/api/content/:key', requireAdmin, async (req, res) => {
 app.delete('/api/content/:key', requireAdmin, async (req, res) => {
   try {
     const { key } = req.params;
-    const result = await run( `DELETE FROM site_content WHERE content_key = ?`, [key]);
+    const result = await run( `DELETE FROM site_content WHERE content_key = $1`, [key]);
     
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Content not found' });
@@ -1400,7 +1400,7 @@ app.post('/api/promocodes', requireAdmin, async (req, res) => {
     
     const result = await run( `
       INSERT INTO promocodes (code, description, discount_type, discount_value, min_purchase, max_uses, valid_from, valid_until, active)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `, [code, description, discount_type || 'percentage', discount_value, min_purchase || 0, max_uses, valid_from, valid_until, active !== undefined ? active : 1]);
     
     const newPromocode = await get( `SELECT * FROM promocodes WHERE id = $1`, [result.lastID]);
@@ -1613,7 +1613,7 @@ app.post('/api/admin/popular-products', requireAdmin, async (req, res) => {
       const productId = productIds[i];
       await run( `
         INSERT INTO popular_products (product_id, sort_order) 
-        VALUES (?, ?)
+        VALUES ($1, $2)
       `, [productId, i]);
     }
     
