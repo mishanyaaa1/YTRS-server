@@ -102,25 +102,7 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-// --- Auth helpers ---
-async function ensureAdminTableAndDefaultUser() {
-  await run(
-    `CREATE TABLE IF NOT EXISTS admins (
-      id SERIAL PRIMARY KEY,
-      username VARCHAR(255) NOT NULL UNIQUE,
-      password_hash VARCHAR(255) NOT NULL,
-      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )`
-  );
-  const row = await get(`SELECT COUNT(1) as cnt FROM admins`);
-  if (!row || !row.cnt) {
-    const username = process.env.ADMIN_USERNAME || 'admin';
-    const password = process.env.ADMIN_PASSWORD || 'admin123';
-    const hash = await bcrypt.hash(password, 12);
-    await run(`INSERT INTO admins (username, password_hash) VALUES ($1, $2)`, [username, hash]);
-    console.log('Created default admin user:', username);
-  }
-}
+// --- Auth helpers удалены - авторизация отключена ---
 
 // Создаем таблицу для настроек бота
 async function ensureBotSettingsTable() {
@@ -147,36 +129,7 @@ async function ensureBotSettingsTable() {
   }
 }
 
-function signAdminToken(payload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '12h' });
-}
-
-function parseAdminFromCookie(req, res, next) {
-  // Проверяем токен из cookie
-  let token = req.cookies && req.cookies.admin_token;
-  
-  // Если токена в cookie нет, проверяем заголовок Authorization
-  if (!token && req.headers.authorization) {
-    const authHeader = req.headers.authorization;
-    if (authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7);
-    }
-  }
-  
-  if (!token) return next();
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.admin = { id: decoded.id, username: decoded.username };
-  } catch (_) {
-    // ignore invalid/expired token
-  }
-  next();
-}
-
-function requireAdmin(req, res, next) {
-  if (!req.admin) return res.status(401).json({ error: 'Unauthorized' });
-  next();
-}
+// Авторизация удалена - прямой доступ к админке
 
 function verifySameOrigin(req, res, next) {
   // Разрешаем системные и auth-эндпоинты без проверки
@@ -195,57 +148,15 @@ function verifySameOrigin(req, res, next) {
   next();
 }
 
-app.use(parseAdminFromCookie);
 app.use(verifySameOrigin);
-
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
 // Healthcheck
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
-// --- Auth routes ---
-app.post('/api/admin/login', loginLimiter, async (req, res) => {
-  try {
-    const { username, password } = req.body || {};
-    if (!username || !password) return res.status(400).json({ error: 'Missing credentials' });
-    const admin = await get( `SELECT id, username, password_hash FROM admins WHERE username=$1`, [username]);
-    if (!admin) return res.status(401).json({ error: 'Неверный логин или пароль' });
-    const ok = await bcrypt.compare(password, admin.password_hash);
-    if (!ok) return res.status(401).json({ error: 'Неверный логин или пароль' });
-
-    const token = signAdminToken({ id: admin.id, username: admin.username });
-    res.cookie('admin_token', token, {
-      httpOnly: true,
-      secure: NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 12 * 60 * 60 * 1000,
-    });
-    res.json({ ok: true, token: token });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Login failed' });
-  }
-});
-
-app.post('/api/admin/logout', requireAdmin, (req, res) => {
-  res.clearCookie('admin_token', { path: '/' });
-  res.json({ ok: true });
-});
-
-app.get('/api/admin/me', requireAdmin, (req, res) => {
-  res.json({ id: req.admin.id, username: req.admin.username });
-});
-
 // Backup DB (download) - DISABLED for PostgreSQL
-// app.get('/api/_debug/backup', requireAdmin, (req, res) => {
+// app.get('/api/_debug/backup' (req, res) => {
 //   try {
 //     const dbPath = require('./db').DB_FILE;
 //     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -257,7 +168,7 @@ app.get('/api/admin/me', requireAdmin, (req, res) => {
 //   }
 // });
 
-app.get('/api/_debug/download', requireAdmin, (req, res) => {
+app.get('/api/_debug/download', (req, res) => {
   const file = req.query.f;
   if (!file) return res.status(400).send('Missing f');
   const full = path.join(backupsDir, file);
@@ -266,7 +177,7 @@ app.get('/api/_debug/download', requireAdmin, (req, res) => {
 });
 
 // Upload image (admin only)
-app.post('/api/upload/image', requireAdmin, upload.single('image'), (req, res) => {
+app.post('/api/upload/image', upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file' });
   
   try {
@@ -305,7 +216,7 @@ app.get('/api/brands', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch brands' });
   }
 });
-app.post('/api/brands', requireAdmin, async (req, res) => {
+app.post('/api/brands', async (req, res) => {
   try {
     const { name } = req.body;
     await ensureBrandByName(name);
@@ -315,7 +226,7 @@ app.post('/api/brands', requireAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to create brand' });
   }
 });
-app.delete('/api/brands/:name', requireAdmin, async (req, res) => {
+app.delete('/api/brands/:name', async (req, res) => {
   try {
     const { name } = req.params;
     await run( `DELETE FROM brands WHERE name=$1`, [name]);
@@ -348,7 +259,7 @@ app.get('/api/categories', async (req, res) => {
   }
 });
 // Categories CRUD by name
-app.post('/api/categories', requireAdmin, async (req, res) => {
+app.post('/api/categories', async (req, res) => {
   try {
     const { name, subcategories = [] } = req.body;
     const catId = await ensureCategoryByName(name);
@@ -361,7 +272,7 @@ app.post('/api/categories', requireAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to create category' });
   }
 });
-app.put('/api/categories/:name', requireAdmin, async (req, res) => {
+app.put('/api/categories/:name', async (req, res) => {
   try {
     const oldName = req.params.name;
     const { newName } = req.body;
@@ -372,7 +283,7 @@ app.put('/api/categories/:name', requireAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to rename category' });
   }
 });
-app.delete('/api/categories/:name', requireAdmin, async (req, res) => {
+app.delete('/api/categories/:name', async (req, res) => {
   try {
     const name = req.params.name;
     await run( `DELETE FROM categories WHERE name=$1`, [name]);
@@ -382,7 +293,7 @@ app.delete('/api/categories/:name', requireAdmin, async (req, res) => {
     res.status(500).json({ error: 'Failed to delete category' });
   }
 });
-app.put('/api/categories/:name/subcategories', requireAdmin, async (req, res) => {
+app.put('/api/categories/:name/subcategories', async (req, res) => {
   try {
     const name = req.params.name;
     const { subcategories = [] } = req.body;
@@ -410,7 +321,7 @@ app.get('/api/terrain-types', async (req, res) => {
   }
 });
 
-app.post('/api/terrain-types', requireAdmin, async (req, res) => {
+app.post('/api/terrain-types', async (req, res) => {
   try {
     const { name } = req.body;
     if (!name || !name.trim()) {
@@ -430,7 +341,7 @@ app.post('/api/terrain-types', requireAdmin, async (req, res) => {
   }
 });
 
-app.delete('/api/terrain-types/:name', requireAdmin, async (req, res) => {
+app.delete('/api/terrain-types/:name', async (req, res) => {
   try {
     const name = req.params.name;
     const result = await run( `DELETE FROM terrain_types WHERE name = $1`, [name]);
@@ -457,7 +368,7 @@ app.get('/api/vehicle-types', async (req, res) => {
   }
 });
 
-app.post('/api/vehicle-types', requireAdmin, async (req, res) => {
+app.post('/api/vehicle-types', async (req, res) => {
   try {
     const { name } = req.body;
     if (!name || !name.trim()) {
@@ -477,7 +388,7 @@ app.post('/api/vehicle-types', requireAdmin, async (req, res) => {
   }
 });
 
-app.delete('/api/vehicle-types/:name', requireAdmin, async (req, res) => {
+app.delete('/api/vehicle-types/:name', async (req, res) => {
   try {
     const name = req.params.name;
     const result = await run( `DELETE FROM vehicle_types WHERE name = $1`, [name]);
@@ -586,7 +497,7 @@ async function ensureBrandByName(name) {
 }
 
 // Create product
-app.post('/api/products', requireAdmin, async (req, res) => {
+app.post('/api/products', async (req, res) => {
   try {
     const { title, price, category, subcategory, brand, available = true, quantity = 0, description = null, specifications, features, images } = req.body;
 
@@ -598,7 +509,6 @@ app.post('/api/products', requireAdmin, async (req, res) => {
     const featJson = features ? JSON.stringify(features) : null;
 
     const r = await run(
-      db,
       `INSERT INTO products (title, price, category_id, subcategory_id, brand_id, available, quantity, description, specifications_json, features_json)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [title, price, categoryId, subcategoryId, brandId, available ? 1 : 0, quantity, description, specJson, featJson]
@@ -619,7 +529,7 @@ app.post('/api/products', requireAdmin, async (req, res) => {
 });
 
 // Update product
-app.put('/api/products/:id', requireAdmin, async (req, res) => {
+app.put('/api/products/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { title, price, category, subcategory, brand, available = true, quantity = 0, description = null, specifications, features, images } = req.body;
@@ -632,7 +542,6 @@ app.put('/api/products/:id', requireAdmin, async (req, res) => {
     const featJson = features ? JSON.stringify(features) : null;
 
     await run(
-      db,
       `UPDATE products SET title=$1, price=$2, category_id=$3, subcategory_id=$4, brand_id=$5, available=$6, quantity=$7, description=$8, specifications_json=$9, features_json=$10, updated_at = CURRENT_TIMESTAMP WHERE id=$11`,
       [title, price, categoryId, subcategoryId, brandId, available ? 1 : 0, quantity, description, specJson, featJson, id]
     );
@@ -653,7 +562,7 @@ app.put('/api/products/:id', requireAdmin, async (req, res) => {
 });
 
 // Delete product
-app.delete('/api/products/:id', requireAdmin, async (req, res) => {
+app.delete('/api/products/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     await run( `DELETE FROM products WHERE id=$1`, [id]);
@@ -691,12 +600,11 @@ app.get('/api/promotions', async (req, res) => {
 });
 
 // Promotions CRUD (минимум)
-app.post('/api/promotions', requireAdmin, async (req, res) => {
+app.post('/api/promotions', async (req, res) => {
   try {
     const { title, description, discount, category, validUntil, active = true, featured = false, minPurchase } = req.body;
     const catId = category ? (await get( `SELECT id FROM categories WHERE name = $1`, [category]))?.id : null;
     const r = await run(
-      db,
       `INSERT INTO promotions (title, description, discount, category_id, valid_until, active, featured, min_purchase)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [title, description ?? null, discount, catId ?? null, validUntil ?? null, active ? 1 : 0, featured ? 1 : 0, minPurchase ?? null]
@@ -708,13 +616,12 @@ app.post('/api/promotions', requireAdmin, async (req, res) => {
   }
 });
 
-app.put('/api/promotions/:id', requireAdmin, async (req, res) => {
+app.put('/api/promotions/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { title, description, discount, category, validUntil, active, featured, minPurchase } = req.body;
     const catId = category ? (await get( `SELECT id FROM categories WHERE name = $1`, [category]))?.id : null;
     await run(
-      db,
       `UPDATE promotions SET title=$1, description=$2, discount=$3, category_id=$4, valid_until=$5, active=$6, featured=$7, min_purchase=$8 WHERE id=$9`,
       [title, description ?? null, discount, catId ?? null, validUntil ?? null, active ? 1 : 0, featured ? 1 : 0, minPurchase ?? null, id]
     );
@@ -725,7 +632,7 @@ app.put('/api/promotions/:id', requireAdmin, async (req, res) => {
   }
 });
 
-app.delete('/api/promotions/:id', requireAdmin, async (req, res) => {
+app.delete('/api/promotions/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     await run( `DELETE FROM promotions WHERE id=$1`, [id]);
@@ -737,7 +644,7 @@ app.delete('/api/promotions/:id', requireAdmin, async (req, res) => {
 });
 
 // Orders
-app.get('/api/orders', requireAdmin, async (req, res) => {
+app.get('/api/orders', async (req, res) => {
   try {
     const orders = await all(`SELECT * FROM orders ORDER BY created_at DESC`);
     const orderIds = orders.map(o => o.id);
@@ -803,7 +710,6 @@ app.post('/api/orders', async (req, res) => {
     let customerId = null;
     if (orderForm) {
       const r = await run(
-        db,
         `INSERT INTO customers (name, phone, email, address) VALUES ($1, $2, $3, $4)`,
         [orderForm.name, orderForm.phone, orderForm.email ?? null, orderForm.address ?? null]
       );
@@ -812,7 +718,6 @@ app.post('/api/orders', async (req, res) => {
 
     const id = String(orderNumber);
     await run(
-      db,
       `INSERT INTO orders (id, order_number, customer_id, status, pricing_json) VALUES ($1, $2, $3, 'new', $4)` ,
       [id, String(orderNumber), customerId, JSON.stringify(priceCalculation)]
     );
@@ -820,7 +725,6 @@ app.post('/api/orders', async (req, res) => {
     if (Array.isArray(cartItems)) {
       for (const it of cartItems) {
         await run(
-          db,
           `INSERT INTO order_items (order_id, product_id, title, price, quantity) VALUES ($1, $2, $3, $4, $5)`,
           [id, it.id ?? null, it.title, it.price, it.quantity]
         );
@@ -835,7 +739,7 @@ app.post('/api/orders', async (req, res) => {
 });
 
 // Orders: update status
-app.patch('/api/orders/:id/status', requireAdmin, async (req, res) => {
+app.patch('/api/orders/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -848,7 +752,7 @@ app.patch('/api/orders/:id/status', requireAdmin, async (req, res) => {
 });
 
 // Orders: add note
-app.post('/api/orders/:id/notes', requireAdmin, async (req, res) => {
+app.post('/api/orders/:id/notes', async (req, res) => {
   try {
     const { id } = req.params;
     const { text, type = 'note' } = req.body;
@@ -861,7 +765,7 @@ app.post('/api/orders/:id/notes', requireAdmin, async (req, res) => {
 });
 
 // Orders: hard delete (used for cancelled orders cleanup)
-app.delete('/api/orders/:id', requireAdmin, async (req, res) => {
+app.delete('/api/orders/:id', async (req, res) => {
   try {
     const { id } = req.params;
     // Удаляем связанные записи явно, чтобы не зависеть от PRAGMA foreign_keys
@@ -876,14 +780,13 @@ app.delete('/api/orders/:id', requireAdmin, async (req, res) => {
 });
 
 // Admin: normalize product IDs to be sequential starting from 1
-app.post('/api/_admin/normalize/products', requireAdmin, async (req, res) => {
+app.post('/api/_admin/normalize/products', async (req, res) => {
   try {
     await run( 'PRAGMA foreign_keys = OFF');
     await run( 'BEGIN TRANSACTION');
 
     // Create temp table with same schema as products
     await run(
-      db,
       `CREATE TABLE IF NOT EXISTS products_tmp (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
@@ -908,7 +811,6 @@ app.post('/api/_admin/normalize/products', requireAdmin, async (req, res) => {
     const idMap = new Map();
     for (const p of products) {
       const r = await run(
-        db,
         `INSERT INTO products_tmp (title, price, category_id, subcategory_id, brand_id, available, quantity, description, specifications_json, features_json, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
         [
@@ -963,7 +865,7 @@ app.post('/api/_admin/normalize/products', requireAdmin, async (req, res) => {
 });
 
 // Advertising API endpoints
-app.get('/api/admin/advertising', requireAdmin, async (req, res) => {
+app.get('/api/admin/advertising', async (req, res) => {
   try {
     const rows = await all(`SELECT platform, enabled, settings_json FROM advertising_settings ORDER BY platform ASC`);
     const result = {};
@@ -987,7 +889,7 @@ app.get('/api/admin/advertising', requireAdmin, async (req, res) => {
   }
 });
 
-app.post('/api/admin/advertising', requireAdmin, async (req, res) => {
+app.post('/api/admin/advertising', async (req, res) => {
   try {
     const { yandexDirect, googleAds, facebookPixel, vkPixel, telegramPixel, customScripts } = req.body;
     
@@ -1006,7 +908,6 @@ app.post('/api/admin/advertising', requireAdmin, async (req, res) => {
         const settingsJson = JSON.stringify(settings);
         
         await run(
-          db,
           `UPDATE advertising_settings SET enabled = $1, settings_json = $2, updated_at = CURRENT_TIMESTAMP WHERE platform = $3`,
           [enabled ? 1 : 0, settingsJson, platform.name]
         );
@@ -1021,7 +922,7 @@ app.post('/api/admin/advertising', requireAdmin, async (req, res) => {
 });
 
 // Debug endpoint to check database content
-app.get('/api/admin/debug/db', requireAdmin, async (req, res) => {
+app.get('/api/admin/debug/db', async (req, res) => {
   try {
     console.log('🔍 Проверяем содержимое базы данных...');
     
@@ -1221,14 +1122,13 @@ app.get('/api/vehicles', async (req, res) => {
   }
 });
 
-app.post('/api/vehicles', requireAdmin, async (req, res) => {
+app.post('/api/vehicles', async (req, res) => {
   try {
     const { name, type, terrain, price, image, description, specs, available = true, quantity = 0 } = req.body;
     
     const specsJson = specs ? JSON.stringify(specs) : null;
     
     const r = await run(
-      db,
       `INSERT INTO vehicles (name, type, terrain, price, image, description, specs_json, available, quantity)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity]
@@ -1241,7 +1141,7 @@ app.post('/api/vehicles', requireAdmin, async (req, res) => {
   }
 });
 
-app.put('/api/vehicles/:id', requireAdmin, async (req, res) => {
+app.put('/api/vehicles/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { name, type, terrain, price, image, description, specs, available = true, quantity = 0 } = req.body;
@@ -1249,7 +1149,6 @@ app.put('/api/vehicles/:id', requireAdmin, async (req, res) => {
     const specsJson = specs ? JSON.stringify(specs) : null;
     
     await run(
-      db,
       `UPDATE vehicles SET name=$1, type=$2, terrain=$3, price=$4, image=$5, description=$6, specs_json=$7, available=$8, quantity=$9, updated_at = CURRENT_TIMESTAMP WHERE id=$10`,
       [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity, id]
     );
@@ -1261,7 +1160,7 @@ app.put('/api/vehicles/:id', requireAdmin, async (req, res) => {
   }
 });
 
-app.delete('/api/vehicles/:id', requireAdmin, async (req, res) => {
+app.delete('/api/vehicles/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
     await run( `DELETE FROM vehicles WHERE id=$1`, [id]);
@@ -1316,7 +1215,7 @@ app.get('/api/content/:key', async (req, res) => {
   }
 });
 
-app.post('/api/content', requireAdmin, async (req, res) => {
+app.post('/api/content', async (req, res) => {
   try {
     const { key, data } = req.body;
     
@@ -1327,7 +1226,6 @@ app.post('/api/content', requireAdmin, async (req, res) => {
     const contentData = JSON.stringify(data);
     
     await run(
-      db,
       `INSERT INTO site_content (content_key, content_data, updated_at) VALUES ($1, $2, CURRENT_TIMESTAMP)`,
       [key, contentData]
     );
@@ -1339,7 +1237,7 @@ app.post('/api/content', requireAdmin, async (req, res) => {
   }
 });
 
-app.put('/api/content/:key', requireAdmin, async (req, res) => {
+app.put('/api/content/:key', async (req, res) => {
   try {
     const { key } = req.params;
     const { data } = req.body;
@@ -1351,7 +1249,6 @@ app.put('/api/content/:key', requireAdmin, async (req, res) => {
     const contentData = JSON.stringify(data);
     
     const result = await run(
-      db,
       `UPDATE site_content SET content_data = $1, updated_at = CURRENT_TIMESTAMP WHERE content_key = $2`,
       [contentData, key]
     );
@@ -1367,7 +1264,7 @@ app.put('/api/content/:key', requireAdmin, async (req, res) => {
   }
 });
 
-app.delete('/api/content/:key', requireAdmin, async (req, res) => {
+app.delete('/api/content/:key', async (req, res) => {
   try {
     const { key } = req.params;
     const result = await run( `DELETE FROM site_content WHERE content_key = $1`, [key]);
@@ -1394,7 +1291,7 @@ app.get('/api/promocodes', async (req, res) => {
   }
 });
 
-app.post('/api/promocodes', requireAdmin, async (req, res) => {
+app.post('/api/promocodes', async (req, res) => {
   try {
     const { code, description, discount_type, discount_value, min_purchase, max_uses, valid_from, valid_until, active } = req.body;
     
@@ -1411,15 +1308,15 @@ app.post('/api/promocodes', requireAdmin, async (req, res) => {
   }
 });
 
-app.put('/api/promocodes/:id', requireAdmin, async (req, res) => {
+app.put('/api/promocodes/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { code, description, discount_type, discount_value, min_purchase, max_uses, valid_from, valid_until, active } = req.body;
     
     const result = await run( `
       UPDATE promocodes 
-      SET code = ?, description = ?, discount_type = ?, discount_value = ?, min_purchase = ?, max_uses = ?, valid_from = ?, valid_until = ?, active = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $1
+      SET code = $1, description = $2, discount_type = $3, discount_value = $4, min_purchase = $5, max_uses = $6, valid_from = $7, valid_until = $8, active = $9, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $10
     `, [code, description, discount_type, discount_value, min_purchase, max_uses, valid_from, valid_until, active, id]);
     
     if (result.changes === 0) {
@@ -1434,7 +1331,7 @@ app.put('/api/promocodes/:id', requireAdmin, async (req, res) => {
   }
 });
 
-app.delete('/api/promocodes/:id', requireAdmin, async (req, res) => {
+app.delete('/api/promocodes/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await run( `DELETE FROM promocodes WHERE id = $1`, [id]);
@@ -1450,7 +1347,7 @@ app.delete('/api/promocodes/:id', requireAdmin, async (req, res) => {
   }
 });
 
-app.post('/api/promocodes/:id/toggle', requireAdmin, async (req, res) => {
+app.post('/api/promocodes/:id/toggle', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await run( `UPDATE promocodes SET active = NOT active, updated_at = CURRENT_TIMESTAMP WHERE id = $1`, [id]);
@@ -1477,7 +1374,7 @@ app.get('/api/test', (req, res) => {
 });
 
 // Bot management endpoints
-app.get('/api/admin/bot', requireAdmin, async (req, res) => {
+app.get('/api/admin/bot', async (req, res) => {
   try {
     const settings = await get( `SELECT bot_token, chat_id, enabled FROM bot_settings ORDER BY id DESC LIMIT 1`);
     if (!settings) {
@@ -1494,7 +1391,7 @@ app.get('/api/admin/bot', requireAdmin, async (req, res) => {
   }
 });
 
-app.post('/api/admin/bot', requireAdmin, async (req, res) => {
+app.post('/api/admin/bot', async (req, res) => {
   try {
     const { bot_token, enabled } = req.body;
     
@@ -1504,14 +1401,12 @@ app.post('/api/admin/bot', requireAdmin, async (req, res) => {
     if (existing) {
       // Обновляем существующие настройки, сохраняя текущий chat_id
       await run(
-        db,
-        `UPDATE bot_settings SET bot_token = ?, enabled = ?, updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+        `UPDATE bot_settings SET bot_token = $1, enabled = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3`,
         [bot_token, enabled ? 1 : 0, existing.id]
       );
     } else {
       // Создаем новые настройки с пустым chat_id
       await run(
-        db,
         `INSERT INTO bot_settings (bot_token, chat_id, enabled) VALUES ($1, $2, $3)`,
         [bot_token, '', enabled ? 1 : 0]
       );
@@ -1525,7 +1420,7 @@ app.post('/api/admin/bot', requireAdmin, async (req, res) => {
 });
 
 // Test bot connection
-app.post('/api/admin/bot/test', requireAdmin, async (req, res) => {
+app.post('/api/admin/bot/test', async (req, res) => {
   try {
     const { bot_token } = req.body;
     
@@ -1570,7 +1465,7 @@ app.post('/api/admin/bot/test', requireAdmin, async (req, res) => {
 // Удален дублирующийся endpoint /api/orders - используется только защищенный версия выше
 
 // Popular products API endpoints
-app.get('/api/admin/popular-products', requireAdmin, async (req, res) => {
+app.get('/api/admin/popular-products', async (req, res) => {
   try {
     const rows = await all(`
       SELECT pp.*, p.title, p.price, p.category_id, p.brand_id, p.available, p.quantity
@@ -1597,7 +1492,7 @@ app.get('/api/admin/popular-products', requireAdmin, async (req, res) => {
   }
 });
 
-app.post('/api/admin/popular-products', requireAdmin, async (req, res) => {
+app.post('/api/admin/popular-products', async (req, res) => {
   try {
     const { productIds } = req.body;
     
@@ -1625,7 +1520,7 @@ app.post('/api/admin/popular-products', requireAdmin, async (req, res) => {
 });
 
 // Filter settings API endpoints
-app.get('/api/admin/filter-settings', requireAdmin, async (req, res) => {
+app.get('/api/admin/filter-settings', async (req, res) => {
   try {
     const rows = await all(`SELECT key, setting_value FROM filter_settings`);
     
@@ -1641,15 +1536,15 @@ app.get('/api/admin/filter-settings', requireAdmin, async (req, res) => {
   }
 });
 
-app.post('/api/admin/filter-settings', requireAdmin, async (req, res) => {
+app.post('/api/admin/filter-settings', async (req, res) => {
   try {
     const settings = req.body;
     
     for (const [key, value] of Object.entries(settings)) {
       await run( `
         UPDATE filter_settings 
-        SET setting_value = ?, updated_at = CURRENT_TIMESTAMP 
-        WHERE key = ?
+        SET setting_value = $1, updated_at = CURRENT_TIMESTAMP 
+        WHERE key = $2
       `, [value ? 1 : 0, key]);
     }
     
@@ -1661,7 +1556,7 @@ app.post('/api/admin/filter-settings', requireAdmin, async (req, res) => {
 });
 
 // Debug: list registered routes (admin only)
-app.get('/api/_debug/routes', requireAdmin, (req, res) => {
+app.get('/api/_debug/routes', (req, res) => {
   try {
     const routes = [];
     app._router.stack.forEach((m) => {
@@ -1695,7 +1590,6 @@ app.get('/api/_debug/routes', requireAdmin, (req, res) => {
 
 console.log('Starting server initialization...');
 Promise.all([
-  ensureAdminTableAndDefaultUser(),
   ensureBotSettingsTable()
 ])
   .then(() => {

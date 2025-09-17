@@ -4,13 +4,7 @@
 -- Включаем расширения
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Администраторы
-CREATE TABLE IF NOT EXISTS admins (
-  id SERIAL PRIMARY KEY,
-  username VARCHAR(255) NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
+-- Таблица админов удалена - авторизация отключена
 
 -- Категории и подкатегории
 CREATE TABLE IF NOT EXISTS categories (

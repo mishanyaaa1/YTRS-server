@@ -14,10 +14,8 @@ import About from './pages/About.jsx'
 import Promotions from './pages/Promotions.jsx'
 import VehiclesPage from './pages/VehiclesPage.jsx'
 import VehicleDetailPage from './pages/VehicleDetailPage.jsx'
-import SimpleAdminLogin from './pages/admin/SimpleAdminLogin.jsx'
 import SimpleAdminDashboard from './pages/admin/SimpleAdminDashboard.jsx'
 import AdvancedAdminDashboard from './pages/admin/AdvancedAdminDashboard.jsx'
-import RequireAdmin from './components/RequireAdmin.jsx'
 import { CartProvider } from './context/CartContext.jsx'
 import { AdminDataProvider } from './context/AdminDataContext.jsx'
 // Removed WishlistProvider
@@ -70,15 +68,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <SimpleAdminLogin />
+    element: (
+      <AdminDataProvider>
+        <SimpleAdminDashboard />
+      </AdminDataProvider>
+    )
   },
   {
     path: "/admin/dashboard",
     element: (
       <AdminDataProvider>
-        <RequireAdmin>
-          <SimpleAdminDashboard />
-        </RequireAdmin>
+        <SimpleAdminDashboard />
       </AdminDataProvider>
     )
   },
@@ -86,9 +86,7 @@ const router = createBrowserRouter([
     path: "/admin/advanced",
     element: (
       <AdminDataProvider>
-        <RequireAdmin>
-          <AdvancedAdminDashboard />
-        </RequireAdmin>
+        <AdvancedAdminDashboard />
       </AdminDataProvider>
     )
   }
