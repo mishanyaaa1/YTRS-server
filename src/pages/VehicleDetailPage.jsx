@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaShoppingCart, FaCheckCircle, FaTimesCircle, FaChevronLeft, FaChevronRight, FaTruck, FaCog, FaSnowflake, FaMountain, FaWater, FaRoad } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import Reveal from '../components/Reveal';
+import ImageModal from '../components/ImageModal';
 import { useCartActions } from '../hooks/useCartActions';
 import { useAdminData } from '../context/AdminDataContext';
 import { migrateProductImages, getMainImage } from '../utils/imageHelpers';
@@ -17,6 +18,11 @@ function VehicleDetailPage() {
   
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  
+  // Состояние для модального окна изображений
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Находим вездеход по ID
   const vehicle = vehicles.find(v => v.id === parseInt(id));
@@ -50,6 +56,42 @@ function VehicleDetailPage() {
       features: vehicle.features
     };
     addToCartWithNotification(cartItem, quantity);
+  };
+
+  // Функции для работы с модальным окном изображений
+  const handleImageClick = () => {
+    // Подготавливаем изображения для модального окна
+    const images = [];
+    if (vehicle.image && typeof vehicle.image === 'string') {
+      images.push({
+        data: vehicle.image,
+        isMain: true
+      });
+    }
+    
+    if (images.length > 0) {
+      setModalImages(images);
+      setCurrentImageIndex(0);
+      setIsImageModalOpen(true);
+    }
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setModalImages([]);
+    setCurrentImageIndex(0);
+  };
+
+  const goToPreviousImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === 0 ? modalImages.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToNextImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === modalImages.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
   const handleBuyNow = () => {
@@ -138,11 +180,13 @@ function VehicleDetailPage() {
                         src={vehicle.image} 
                         alt={vehicle.name} 
                         className="vehicle-detail-image"
+                        onClick={handleImageClick}
                         style={{
                           width: '100%',
                           height: '100%',
                           objectFit: 'cover',
-                          borderRadius: '14px'
+                          borderRadius: '14px',
+                          cursor: 'pointer'
                         }}
                       />
                     );
@@ -289,6 +333,17 @@ function VehicleDetailPage() {
           </div>
         </Reveal>
       </div>
+
+      {/* Модальное окно для просмотра изображений */}
+      <ImageModal
+        isOpen={isImageModalOpen}
+        onClose={closeImageModal}
+        images={modalImages}
+        currentIndex={currentImageIndex}
+        onPrevious={goToPreviousImage}
+        onNext={goToNextImage}
+        productTitle={vehicle.name}
+      />
     </motion.div>
   );
 }

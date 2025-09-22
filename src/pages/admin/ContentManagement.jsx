@@ -390,6 +390,11 @@ export default function ContentManagement() {
     reader.readAsDataURL(file);
   };
 
+  // Удаление фото сотрудника
+  const removeTeamMemberPhoto = (index) => {
+    updateTeamMember(index, 'photo', '');
+  };
+
   const saveContent = () => {
     console.log('ContentManagement: Saving content data:', formData);
     console.log('ContentManagement: Current aboutContent before save:', aboutContent);
@@ -725,12 +730,19 @@ export default function ContentManagement() {
                         }}
                         className="file-input"
                       />
-                      <button type="button" className="upload-btn" onClick={() => {
-                        const input = document.querySelector(`input[type="file"]`);
-                        if (input) input.click();
-                      }}>
-                        <FaUpload /> {member.photo ? 'Изменить фото' : 'Загрузить фото'}
-                      </button>
+                      <div className="photo-buttons">
+                        <button type="button" className="upload-btn" onClick={() => {
+                          const input = document.querySelector(`input[type="file"]`);
+                          if (input) input.click();
+                        }}>
+                          <FaUpload /> {member.photo ? 'Изменить фото' : 'Загрузить фото'}
+                        </button>
+                        {member.photo && (
+                          <button type="button" className="remove-photo-btn" onClick={() => removeTeamMemberPhoto(index)}>
+                            <FaTrash /> Удалить фото
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
