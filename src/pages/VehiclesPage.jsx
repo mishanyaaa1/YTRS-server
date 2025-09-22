@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FaTruck, FaCog, FaSnowflake, FaMountain, FaWater, FaRoad, FaFilter, FaTimes, FaCheckCircle, FaTimesCircle, FaShoppingBasket } from 'react-icons/fa';
 import Reveal from '../components/Reveal';
+import ImageModal from '../components/ImageModal';
 import { useAdminData } from '../context/AdminDataContext';
 import { useCartActions } from '../hooks/useCartActions';
 import { migrateProductImages, getMainImage } from '../utils/imageHelpers';
@@ -20,6 +21,11 @@ function VehiclesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' или 'list'
+  
+  // Состояние для модального окна изображений
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Автоматическое переключение режимов просмотра
   useEffect(() => {
@@ -39,6 +45,44 @@ function VehiclesPage() {
 
   const handleVehicleClick = (vehicle) => {
     navigate(`/vehicle/${vehicle.id}`);
+  };
+
+  // Функции для работы с модальным окном изображений
+  const handleImageClick = (vehicle, e) => {
+    e.stopPropagation(); // Предотвращаем переход на страницу вездехода
+    
+    // Подготавливаем изображения для модального окна
+    const images = [];
+    if (vehicle.image && typeof vehicle.image === 'string') {
+      images.push({
+        data: vehicle.image,
+        isMain: true
+      });
+    }
+    
+    if (images.length > 0) {
+      setModalImages(images);
+      setCurrentImageIndex(0);
+      setIsImageModalOpen(true);
+    }
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setModalImages([]);
+    setCurrentImageIndex(0);
+  };
+
+  const goToPreviousImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === 0 ? modalImages.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToNextImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      prevIndex === modalImages.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
   const handleAddToCart = (vehicle, e) => {
@@ -197,7 +241,15 @@ function VehiclesPage() {
                            vehicle.image.startsWith('http') || 
                            vehicle.image.startsWith('/img/vehicles/') ||
                            vehicle.image.startsWith('/uploads/'))) {
-                        return <img src={vehicle.image} alt={vehicle.name} className="catalog-product-image" />;
+                        return (
+                          <img 
+                            src={vehicle.image} 
+                            alt={vehicle.name} 
+                            className="catalog-product-image" 
+                            onClick={(e) => handleImageClick(vehicle, e)}
+                            style={{ cursor: 'pointer' }}
+                          />
+                        );
                       }
                       return (
                         <div className="vehicle-placeholder">
@@ -316,6 +368,16 @@ function VehiclesPage() {
         </div>
       </div>
 
+      {/* Модальное окно для просмотра изображений */}
+      <ImageModal
+        isOpen={isImageModalOpen}
+        onClose={closeImageModal}
+        images={modalImages}
+        currentIndex={currentImageIndex}
+        onPrevious={goToPreviousImage}
+        onNext={goToNextImage}
+        productTitle="Вездеход"
+      />
       
     </div>
   );

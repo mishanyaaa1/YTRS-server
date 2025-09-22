@@ -1367,6 +1367,18 @@ app.get('/api/test', (req, res) => {
 // Bot management endpoints
 app.get('/api/admin/bot', async (req, res) => {
   try {
+    // Убеждаемся, что таблица существует
+    await run(`
+      CREATE TABLE IF NOT EXISTS bot_settings (
+        id SERIAL PRIMARY KEY,
+        bot_token VARCHAR(255),
+        chat_id VARCHAR(255),
+        enabled INTEGER DEFAULT 1,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
     const settings = await get( `SELECT bot_token, chat_id, enabled FROM bot_settings ORDER BY id DESC LIMIT 1`);
     if (!settings) {
       return res.json({ bot_token: '', chat_id: '', enabled: false });
@@ -1385,6 +1397,18 @@ app.get('/api/admin/bot', async (req, res) => {
 app.post('/api/admin/bot', async (req, res) => {
   try {
     const { bot_token, enabled } = req.body;
+    
+    // Убеждаемся, что таблица существует
+    await run(`
+      CREATE TABLE IF NOT EXISTS bot_settings (
+        id SERIAL PRIMARY KEY,
+        bot_token VARCHAR(255),
+        chat_id VARCHAR(255),
+        enabled INTEGER DEFAULT 1,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
     
     // Проверяем, есть ли уже настройки
     const existing = await get( `SELECT id, chat_id FROM bot_settings ORDER BY id DESC LIMIT 1`);
