@@ -485,10 +485,33 @@ html {
   color: #888888;
 }
 
+.footer-bottom-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .footer-bottom p {
   font-family: 'Russo One', sans-serif;
   font-weight: 400;
   letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.developer-link {
+  color: #888888;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 400;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.developer-link:hover {
+  color: #e6a34a;
+  text-decoration: underline;
 }
 
 /* Стили для социальных ссылок */
@@ -1058,6 +1081,12 @@ html {
   
   .footer-content {
     gap: 1.5rem;
+  }
+  
+  .footer-bottom-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
   }
   
   .social-links {
