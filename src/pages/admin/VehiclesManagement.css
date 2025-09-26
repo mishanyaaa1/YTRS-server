@@ -240,8 +240,7 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
   border: 1px solid #333;
-  min-height: 350px;
-  max-height: 400px;
+  height: 380px;
   display: flex;
   flex-direction: column;
 }
@@ -310,19 +309,26 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .vehicle-name {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 0.8rem 0;
-  line-height: 1.3;
+  margin: 0 0 0.6rem 0;
+  line-height: 1.2;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 1.4rem;
 }
 
 .vehicle-key-specs {
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
+  flex-shrink: 0;
 }
 
 .spec-compact {
@@ -330,8 +336,9 @@
   justify-content: space-between;
   align-items: center;
   color: #cccccc;
-  font-size: 0.85rem;
-  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.3rem;
+  min-height: 1.2rem;
 }
 
 .spec-label {
@@ -349,12 +356,13 @@
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding: 1rem 0 0 0;
+  padding: 0.8rem 0 0 0;
   border-top: 1px solid #333;
-  min-height: 60px;
+  height: 50px;
   position: relative;
   z-index: 1;
-  gap: 1rem;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .vehicle-description {
@@ -397,13 +405,17 @@
 }
 
 .price {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #059669;
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
 }
 
 .vehicle-actions {
@@ -437,21 +449,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0.8rem;
+  gap: 0.3rem;
+  padding: 0.4rem 0.6rem;
   border: none;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   width: auto;
   height: auto;
-  min-width: 100px;
+  min-width: 80px;
   white-space: nowrap;
   z-index: 10;
   position: relative;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .edit-btn-text {
@@ -536,18 +549,25 @@
   
   .edit-btn-text,
   .delete-btn-text {
-    min-width: 80px;
-    font-size: 0.75rem;
-    padding: 0.4rem 0.6rem;
+    min-width: 70px;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
   }
   
   .vehicle-footer {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.8rem;
+    gap: 0.5rem;
+    height: auto;
+    min-height: 60px;
   }
   
   .vehicle-price {
     text-align: center;
+  }
+  
+  .price {
+    max-width: none;
+    font-size: 0.9rem;
   }
 }
