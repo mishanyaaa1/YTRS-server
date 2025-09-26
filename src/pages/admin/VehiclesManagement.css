@@ -240,7 +240,7 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
   border: 1px solid #333;
-  height: 380px;
+  height: 400px;
   display: flex;
   flex-direction: column;
 }
@@ -327,7 +327,12 @@
 }
 
 .vehicle-key-specs {
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.vehicle-price-section {
+  margin-bottom: 1rem;
   flex-shrink: 0;
 }
 
@@ -356,9 +361,9 @@
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding: 0.8rem 0 0 0;
+  padding: 1rem 0 0 0;
   border-top: 1px solid #333;
-  height: 50px;
+  height: 60px;
   position: relative;
   z-index: 1;
   gap: 0.5rem;
@@ -421,7 +426,7 @@
 .vehicle-actions {
   display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
   z-index: 10;
@@ -450,16 +455,16 @@
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
-  padding: 0.4rem 0.6rem;
+  padding: 0.5rem 0.8rem;
   border: none;
-  border-radius: 6px;
-  font-size: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   width: auto;
   height: auto;
-  min-width: 80px;
+  min-width: 90px;
   white-space: nowrap;
   z-index: 10;
   position: relative;
@@ -543,15 +548,17 @@
   }
   
   .vehicle-actions {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.3rem;
+    justify-content: space-between;
   }
   
   .edit-btn-text,
   .delete-btn-text {
     min-width: 70px;
     font-size: 0.7rem;
-    padding: 0.3rem 0.5rem;
+    padding: 0.4rem 0.6rem;
+    flex: 1;
   }
   
   .vehicle-footer {
@@ -559,7 +566,7 @@
     align-items: stretch;
     gap: 0.5rem;
     height: auto;
-    min-height: 60px;
+    min-height: 70px;
   }
   
   .vehicle-price {
