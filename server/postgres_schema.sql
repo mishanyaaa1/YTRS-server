@@ -191,6 +191,15 @@ CREATE TABLE IF NOT EXISTS filter_settings (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
+-- Инициализация настроек фильтров
+INSERT INTO filter_settings (setting_key, setting_value) VALUES 
+  ('showCategoryFilter', 1),
+  ('showSubcategoryFilter', 1),
+  ('showBrandFilter', 1),
+  ('showPriceFilter', 1),
+  ('showStockFilter', 1)
+ON CONFLICT (setting_key) DO NOTHING;
+
 -- Промокоды
 CREATE TABLE IF NOT EXISTS promocodes (
   id SERIAL PRIMARY KEY,

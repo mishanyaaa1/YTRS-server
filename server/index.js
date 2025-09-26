@@ -135,10 +135,6 @@ async function ensureBotSettingsTable() {
 
 // Admin me endpoint
 
-// Admin filter-settings endpoint
-app.get("/api/admin/filter-settings", (req, res) => {
-  res.json({});
-});
 app.get("/api/admin/me", (req, res) => {
   res.json({ username: "admin", id: 1 });
 });
@@ -1537,11 +1533,11 @@ app.post('/api/admin/popular-products', async (req, res) => {
 // Filter settings API endpoints
 app.get('/api/admin/filter-settings', async (req, res) => {
   try {
-    const rows = await all(`SELECT key, setting_value FROM filter_settings`);
+    const rows = await all(`SELECT setting_key, setting_value FROM filter_settings`);
     
     const settings = {};
     rows.forEach(row => {
-      settings[row.key] = Boolean(row.setting_value);
+      settings[row.setting_key] = Boolean(row.setting_value);
     });
     
     res.json(settings);
@@ -1559,7 +1555,7 @@ app.post('/api/admin/filter-settings', async (req, res) => {
       await run( `
         UPDATE filter_settings 
         SET setting_value = $1, updated_at = CURRENT_TIMESTAMP 
-        WHERE key = $2
+        WHERE setting_key = $2
       `, [value ? 1 : 0, key]);
     }
     
