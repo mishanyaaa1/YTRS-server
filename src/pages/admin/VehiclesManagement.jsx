@@ -395,9 +395,6 @@ function VehiclesManagement() {
                     <div className="vehicle-price">
                       <span className="price">{formatPrice(vehicle.price)} ₽</span>
                     </div>
-                  </div>
-                  
-                  <div className="vehicle-footer">
                     <div className="vehicle-actions">
                       <button 
                         className="action-btn edit-btn-text"
