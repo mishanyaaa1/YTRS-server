@@ -37,31 +37,74 @@ function VehiclesManagement() {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Берем первое изображение из массива images
-    const mainImage = formData.images && formData.images.length > 0 ? formData.images[0].data : null;
+    console.log('Saving vehicle:', { formData, editingVehicle });
     
-    const vehicleData = {
-      ...formData,
-      price: parseInt(formData.price),
-      quantity: parseInt(formData.quantity),
-      image: mainImage, // Добавляем поле image
-      specs: {
-        engine: formData.engine,
-        weight: formData.weight,
-        capacity: formData.capacity,
-        maxSpeed: formData.maxSpeed
-      }
-    };
-
-    if (editingVehicle) {
-      updateVehicle(editingVehicle.id, vehicleData);
-      setEditingVehicle(null);
-    } else {
-      addVehicle(vehicleData);
+    // Валидация обязательных полей
+    if (!formData.name) {
+      alert('Заполните обязательное поле: название вездехода!');
+      return;
     }
 
-    resetForm();
-    setIsAddingVehicle(false);
+    const price = parseInt(formData.price);
+    if (isNaN(price) || price < 0) {
+      alert('Укажите корректную цену вездехода!');
+      return;
+    }
+
+    if (!formData.engine) {
+      alert('Заполните обязательное поле: двигатель!');
+      return;
+    }
+
+    if (!formData.weight) {
+      alert('Заполните обязательное поле: вес!');
+      return;
+    }
+
+    if (!formData.capacity) {
+      alert('Заполните обязательное поле: вместимость!');
+      return;
+    }
+
+    if (!formData.maxSpeed) {
+      alert('Заполните обязательное поле: максимальная скорость!');
+      return;
+    }
+
+    try {
+      // Берем первое изображение из массива images
+      const mainImage = formData.images && formData.images.length > 0 ? formData.images[0].data : null;
+      
+      const vehicleData = {
+        ...formData,
+        price: price,
+        quantity: parseInt(formData.quantity) || 1,
+        image: mainImage, // Добавляем поле image
+        specs: {
+          engine: formData.engine,
+          weight: formData.weight,
+          capacity: formData.capacity,
+          maxSpeed: formData.maxSpeed
+        }
+      };
+
+      if (editingVehicle) {
+        console.log('Updating existing vehicle:', editingVehicle.id, vehicleData);
+        updateVehicle(editingVehicle.id, vehicleData);
+        alert('Вездеход обновлен!');
+        setEditingVehicle(null);
+      } else {
+        console.log('Creating new vehicle:', vehicleData);
+        addVehicle(vehicleData);
+        alert('Вездеход создан!');
+      }
+
+      resetForm();
+      setIsAddingVehicle(false);
+    } catch (error) {
+      console.error('Error saving vehicle:', error);
+      alert('Ошибка при сохранении вездехода!');
+    }
   };
 
   const handleEdit = (vehicle) => {
@@ -153,7 +196,6 @@ function VehiclesManagement() {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    required
                     placeholder="Вездеход 'Буран'"
                   />
                 </div>
@@ -183,7 +225,6 @@ function VehiclesManagement() {
                     name="price"
                     value={formData.price}
                     onChange={handleInputChange}
-                    required
                     placeholder="2500000"
                   />
                 </div>
@@ -195,7 +236,6 @@ function VehiclesManagement() {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  required
                   placeholder="Описание вездехода..."
                   rows="3"
                 />
@@ -219,7 +259,6 @@ function VehiclesManagement() {
                     name="engine"
                     value={formData.engine}
                     onChange={handleInputChange}
-                    required
                     placeholder="Дизель 150 л.с."
                   />
                 </div>
@@ -230,7 +269,6 @@ function VehiclesManagement() {
                     name="weight"
                     value={formData.weight}
                     onChange={handleInputChange}
-                    required
                     placeholder="2.5 тонны"
                   />
                 </div>
@@ -244,7 +282,6 @@ function VehiclesManagement() {
                     name="capacity"
                     value={formData.capacity}
                     onChange={handleInputChange}
-                    required
                     placeholder="6 человек"
                   />
                 </div>
@@ -255,7 +292,6 @@ function VehiclesManagement() {
                     name="maxSpeed"
                     value={formData.maxSpeed}
                     onChange={handleInputChange}
-                    required
                     placeholder="45 км/ч"
                   />
                 </div>
@@ -269,7 +305,6 @@ function VehiclesManagement() {
                     name="quantity"
                     value={formData.quantity}
                     onChange={handleInputChange}
-                    required
                     min="0"
                   />
                 </div>
