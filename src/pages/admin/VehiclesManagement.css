@@ -349,11 +349,12 @@
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding: 0.5rem 0 0 0;
+  padding: 1rem 0 0 0;
   border-top: 1px solid #333;
-  min-height: 50px;
+  min-height: 60px;
   position: relative;
   z-index: 1;
+  gap: 1rem;
 }
 
 .vehicle-description {
@@ -407,12 +408,13 @@
 
 .vehicle-actions {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   z-index: 10;
   position: relative;
+  flex-shrink: 0;
 }
 
 .action-btn {
@@ -436,41 +438,46 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.4rem 0.8rem;
+  padding: 0.5rem 0.8rem;
   border: none;
-  border-radius: 6px;
-  font-size: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   width: auto;
   height: auto;
-  min-width: 90px;
+  min-width: 100px;
   white-space: nowrap;
   z-index: 10;
   position: relative;
+  text-decoration: none;
 }
 
 .edit-btn-text {
-  background: #2196f3;
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
   color: white;
+  border: 1px solid #1976d2;
 }
 
 .edit-btn-text:hover {
-  background: #1976d2;
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+  border-color: #1565c0;
 }
 
 .delete-btn-text {
-  background: #f44336;
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
   color: white;
+  border: 1px solid #d32f2f;
 }
 
 .delete-btn-text:hover {
-  background: #d32f2f;
+  background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+  border-color: #c62828;
 }
 
 .edit-btn {
@@ -524,5 +531,23 @@
   
   .vehicle-actions {
     flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .edit-btn-text,
+  .delete-btn-text {
+    min-width: 80px;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .vehicle-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+  }
+  
+  .vehicle-price {
+    text-align: center;
   }
 }
