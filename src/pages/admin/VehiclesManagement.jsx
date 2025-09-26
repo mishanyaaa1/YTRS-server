@@ -351,70 +351,79 @@ function VehiclesManagement() {
             <p>Вездеходы не найдены. Добавьте первый вездеход!</p>
           </div>
         ) : (
-          <div className="vehicles-grid">
-            {vehicles.map(vehicle => (
-              <div key={vehicle.id} className="vehicle-card">
-                <div className="vehicle-image">
-                  {(() => {
-                    // Для вездеходов используем поле image напрямую
-                    if (vehicle.image && 
-                        typeof vehicle.image === 'string' && 
-                        (vehicle.image.startsWith('data:image') || 
-                         vehicle.image.startsWith('http') || 
-                         vehicle.image.startsWith('/img/vehicles/') ||
-                         vehicle.image.startsWith('/uploads/'))) {
-                      return <img src={vehicle.image} alt={vehicle.name} className="vehicle-product-image" />;
-                    }
-                    return (
-                      <div className="vehicle-placeholder">
-                        🚗
+          <div className="vehicles-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Название</th>
+                  <th>Тип</th>
+                  <th>Местность</th>
+                  <th>Цена</th>
+                  <th>Двигатель</th>
+                  <th>Вместимость</th>
+                  <th>Наличие</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {vehicles.map(vehicle => (
+                  <tr key={vehicle.id}>
+                    <td>{vehicle.id}</td>
+                    <td>
+                      <div className="vehicle-title">
+                        {(() => {
+                          if (vehicle.image && 
+                              typeof vehicle.image === 'string' && 
+                              (vehicle.image.startsWith('data:image') || 
+                               vehicle.image.startsWith('http') || 
+                               vehicle.image.startsWith('/img/vehicles/') ||
+                               vehicle.image.startsWith('/uploads/'))) {
+                            return <img src={vehicle.image} alt={vehicle.name} className="vehicle-image" />;
+                          }
+                          return (
+                            <div className="vehicle-icon">
+                              🚗
+                            </div>
+                          );
+                        })()}
+                        {vehicle.name}
                       </div>
-                    );
-                  })()}
-                  <div className="vehicle-badge">{vehicle.type}</div>
-                  <div className="vehicle-status">
-                    {vehicle.available ? '✅ В наличии' : '❌ Нет в наличии'}
-                  </div>
-                </div>
-                
-                <div className="vehicle-content">
-                  <h3 className="vehicle-name">{vehicle.name}</h3>
-                  
-                  <div className="vehicle-key-specs">
-                    <div className="spec-compact">
-                      <span className="spec-label">Двигатель:</span>
-                      <span className="spec-value">{vehicle.specs.engine}</span>
-                    </div>
-                    <div className="spec-compact">
-                      <span className="spec-label">Вместимость:</span>
-                      <span className="spec-value">{vehicle.specs.capacity}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="vehicle-price-section">
-                    <div className="vehicle-price">
-                      <span className="price">{formatPrice(vehicle.price)} ₽</span>
-                    </div>
-                    <div className="vehicle-actions">
-                      <button 
-                        className="action-btn edit-btn-text"
-                        onClick={() => handleEdit(vehicle)}
-                        title="Редактировать вездеход"
-                      >
-                        <FaEdit /> Редактировать
-                      </button>
-                      <button 
-                        className="action-btn delete-btn-text"
-                        onClick={() => handleDelete(vehicle.id)}
-                        title="Удалить вездеход"
-                      >
-                        <FaTrash /> Удалить
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+                    </td>
+                    <td>
+                      <span className="vehicle-type-badge">{vehicle.type}</span>
+                    </td>
+                    <td>{vehicle.terrain}</td>
+                    <td>{formatPrice(vehicle.price)} ₽</td>
+                    <td>{vehicle.specs?.engine || '-'}</td>
+                    <td>{vehicle.specs?.capacity || '-'}</td>
+                    <td>
+                      <span className={vehicle.available ? 'status-available' : 'status-unavailable'}>
+                        {vehicle.available ? 'В наличии' : 'Нет в наличии'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button 
+                          onClick={() => handleEdit(vehicle)}
+                          className="btn-edit"
+                          title="Редактировать"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(vehicle.id)}
+                          className="btn-delete"
+                          title="Удалить"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
