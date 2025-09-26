@@ -230,6 +230,39 @@ export const AdminDataProvider = ({ children }) => {
     }
   }, [filterSettings]);
 
+  // Загружаем настройки фильтров при первом использовании
+  useEffect(() => {
+    const loadFilterSettings = async () => {
+      try {
+        const res = await fetch('/api/admin/filter-settings', { 
+          credentials: 'include',
+          headers: getAuthHeaders()
+        });
+        if (res.ok) {
+          const apiFilterSettings = await res.json();
+          if (apiFilterSettings && typeof apiFilterSettings === 'object' && Object.keys(apiFilterSettings).length > 0) {
+            console.log('AdminDataContext: Loaded filter settings from API on demand');
+            setFilterSettings(apiFilterSettings);
+            localStorage.setItem('adminFilterSettings', JSON.stringify(apiFilterSettings));
+          }
+        }
+      } catch (e) {
+        console.warn('AdminDataContext: Failed to load filter settings on demand:', e);
+      }
+    };
+
+    // Загружаем только если настройки не загружены (все значения по умолчанию)
+    const hasDefaultSettings = filterSettings.showBrandFilter === true && 
+                              filterSettings.showCategoryFilter === true && 
+                              filterSettings.showSubcategoryFilter === true && 
+                              filterSettings.showPriceFilter === true && 
+                              filterSettings.showStockFilter === true;
+    
+    if (hasDefaultSettings) {
+      loadFilterSettings();
+    }
+  }, []);
+
   // Сохраняем вездеходы в localStorage
   useEffect(() => {
     try {

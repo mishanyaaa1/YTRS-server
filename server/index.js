@@ -129,6 +129,31 @@ async function ensureBotSettingsTable() {
   }
 }
 
+// Создаем таблицу для настроек фильтров
+async function ensureFilterSettingsTable() {
+  await run(
+    `CREATE TABLE IF NOT EXISTS filter_settings (
+      id SERIAL PRIMARY KEY,
+      setting_key VARCHAR(255) NOT NULL UNIQUE,
+      setting_value INTEGER NOT NULL DEFAULT 1,
+      created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    )`
+  );
+  
+  // Инициализируем настройки фильтров
+  await run(`
+    INSERT INTO filter_settings (setting_key, setting_value) VALUES 
+      ('showCategoryFilter', 1),
+      ('showSubcategoryFilter', 1),
+      ('showBrandFilter', 1),
+      ('showPriceFilter', 1),
+      ('showStockFilter', 1)
+    ON CONFLICT (setting_key) DO NOTHING
+  `);
+  console.log('Initialized filter settings');
+}
+
 
 
 // Healthcheck
@@ -1601,7 +1626,8 @@ app.get('/api/_debug/routes', (req, res) => {
 
 console.log('Starting server initialization...');
 Promise.all([
-  ensureBotSettingsTable()
+  ensureBotSettingsTable(),
+  ensureFilterSettingsTable()
 ])
   .then(() => {
     console.log('Tables initialized successfully');
