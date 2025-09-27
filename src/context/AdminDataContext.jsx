@@ -321,15 +321,24 @@ export const AdminDataProvider = ({ children }) => {
         } catch (e) {
           if (e.name === 'QuotaExceededError') {
             console.warn('AdminDataContext: localStorage is full, clearing old data...');
-            // Очищаем старые данные, оставляя только критически важные
-            const criticalKeys = ['adminVehicles', 'adminProducts', 'adminCategories', 'adminBrands'];
-            const allKeys = Object.keys(localStorage);
-            allKeys.forEach(key => {
-              if (!criticalKeys.includes(key) && key.startsWith('admin')) {
-                localStorage.removeItem(key);
-                console.log('AdminDataContext: Removed', key, 'from localStorage');
-              }
-            });
+            logger.addLog('WARN', 'localStorage is full, clearing old data...');
+            
+            // На мобильных устройствах очищаем ВСЕ данные
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+              logger.addLog('WARN', 'Mobile device: clearing ALL localStorage data');
+              localStorage.clear();
+            } else {
+              // На десктопе очищаем только старые admin данные
+              const criticalKeys = ['adminVehicles', 'adminProducts', 'adminCategories', 'adminBrands'];
+              const allKeys = Object.keys(localStorage);
+              allKeys.forEach(key => {
+                if (!criticalKeys.includes(key) && key.startsWith('admin')) {
+                  localStorage.removeItem(key);
+                  console.log('AdminDataContext: Removed', key, 'from localStorage');
+                }
+              });
+            }
           }
         }
         
@@ -337,12 +346,23 @@ export const AdminDataProvider = ({ children }) => {
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         if (isMobile) {
           console.log('AdminDataContext: Mobile device detected, clearing localStorage before loading...');
-          const criticalKeys = ['adminVehicles', 'adminProducts', 'adminCategories', 'adminBrands'];
+          logger.addLog('INFO', 'Mobile device detected, clearing localStorage...');
+          
+          // Очищаем ВСЕ admin данные на мобильных устройствах для экономии места
           const allKeys = Object.keys(localStorage);
           allKeys.forEach(key => {
-            if (!criticalKeys.includes(key) && key.startsWith('admin')) {
+            if (key.startsWith('admin')) {
               localStorage.removeItem(key);
               console.log('AdminDataContext: Mobile cleanup - removed', key);
+              logger.addLog('INFO', `Removed ${key} from localStorage`);
+            }
+          });
+          
+          // Очищаем также другие большие данные
+          ['cart', 'wishlist', 'user_preferences'].forEach(key => {
+            if (localStorage.getItem(key)) {
+              localStorage.removeItem(key);
+              logger.addLog('INFO', `Removed ${key} from localStorage`);
             }
           });
         }
@@ -505,22 +525,35 @@ export const AdminDataProvider = ({ children }) => {
             try {
               localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
               console.log('AdminDataContext: Successfully saved vehicles to localStorage');
+              logger.addLog('API', 'Vehicles saved to localStorage successfully');
             } catch (e) {
               if (e.name === 'QuotaExceededError') {
                 console.error('AdminDataContext: Cannot save vehicles to localStorage - quota exceeded');
-                // Очищаем localStorage и пробуем снова
-                const criticalKeys = ['adminVehicles'];
-                const allKeys = Object.keys(localStorage);
-                allKeys.forEach(key => {
-                  if (!criticalKeys.includes(key)) {
-                    localStorage.removeItem(key);
-                  }
-                });
+                logger.addLog('ERROR', 'Cannot save vehicles - localStorage quota exceeded');
+                
+                // На мобильных устройствах очищаем ВСЕ данные
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (isMobile) {
+                  logger.addLog('WARN', 'Mobile: clearing ALL localStorage and retrying');
+                  localStorage.clear();
+                } else {
+                  // На десктопе очищаем только неважные данные
+                  const criticalKeys = ['adminVehicles'];
+                  const allKeys = Object.keys(localStorage);
+                  allKeys.forEach(key => {
+                    if (!criticalKeys.includes(key)) {
+                      localStorage.removeItem(key);
+                    }
+                  });
+                }
+                
                 try {
                   localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
                   console.log('AdminDataContext: Successfully saved vehicles after cleanup');
+                  logger.addLog('API', 'Vehicles saved after localStorage cleanup');
                 } catch (e2) {
                   console.error('AdminDataContext: Still cannot save vehicles after cleanup:', e2);
+                  logger.addLog('ERROR', `Still cannot save vehicles: ${e2.message}`);
                 }
               }
             }
