@@ -319,16 +319,30 @@ export const AdminDataProvider = ({ children }) => {
         } catch (e) {
           if (e.name === 'QuotaExceededError') {
             console.warn('AdminDataContext: localStorage is full, clearing old data...');
-        // Очищаем старые данные, оставляя только критически важные
-        const criticalKeys = ['adminVehicles', 'adminProducts', 'adminCategories', 'adminBrands'];
-        const allKeys = Object.keys(localStorage);
-        allKeys.forEach(key => {
-          if (!criticalKeys.includes(key) && key.startsWith('admin')) {
-            localStorage.removeItem(key);
-            console.log('AdminDataContext: Removed', key, 'from localStorage');
+            // Очищаем старые данные, оставляя только критически важные
+            const criticalKeys = ['adminVehicles', 'adminProducts', 'adminCategories', 'adminBrands'];
+            const allKeys = Object.keys(localStorage);
+            allKeys.forEach(key => {
+              if (!criticalKeys.includes(key) && key.startsWith('admin')) {
+                localStorage.removeItem(key);
+                console.log('AdminDataContext: Removed', key, 'from localStorage');
+              }
+            });
           }
-        });
-          }
+        }
+        
+        // Очищаем localStorage перед загрузкой новых данных на мобильных устройствах
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+          console.log('AdminDataContext: Mobile device detected, clearing localStorage before loading...');
+          const criticalKeys = ['adminVehicles', 'adminProducts', 'adminCategories', 'adminBrands'];
+          const allKeys = Object.keys(localStorage);
+          allKeys.forEach(key => {
+            if (!criticalKeys.includes(key) && key.startsWith('admin')) {
+              localStorage.removeItem(key);
+              console.log('AdminDataContext: Mobile cleanup - removed', key);
+            }
+          });
         }
         const [apiProductsRes, apiCategoriesRes, apiBrandsRes, apiPromosRes, apiTerrainTypesRes, apiVehicleTypesRes, apiVehiclesRes, apiContentRes, apiPopularProductsRes, apiFilterSettingsRes] = await Promise.allSettled([
           fetch('/api/products', { credentials: 'include' }),
@@ -389,7 +403,16 @@ export const AdminDataProvider = ({ children }) => {
           if (Array.isArray(apiPromos)) {
             console.log('AdminDataContext: Loaded promotions from API');
             setPromotions(apiPromos);
-            localStorage.setItem('adminPromotions', JSON.stringify(apiPromos));
+            try {
+              localStorage.setItem('adminPromotions', JSON.stringify(apiPromos));
+              console.log('AdminDataContext: Successfully saved promotions to localStorage');
+            } catch (e) {
+              if (e.name === 'QuotaExceededError') {
+                console.warn('AdminDataContext: Cannot save promotions to localStorage - quota exceeded, skipping');
+              } else {
+                console.error('AdminDataContext: Error saving promotions:', e);
+              }
+            }
           }
         } else {
           console.warn('AdminDataContext: Failed to load promotions from API:', apiPromosRes.status);
@@ -400,7 +423,16 @@ export const AdminDataProvider = ({ children }) => {
           if (Array.isArray(apiTerrainTypes)) {
             console.log('AdminDataContext: Loaded terrain types from API');
             setTerrainTypes(apiTerrainTypes);
-            localStorage.setItem('adminTerrainTypes', JSON.stringify(apiTerrainTypes));
+            try {
+              localStorage.setItem('adminTerrainTypes', JSON.stringify(apiTerrainTypes));
+              console.log('AdminDataContext: Successfully saved terrain types to localStorage');
+            } catch (e) {
+              if (e.name === 'QuotaExceededError') {
+                console.warn('AdminDataContext: Cannot save terrain types to localStorage - quota exceeded, skipping');
+              } else {
+                console.error('AdminDataContext: Error saving terrain types:', e);
+              }
+            }
           }
         } else {
           console.warn('AdminDataContext: Failed to load terrain types from API:', apiTerrainTypesRes.status);
@@ -411,7 +443,16 @@ export const AdminDataProvider = ({ children }) => {
           if (Array.isArray(apiVehicleTypes)) {
             console.log('AdminDataContext: Loaded vehicle types from API');
             setVehicleTypes(apiVehicleTypes);
-            localStorage.setItem('adminVehicleTypes', JSON.stringify(apiVehicleTypes));
+            try {
+              localStorage.setItem('adminVehicleTypes', JSON.stringify(apiVehicleTypes));
+              console.log('AdminDataContext: Successfully saved vehicle types to localStorage');
+            } catch (e) {
+              if (e.name === 'QuotaExceededError') {
+                console.warn('AdminDataContext: Cannot save vehicle types to localStorage - quota exceeded, skipping');
+              } else {
+                console.error('AdminDataContext: Error saving vehicle types:', e);
+              }
+            }
           }
         } else {
           console.warn('AdminDataContext: Failed to load vehicle types from API:', apiVehicleTypesRes.status);
