@@ -9,7 +9,6 @@ import { getMainImage } from '../utils/imageHelpers';
 import BrandMark from '../components/BrandMark';
 import { sendTelegramMessage, formatOrderMessage, generateOrderNumber } from '../utils/telegramService';
 import ProductModal from '../components/ProductModal';
-import { LoadingButton, OrderLoadingSteps } from '../components/LoadingSpinner';
 import './Cart.css';
 
 function Cart() {
@@ -46,9 +45,6 @@ function Cart() {
     comment: ''
   });
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
-  const [loadingStep, setLoadingStep] = useState(0);
-  const [loadingMessage, setLoadingMessage] = useState('');
-  const [isCancelling, setIsCancelling] = useState(false);
 
   // ВСЕ ХУКИ ДОЛЖНЫ БЫТЬ ВЫЗВАНЫ ДО УСЛОВНЫХ ВОЗВРАТОВ
   // Расчет применимых скидок
@@ -293,8 +289,6 @@ function Cart() {
     if (isSubmittingOrder) return; // Предотвращаем повторную отправку
     
     setIsSubmittingOrder(true);
-    setLoadingStep(1); // Начинаем с этапа создания заказа
-    setLoadingMessage('Создаем заказ в системе...');
     
     try {
       // Генерируем номер заказа
@@ -308,22 +302,16 @@ function Cart() {
         orderNumber
       };
       
-      // Этап 1: Сохраняем заказ в систему
+      // Сохраняем заказ в систему
       const savedOrder = await createOrder(orderData);
       console.log('Заказ сохранен в системе:', savedOrder);
-      
-      setLoadingStep(2); // Переходим к этапу отправки уведомления
-      setLoadingMessage('Отправляем уведомление...');
       
       // Форматируем сообщение для Telegram
       const message = formatOrderMessage(orderData);
       
-      // Этап 2: Отправляем в Telegram
+      // Отправляем в Telegram
       console.log('Отправляем заказ в Telegram...');
       const result = await sendTelegramMessage(message);
-      
-      setLoadingStep(3); // Завершающий этап
-      setLoadingMessage('Завершаем оформление заказа...');
       
       if (result.success) {
         alert(`Заказ #${orderNumber} успешно оформлен! Мы свяжемся с вами в ближайшее время.`);
@@ -332,9 +320,6 @@ function Cart() {
         console.error('Ошибка отправки в Telegram:', result.error);
         alert(`Заказ #${orderNumber} оформлен, но возникла ошибка при отправке уведомления. Мы обязательно с вами свяжемся!`);
       }
-      
-      // Небольшая задержка для показа завершающего этапа
-      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Очищаем корзину и переходим на главную
       clearCart();
@@ -346,28 +331,9 @@ function Cart() {
       alert('Произошла ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.');
     } finally {
       setIsSubmittingOrder(false);
-      setLoadingStep(0);
-      setLoadingMessage('');
     }
   };
 
-  const handleCancelOrder = () => {
-    if (isSubmittingOrder) {
-      setIsCancelling(true);
-      setLoadingMessage('Отменяем заказ...');
-      
-      // Симулируем небольшую задержку для отмены
-      setTimeout(() => {
-        setIsSubmittingOrder(false);
-        setLoadingStep(0);
-        setLoadingMessage('');
-        setIsCancelling(false);
-        setShowCheckout(false);
-      }, 1000);
-    } else {
-      setShowCheckout(false);
-    }
-  };
 
   if (cartItems.length === 0) {
     return (
@@ -657,7 +623,7 @@ function Cart() {
         <AnimatePresence>
           {showCheckout && (
             <motion.div
-              className={`checkout-modal ${isSubmittingOrder ? 'loading' : ''}`}
+              className="checkout-modal"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -797,31 +763,23 @@ function Cart() {
                     </div>
                   </div>
                   
-                  {/* Компонент этапов загрузки */}
-                  <OrderLoadingSteps 
-                    currentStep={loadingStep} 
-                    isLoading={isSubmittingOrder} 
-                    message={loadingMessage}
-                  />
                   
                   <div className="form-actions">
                     <button 
                       type="button" 
-                      onClick={handleCancelOrder} 
+                      onClick={() => setShowCheckout(false)} 
                       className="cancel-btn"
-                      disabled={isCancelling}
-                    >
-                      {isCancelling ? 'Отмена...' : 'Отмена'}
-                    </button>
-                    <LoadingButton
-                      type="submit"
-                      isLoading={isSubmittingOrder}
-                      loadingText="Обрабатываем заказ..."
                       disabled={isSubmittingOrder}
-                      className="submit-btn"
                     >
-                      Подтвердить заказ
-                    </LoadingButton>
+                      Отмена
+                    </button>
+                    <button 
+                      type="submit" 
+                      className="submit-btn"
+                      disabled={isSubmittingOrder}
+                    >
+                      {isSubmittingOrder ? 'Обработка...' : 'Подтвердить заказ'}
+                    </button>
                   </div>
                 </form>
               </motion.div>

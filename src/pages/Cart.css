@@ -577,67 +577,6 @@ input[type="number"].quantity-input,
   transition: backdrop-filter 0.3s ease;
 }
 
-/* Модальное окно во время загрузки */
-.checkout-modal.loading {
-  backdrop-filter: blur(8px);
-}
-
-.checkout-modal.loading .checkout-content {
-  opacity: 0.95;
-  transform: scale(1.02);
-}
-
-/* Дополнительная защита от неправильного позиционирования анимации */
-.checkout-modal.loading {
-  overflow: hidden; /* Скрываем любые элементы, выходящие за границы */
-}
-
-.checkout-modal.loading * {
-  position: relative !important; /* Принудительно устанавливаем относительное позиционирование */
-  transform-origin: center center !important; /* Устанавливаем центр трансформации */
-}
-
-/* Дополнительная защита от неправильного позиционирования спиннеров */
-.checkout-modal .spinner,
-.checkout-modal .loading-spinner,
-.checkout-modal .loading-dots,
-.checkout-modal .wave-loading {
-  position: relative !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  margin: 0 auto !important;
-  display: inline-block !important;
-  vertical-align: middle !important;
-}
-
-/* Переопределение любых глобальных стилей для спиннеров */
-.checkout-modal *[class*="spinner"],
-.checkout-modal *[class*="loading"] {
-  position: relative !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  margin: 0 auto !important;
-}
-
-/* Стили для заблокированных полей во время загрузки */
-.checkout-modal.loading .form-group input,
-.checkout-modal.loading .form-group select,
-.checkout-modal.loading .form-group textarea {
-  opacity: 0.7;
-  cursor: not-allowed;
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.checkout-modal.loading .form-group label {
-  opacity: 0.7;
-  color: rgba(255, 255, 255, 0.6);
-}
 
 .checkout-content {
   background: #1a1a1a;
@@ -649,9 +588,6 @@ input[type="number"].quantity-input,
   max-height: 90vh;
   overflow-y: auto;
   color: #ffffff;
-  position: relative; /* Убеждаемся что позиционирование относительно */
-  z-index: 1; /* Правильный z-index для контента */
-  isolation: isolate; /* Создаем новый контекст стекинга */
 }
 
 .checkout-content h2 {

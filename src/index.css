@@ -455,22 +455,3 @@ textarea:focus-visible {
 .text-with-line-breaks-spaced p:not(:first-child) {
   margin-top: 0.1em !important;
 }
-
-/* Критически важные стили для предотвращения неправильного позиционирования спиннеров */
-.checkout-modal .spinner,
-.checkout-modal .loading-spinner,
-.checkout-modal .loading-dots,
-.checkout-modal .wave-loading,
-.checkout-modal *[class*="spinner"],
-.checkout-modal *[class*="loading"] {
-  position: relative !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  margin: 0 auto !important;
-  display: inline-block !important;
-  vertical-align: middle !important;
-  z-index: 1 !important;
-}
