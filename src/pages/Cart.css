@@ -573,6 +573,32 @@ input[type="number"].quantity-input,
   justify-content: center;
   z-index: 2000;
   padding: 2rem;
+  backdrop-filter: blur(4px);
+  transition: backdrop-filter 0.3s ease;
+}
+
+/* Модальное окно во время загрузки */
+.checkout-modal.loading {
+  backdrop-filter: blur(8px);
+}
+
+.checkout-modal.loading .checkout-content {
+  opacity: 0.95;
+  transform: scale(1.02);
+}
+
+/* Стили для заблокированных полей во время загрузки */
+.checkout-modal.loading .form-group input,
+.checkout-modal.loading .form-group select,
+.checkout-modal.loading .form-group textarea {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.checkout-modal.loading .form-group label {
+  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .checkout-content {

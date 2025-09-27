@@ -9,6 +9,7 @@ import { getMainImage } from '../utils/imageHelpers';
 import BrandMark from '../components/BrandMark';
 import { sendTelegramMessage, formatOrderMessage, generateOrderNumber } from '../utils/telegramService';
 import ProductModal from '../components/ProductModal';
+import { LoadingButton, OrderLoadingSteps } from '../components/LoadingSpinner';
 import './Cart.css';
 
 function Cart() {
@@ -44,6 +45,10 @@ function Cart() {
     paymentMethod: 'cash',
     comment: ''
   });
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // ВСЕ ХУКИ ДОЛЖНЫ БЫТЬ ВЫЗВАНЫ ДО УСЛОВНЫХ ВОЗВРАТОВ
   // Расчет применимых скидок
@@ -285,6 +290,12 @@ function Cart() {
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
     
+    if (isSubmittingOrder) return; // Предотвращаем повторную отправку
+    
+    setIsSubmittingOrder(true);
+    setLoadingStep(1); // Начинаем с этапа создания заказа
+    setLoadingMessage('Создаем заказ в системе...');
+    
     try {
       // Генерируем номер заказа
       const orderNumber = generateOrderNumber();
@@ -297,16 +308,22 @@ function Cart() {
         orderNumber
       };
       
-      // Сохраняем заказ в систему
+      // Этап 1: Сохраняем заказ в систему
       const savedOrder = await createOrder(orderData);
       console.log('Заказ сохранен в системе:', savedOrder);
+      
+      setLoadingStep(2); // Переходим к этапу отправки уведомления
+      setLoadingMessage('Отправляем уведомление...');
       
       // Форматируем сообщение для Telegram
       const message = formatOrderMessage(orderData);
       
-      // Отправляем в Telegram
+      // Этап 2: Отправляем в Telegram
       console.log('Отправляем заказ в Telegram...');
       const result = await sendTelegramMessage(message);
+      
+      setLoadingStep(3); // Завершающий этап
+      setLoadingMessage('Завершаем оформление заказа...');
       
       if (result.success) {
         alert(`Заказ #${orderNumber} успешно оформлен! Мы свяжемся с вами в ближайшее время.`);
@@ -316,6 +333,9 @@ function Cart() {
         alert(`Заказ #${orderNumber} оформлен, но возникла ошибка при отправке уведомления. Мы обязательно с вами свяжемся!`);
       }
       
+      // Небольшая задержка для показа завершающего этапа
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       // Очищаем корзину и переходим на главную
       clearCart();
       setShowCheckout(false);
@@ -324,6 +344,28 @@ function Cart() {
     } catch (error) {
       console.error('Ошибка при оформлении заказа:', error);
       alert('Произошла ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.');
+    } finally {
+      setIsSubmittingOrder(false);
+      setLoadingStep(0);
+      setLoadingMessage('');
+    }
+  };
+
+  const handleCancelOrder = () => {
+    if (isSubmittingOrder) {
+      setIsCancelling(true);
+      setLoadingMessage('Отменяем заказ...');
+      
+      // Симулируем небольшую задержку для отмены
+      setTimeout(() => {
+        setIsSubmittingOrder(false);
+        setLoadingStep(0);
+        setLoadingMessage('');
+        setIsCancelling(false);
+        setShowCheckout(false);
+      }, 1000);
+    } else {
+      setShowCheckout(false);
     }
   };
 
@@ -615,7 +657,7 @@ function Cart() {
         <AnimatePresence>
           {showCheckout && (
             <motion.div
-              className="checkout-modal"
+              className={`checkout-modal ${isSubmittingOrder ? 'loading' : ''}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -638,6 +680,7 @@ function Cart() {
                       value={orderForm.name}
                       onChange={handleFormChange}
                       required
+                      disabled={isSubmittingOrder}
                     />
                   </div>
                   
@@ -650,6 +693,7 @@ function Cart() {
                       value={orderForm.phone}
                       onChange={handleFormChange}
                       required
+                      disabled={isSubmittingOrder}
                     />
                   </div>
                   
@@ -661,6 +705,7 @@ function Cart() {
                       name="email"
                       value={orderForm.email}
                       onChange={handleFormChange}
+                      disabled={isSubmittingOrder}
                     />
                   </div>
                   
@@ -672,6 +717,7 @@ function Cart() {
                       value={orderForm.deliveryMethod}
                       onChange={handleFormChange}
                       required
+                      disabled={isSubmittingOrder}
                     >
                       <option value="pickup">Самовывоз</option>
                       <option value="delivery">Доставка</option>
@@ -688,6 +734,7 @@ function Cart() {
                         onChange={handleFormChange}
                         required={orderForm.deliveryMethod === 'delivery'}
                         rows="3"
+                        disabled={isSubmittingOrder}
                       />
                     </div>
                   )}
@@ -700,6 +747,7 @@ function Cart() {
                       value={orderForm.paymentMethod}
                       onChange={handleFormChange}
                       required
+                      disabled={isSubmittingOrder}
                     >
                       <option value="cash">Наличными</option>
                       <option value="card">Банковской картой</option>
@@ -715,6 +763,7 @@ function Cart() {
                       value={orderForm.comment}
                       onChange={handleFormChange}
                       rows="3"
+                      disabled={isSubmittingOrder}
                     />
                   </div>
                   
@@ -748,13 +797,31 @@ function Cart() {
                     </div>
                   </div>
                   
+                  {/* Компонент этапов загрузки */}
+                  <OrderLoadingSteps 
+                    currentStep={loadingStep} 
+                    isLoading={isSubmittingOrder} 
+                    message={loadingMessage}
+                  />
+                  
                   <div className="form-actions">
-                    <button type="button" onClick={() => setShowCheckout(false)} className="cancel-btn">
-                      Отмена
+                    <button 
+                      type="button" 
+                      onClick={handleCancelOrder} 
+                      className="cancel-btn"
+                      disabled={isCancelling}
+                    >
+                      {isCancelling ? 'Отмена...' : 'Отмена'}
                     </button>
-                    <button type="submit" className="submit-btn">
+                    <LoadingButton
+                      type="submit"
+                      isLoading={isSubmittingOrder}
+                      loadingText="Обрабатываем заказ..."
+                      disabled={isSubmittingOrder}
+                      className="submit-btn"
+                    >
                       Подтвердить заказ
-                    </button>
+                    </LoadingButton>
                   </div>
                 </form>
               </motion.div>
