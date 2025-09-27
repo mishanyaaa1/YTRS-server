@@ -34,6 +34,7 @@ const allowedOrigins = new Set([
   'http://localhost:5174',
   'http://127.0.0.1:5174',
   'http://localhost:3001', // через прокси changeOrigin
+  'http://83.166.247.112:5174', // IP сервера для мобильных устройств
   'https://yourdomain.com',
   'https://www.yourdomain.com',
   process.env.DOMAIN ? `https://${process.env.DOMAIN}` : '',
@@ -46,10 +47,18 @@ app.use(
     origin(origin, callback) {
       if (!origin) return callback(null, true);
       if (allowedOrigins.has(origin)) return callback(null, true);
+      
+      // Разрешаем запросы с IP сервера (для мобильных устройств)
+      if (origin && origin.startsWith('http://83.166.247.112:')) {
+        return callback(null, true);
+      }
+      
       // В продакшене разрешаем только HTTPS
       if (NODE_ENV === 'production' && origin.startsWith('https://')) {
         return callback(null, true);
       }
+      
+      console.log('CORS blocked origin:', origin);
       return callback(null, false);
     },
     credentials: true,
