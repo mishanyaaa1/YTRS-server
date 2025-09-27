@@ -45,36 +45,19 @@ const allowedOrigins = new Set([
 app.use(
   cors({
     origin(origin, callback) {
-      console.log('CORS request from origin:', origin);
-      console.log('Allowed origins:', Array.from(allowedOrigins));
-      
-      // ВРЕМЕННО: разрешаем все запросы для отладки
-      console.log('CORS: Temporarily allowing all origins for debugging');
-      return callback(null, true);
-      
-      if (!origin) {
-        console.log('CORS: No origin, allowing');
-        return callback(null, true);
-      }
-      
-      if (allowedOrigins.has(origin)) {
-        console.log('CORS: Origin in allowed list, allowing');
-        return callback(null, true);
-      }
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.has(origin)) return callback(null, true);
       
       // Разрешаем запросы с IP сервера (для мобильных устройств)
       if (origin && origin.startsWith('http://83.166.247.112:')) {
-        console.log('CORS: IP server origin, allowing');
         return callback(null, true);
       }
       
       // В продакшене разрешаем только HTTPS
       if (NODE_ENV === 'production' && origin.startsWith('https://')) {
-        console.log('CORS: Production HTTPS origin, allowing');
         return callback(null, true);
       }
       
-      console.log('CORS blocked origin:', origin);
       return callback(null, false);
     },
     credentials: true,
@@ -84,11 +67,6 @@ app.use(
 app.use(cookieParser());
 app.use(express.json({ limit: '25mb' }));
 
-// Логирование всех запросов
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} from ${req.get('origin') || 'no-origin'}`);
-  next();
-});
 // Статическая раздача загруженных файлов
 const uploadsDir = path.join(__dirname, 'uploads');
 const backupsDir = path.join(__dirname, 'backups');

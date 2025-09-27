@@ -178,14 +178,6 @@ textarea:focus-visible {
   font-weight: bold;
 }
 
-.debug-button {
-  color: #ff6b6b !important;
-}
-
-.debug-button:hover {
-  background: rgba(255, 107, 107, 0.1) !important;
-  color: #ff5252 !important;
-}
 
 /* Мобильное меню */
 .mobile-menu-button {

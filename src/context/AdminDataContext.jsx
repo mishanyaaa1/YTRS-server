@@ -8,7 +8,6 @@ import {
   initialVehicles
 } from '../data/initialData.js';
 import { migrateProductImages } from '../utils/imageHelpers';
-import logger from '../utils/logger';
 
 // Вспомогательная функция для получения заголовков с токеном
 const getAuthHeaders = () => {
@@ -20,14 +19,11 @@ const getAuthHeaders = () => {
 };
 
 // Безопасное сохранение в localStorage
-const safeSetItem = (key, value, logMessage = '') => {
+const safeSetItem = (key, value) => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
-    if (logMessage) {
-      logger.addLog('API', logMessage);
-    }
   } catch (e) {
-    logger.addLog('WARN', `Cannot save ${key} to localStorage: ${e.message}`);
+    // Игнорируем ошибки localStorage
   }
 };
 
@@ -324,19 +320,16 @@ export const AdminDataProvider = ({ children }) => {
     const bootstrapFromApi = async () => {
       try {
         console.log('AdminDataContext: Starting API bootstrap...');
-        logger.addLog('INFO', 'AdminDataContext: Starting API bootstrap...');
         
         // Определяем мобильное устройство один раз
         const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
         // АГРЕССИВНАЯ очистка localStorage на мобильных устройствах
         if (isMobileDevice) {
-          logger.addLog('WARN', 'Mobile device: performing aggressive localStorage cleanup');
           try {
             localStorage.clear();
-            logger.addLog('INFO', 'localStorage cleared completely on mobile');
           } catch (e) {
-            logger.addLog('ERROR', `Failed to clear localStorage: ${e.message}`);
+            // Игнорируем ошибки очистки
           }
         }
         
@@ -347,11 +340,9 @@ export const AdminDataProvider = ({ children }) => {
         } catch (e) {
           if (e.name === 'QuotaExceededError') {
             console.warn('AdminDataContext: localStorage is full, clearing old data...');
-            logger.addLog('WARN', 'localStorage is full, clearing old data...');
             
             // На мобильных устройствах очищаем ВСЕ данные
             if (isMobileDevice) {
-              logger.addLog('WARN', 'Mobile device: clearing ALL localStorage data');
               localStorage.clear();
             } else {
               // На десктопе очищаем только старые admin данные
@@ -360,7 +351,6 @@ export const AdminDataProvider = ({ children }) => {
               allKeys.forEach(key => {
                 if (!criticalKeys.includes(key) && key.startsWith('admin')) {
                   localStorage.removeItem(key);
-                  console.log('AdminDataContext: Removed', key, 'from localStorage');
                 }
               });
             }
@@ -370,15 +360,12 @@ export const AdminDataProvider = ({ children }) => {
         // Очищаем localStorage перед загрузкой новых данных на мобильных устройствах
         if (isMobileDevice) {
           console.log('AdminDataContext: Mobile device detected, clearing localStorage before loading...');
-          logger.addLog('INFO', 'Mobile device detected, clearing localStorage...');
           
           // Очищаем ВСЕ admin данные на мобильных устройствах для экономии места
           const allKeys = Object.keys(localStorage);
           allKeys.forEach(key => {
             if (key.startsWith('admin')) {
               localStorage.removeItem(key);
-              console.log('AdminDataContext: Mobile cleanup - removed', key);
-              logger.addLog('INFO', `Removed ${key} from localStorage`);
             }
           });
           
@@ -386,57 +373,25 @@ export const AdminDataProvider = ({ children }) => {
           ['cart', 'wishlist', 'user_preferences'].forEach(key => {
             if (localStorage.getItem(key)) {
               localStorage.removeItem(key);
-              logger.addLog('INFO', `Removed ${key} from localStorage`);
             }
           });
         }
-        logger.addLog('API', 'Starting parallel API requests...');
         const [apiProductsRes, apiCategoriesRes, apiBrandsRes, apiPromosRes, apiTerrainTypesRes, apiVehicleTypesRes, apiVehiclesRes, apiContentRes, apiPopularProductsRes, apiFilterSettingsRes] = await Promise.allSettled([
-          fetch('/api/products', { credentials: 'include' }).then(r => {
-            logger.addLog('API', `Products: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
-          }),
-          fetch('/api/categories', { credentials: 'include' }).then(r => {
-            logger.addLog('API', `Categories: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
-          }),
-          fetch('/api/brands', { credentials: 'include' }).then(r => {
-            logger.addLog('API', `Brands: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
-          }),
-          fetch('/api/promotions', { credentials: 'include' }).then(r => {
-            logger.addLog('API', `Promotions: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
-          }),
-          fetch('/api/terrain-types', { credentials: 'include' }).then(r => {
-            logger.addLog('API', `Terrain Types: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
-          }),
-          fetch('/api/vehicle-types', { credentials: 'include' }).then(r => {
-            logger.addLog('API', `Vehicle Types: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
-          }),
-          fetch('/api/vehicles', { credentials: 'include' }).then(r => {
-            logger.addLog('API', `Vehicles: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
-          }),
-          fetch('/api/content', { credentials: 'include' }).then(r => {
-            logger.addLog('API', `Content: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
-          }),
+          fetch('/api/products', { credentials: 'include' }),
+          fetch('/api/categories', { credentials: 'include' }),
+          fetch('/api/brands', { credentials: 'include' }),
+          fetch('/api/promotions', { credentials: 'include' }),
+          fetch('/api/terrain-types', { credentials: 'include' }),
+          fetch('/api/vehicle-types', { credentials: 'include' }),
+          fetch('/api/vehicles', { credentials: 'include' }),
+          fetch('/api/content', { credentials: 'include' }),
           fetch('/api/admin/popular-products', { 
             credentials: 'include',
             headers: getAuthHeaders()
-          }).then(r => {
-            logger.addLog('API', `Popular Products: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
           }),
           fetch('/api/admin/filter-settings', { 
             credentials: 'include',
             headers: getAuthHeaders()
-          }).then(r => {
-            logger.addLog('API', `Filter Settings: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
-            return r;
           })
         ]);
 
@@ -446,11 +401,10 @@ export const AdminDataProvider = ({ children }) => {
             ? apiProducts.map(p => migrateProductImages(p)).sort((a, b) => (a.id || 0) - (b.id || 0))
             : [];
           console.log('AdminDataContext: Loaded', normalized.length, 'products from API');
-          logger.addLog('API', `Loaded ${normalized.length} products from API`);
           setProducts(normalized);
           
           // Безопасное сохранение в localStorage
-          safeSetItem('adminProducts', normalized, 'Products saved to localStorage');
+          safeSetItem('adminProducts', normalized);
         } else {
           console.warn('AdminDataContext: Failed to load products from API:', apiProductsRes.status);
         }
@@ -460,10 +414,9 @@ export const AdminDataProvider = ({ children }) => {
           const normalizedCats = normalizeCategories(apiCats);
           if (normalizedCats && typeof normalizedCats === 'object') {
             console.log('AdminDataContext: Loaded categories from API');
-            logger.addLog('API', 'Categories loaded from API');
             setCategories(normalizedCats);
             
-            safeSetItem('adminCategories', normalizedCats, 'Categories saved to localStorage');
+            safeSetItem('adminCategories', normalizedCats);
           }
         } else {
           console.warn('AdminDataContext: Failed to load categories from API:', apiCategoriesRes.status);
@@ -473,10 +426,9 @@ export const AdminDataProvider = ({ children }) => {
           const apiBrands = await apiBrandsRes.value.json();
           if (Array.isArray(apiBrands) && apiBrands.length) {
             console.log('AdminDataContext: Loaded brands from API');
-            logger.addLog('API', `Loaded ${apiBrands.length} brands from API`);
             setBrands(apiBrands);
             
-            safeSetItem('adminBrands', apiBrands, 'Brands saved to localStorage');
+            safeSetItem('adminBrands', apiBrands);
           }
         } else {
           console.warn('AdminDataContext: Failed to load brands from API:', apiBrandsRes.status);
@@ -543,26 +495,19 @@ export const AdminDataProvider = ({ children }) => {
         }
 
         if (apiVehiclesRes.status === 'fulfilled' && apiVehiclesRes.value.ok) {
-          logger.addLog('API', 'Processing vehicles data...');
           const apiVehicles = await apiVehiclesRes.value.json();
           console.log('AdminDataContext: API vehicles response:', apiVehicles);
-          logger.addLog('API', `Vehicles data received: ${Array.isArray(apiVehicles) ? apiVehicles.length : 'not array'} items`);
           if (Array.isArray(apiVehicles)) {
             console.log('AdminDataContext: Loaded', apiVehicles.length, 'vehicles from API');
-            logger.addLog('API', `Successfully loaded ${apiVehicles.length} vehicles from API`);
-            logger.addLog('API', 'Setting vehicles state...');
             setVehicles(apiVehicles);
-            logger.addLog('API', 'Vehicles state set successfully');
-            safeSetItem('adminVehicles', apiVehicles, 'Vehicles saved to localStorage successfully');
+            safeSetItem('adminVehicles', apiVehicles);
           } else {
             console.warn('AdminDataContext: API vehicles response is not an array:', apiVehicles);
           }
         } else {
           console.warn('AdminDataContext: Failed to load vehicles from API:', apiVehiclesRes.status, apiVehiclesRes.reason);
-          logger.addLog('ERROR', `Failed to load vehicles from API: ${apiVehiclesRes.status} ${apiVehiclesRes.reason || ''}`);
           if (apiVehiclesRes.status === 'rejected') {
             console.error('AdminDataContext: Vehicles API error:', apiVehiclesRes.reason);
-            logger.addLog('ERROR', `Vehicles API error: ${apiVehiclesRes.reason}`);
           }
         }
 
@@ -628,13 +573,10 @@ export const AdminDataProvider = ({ children }) => {
           console.warn('AdminDataContext: Failed to load filter settings from API:', apiFilterSettingsRes.status);
         }
         
-        logger.addLog('API', 'API bootstrap completed successfully');
         console.log('AdminDataContext: API bootstrap completed');
       } catch (e) {
         console.error('AdminDataContext: API bootstrap failed:', e);
-        logger.addLog('ERROR', `API bootstrap failed: ${e.message}`);
         console.warn('AdminDataContext: Using local data as fallback');
-        logger.addLog('WARN', 'Using local data as fallback');
       }
     };
     bootstrapFromApi();

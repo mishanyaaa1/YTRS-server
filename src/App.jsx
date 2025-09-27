@@ -11,13 +11,11 @@ import {
   FaTimes,
   FaVk,
   FaInstagram,
-  FaYoutube,
-  FaBug
+  FaYoutube
 } from 'react-icons/fa';
 import { useCart } from './context/CartContext';
 import { useAdminData } from './context/AdminDataContext';
 import SearchModal from './components/SearchModal';
-import logger from './utils/logger';
 import './App.css';
 import './index.css';
 import './global-input-styles.css';
@@ -191,15 +189,6 @@ function App() {
                 aria-label="Поиск"
               >
                 <FaSearch />
-              </button>
-
-              <button 
-                className="icon-button debug-button" 
-                onClick={() => logger.show()}
-                aria-label="Открыть логи"
-                title="Открыть логи для отладки"
-              >
-                <FaBug />
               </button>
 
               <Link to="/cart" className="icon-button cart-button" aria-label="Корзина">

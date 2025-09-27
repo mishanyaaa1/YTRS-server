@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import logger from '../utils/logger';
 
 const OrdersContext = createContext();
 
@@ -57,20 +56,15 @@ export const OrdersProvider = ({ children }) => {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        logger.addLog('API', 'Loading orders...');
         const response = await fetch('/api/orders', { 
           credentials: 'include',
           headers: getAuthHeaders()
         });
-        logger.addLog('API', `Orders response: ${response.status} ${response.ok ? 'OK' : 'ERROR'}`);
         if (!response.ok) throw new Error('Failed to load orders');
         const data = await response.json();
-        logger.addLog('API', `Orders data received: ${Array.isArray(data) ? data.length : 'not array'} items`);
         setOrders(Array.isArray(data) ? data : []);
-        logger.addLog('API', 'Orders loaded successfully');
       } catch (error) {
         console.error('Ошибка при загрузке заказов с сервера:', error);
-        logger.addLog('ERROR', `Orders loading error: ${error.message}`);
         setOrders([]);
       }
     };

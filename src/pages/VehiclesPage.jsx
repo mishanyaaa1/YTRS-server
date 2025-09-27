@@ -8,7 +8,6 @@ import { useAdminData } from '../context/AdminDataContext';
 import { useCartActions } from '../hooks/useCartActions';
 import { migrateProductImages, getMainImage, isImageUrl } from '../utils/imageHelpers';
 import BrandMark from '../components/BrandMark';
-import logger from '../utils/logger';
 import './VehiclesPage.css';
 import '../Catalog.css';
 
@@ -20,11 +19,6 @@ function VehiclesPage() {
   const [selectedTerrain, setSelectedTerrain] = useState('Все');
   const [priceRange, setPriceRange] = useState([0, 0]);
 
-  // Логирование состояния vehicles
-  useEffect(() => {
-    logger.addLog('VEHICLES', `VehiclesPage: vehicles state changed - ${vehicles.length} items`);
-    console.log('VehiclesPage: vehicles state:', vehicles);
-  }, [vehicles]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
