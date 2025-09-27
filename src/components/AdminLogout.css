@@ -1,0 +1,43 @@
+.admin-logout-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.admin-logout-button:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+}
+
+.admin-logout-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+}
+
+.admin-logout-button svg {
+  flex-shrink: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .admin-logout-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .admin-logout-button svg {
+    width: 14px;
+    height: 14px;
+  }
+}

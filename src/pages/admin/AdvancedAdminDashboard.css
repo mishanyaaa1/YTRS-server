@@ -125,6 +125,16 @@
   padding: 10px 0;
 }
 
+.logout-container {
+  padding: 0 20px;
+}
+
+.logout-container .admin-logout-button {
+  width: 100%;
+  justify-content: center;
+  margin: 0;
+}
+
 .admin-main {
   flex: 1;
   margin-left: 280px;

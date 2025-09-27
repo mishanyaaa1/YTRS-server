@@ -18,6 +18,8 @@ import SimpleAdminDashboard from './pages/admin/SimpleAdminDashboard.jsx'
 import AdvancedAdminDashboard from './pages/admin/AdvancedAdminDashboard.jsx'
 import { CartProvider } from './context/CartContext.jsx'
 import { AdminDataProvider } from './context/AdminDataContext.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 // Removed WishlistProvider
 import { OrdersProvider } from './context/OrdersContext.jsx'
 
@@ -69,25 +71,37 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      <AdminDataProvider>
-        <SimpleAdminDashboard />
-      </AdminDataProvider>
+      <AuthProvider>
+        <AdminDataProvider>
+          <ProtectedRoute>
+            <SimpleAdminDashboard />
+          </ProtectedRoute>
+        </AdminDataProvider>
+      </AuthProvider>
     )
   },
   {
     path: "/admin/dashboard",
     element: (
-      <AdminDataProvider>
-        <SimpleAdminDashboard />
-      </AdminDataProvider>
+      <AuthProvider>
+        <AdminDataProvider>
+          <ProtectedRoute>
+            <SimpleAdminDashboard />
+          </ProtectedRoute>
+        </AdminDataProvider>
+      </AuthProvider>
     )
   },
   {
     path: "/admin/advanced",
     element: (
-      <AdminDataProvider>
-        <AdvancedAdminDashboard />
-      </AdminDataProvider>
+      <AuthProvider>
+        <AdminDataProvider>
+          <ProtectedRoute>
+            <AdvancedAdminDashboard />
+          </ProtectedRoute>
+        </AdminDataProvider>
+      </AuthProvider>
     )
   }
 ]);

@@ -330,67 +330,24 @@ export const AdminDataProvider = ({ children }) => {
             });
           }
         }
-        console.log('AdminDataContext: Starting parallel API requests...');
         const [apiProductsRes, apiCategoriesRes, apiBrandsRes, apiPromosRes, apiTerrainTypesRes, apiVehicleTypesRes, apiVehiclesRes, apiContentRes, apiPopularProductsRes, apiFilterSettingsRes] = await Promise.allSettled([
-          fetch('/api/products', { credentials: 'include' }).then(r => {
-            console.log('AdminDataContext: Products API response:', r.status, r.ok);
-            return r;
-          }),
-          fetch('/api/categories', { credentials: 'include' }).then(r => {
-            console.log('AdminDataContext: Categories API response:', r.status, r.ok);
-            return r;
-          }),
-          fetch('/api/brands', { credentials: 'include' }).then(r => {
-            console.log('AdminDataContext: Brands API response:', r.status, r.ok);
-            return r;
-          }),
-          fetch('/api/promotions', { credentials: 'include' }).then(r => {
-            console.log('AdminDataContext: Promotions API response:', r.status, r.ok);
-            return r;
-          }),
-          fetch('/api/terrain-types', { credentials: 'include' }).then(r => {
-            console.log('AdminDataContext: Terrain types API response:', r.status, r.ok);
-            return r;
-          }),
-          fetch('/api/vehicle-types', { credentials: 'include' }).then(r => {
-            console.log('AdminDataContext: Vehicle types API response:', r.status, r.ok);
-            return r;
-          }),
-          fetch('/api/vehicles', { credentials: 'include' }).then(r => {
-            console.log('AdminDataContext: Vehicles API response:', r.status, r.ok);
-            return r;
-          }),
-          fetch('/api/content', { credentials: 'include' }).then(r => {
-            console.log('AdminDataContext: Content API response:', r.status, r.ok);
-            return r;
-          }),
+          fetch('/api/products', { credentials: 'include' }),
+          fetch('/api/categories', { credentials: 'include' }),
+          fetch('/api/brands', { credentials: 'include' }),
+          fetch('/api/promotions', { credentials: 'include' }),
+          fetch('/api/terrain-types', { credentials: 'include' }),
+          fetch('/api/vehicle-types', { credentials: 'include' }),
+          fetch('/api/vehicles', { credentials: 'include' }),
+          fetch('/api/content', { credentials: 'include' }),
           fetch('/api/admin/popular-products', { 
             credentials: 'include',
             headers: getAuthHeaders()
-          }).then(r => {
-            console.log('AdminDataContext: Popular products API response:', r.status, r.ok);
-            return r;
           }),
           fetch('/api/admin/filter-settings', { 
             credentials: 'include',
             headers: getAuthHeaders()
-          }).then(r => {
-            console.log('AdminDataContext: Filter settings API response:', r.status, r.ok);
-            return r;
           })
         ]);
-        
-        console.log('AdminDataContext: All API requests completed. Results:');
-        console.log('- Products:', apiProductsRes.status, apiProductsRes.value?.ok);
-        console.log('- Categories:', apiCategoriesRes.status, apiCategoriesRes.value?.ok);
-        console.log('- Brands:', apiBrandsRes.status, apiBrandsRes.value?.ok);
-        console.log('- Promotions:', apiPromosRes.status, apiPromosRes.value?.ok);
-        console.log('- Terrain types:', apiTerrainTypesRes.status, apiTerrainTypesRes.value?.ok);
-        console.log('- Vehicle types:', apiVehicleTypesRes.status, apiVehicleTypesRes.value?.ok);
-        console.log('- Vehicles:', apiVehiclesRes.status, apiVehiclesRes.value?.ok);
-        console.log('- Content:', apiContentRes.status, apiContentRes.value?.ok);
-        console.log('- Popular products:', apiPopularProductsRes.status, apiPopularProductsRes.value?.ok);
-        console.log('- Filter settings:', apiFilterSettingsRes.status, apiFilterSettingsRes.value?.ok);
 
         if (apiProductsRes.status === 'fulfilled' && apiProductsRes.value.ok) {
           const apiProducts = await apiProductsRes.value.json();
