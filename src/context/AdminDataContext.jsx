@@ -311,6 +311,25 @@ export const AdminDataProvider = ({ children }) => {
     const bootstrapFromApi = async () => {
       try {
         console.log('AdminDataContext: Starting API bootstrap...');
+        
+        // Проверяем и очищаем localStorage если он переполнен
+        try {
+          localStorage.setItem('test', 'test');
+          localStorage.removeItem('test');
+        } catch (e) {
+          if (e.name === 'QuotaExceededError') {
+            console.warn('AdminDataContext: localStorage is full, clearing old data...');
+            // Очищаем старые данные, оставляя только критически важные
+            const criticalKeys = ['adminVehicles', 'adminProducts'];
+            const allKeys = Object.keys(localStorage);
+            allKeys.forEach(key => {
+              if (!criticalKeys.includes(key) && key.startsWith('admin')) {
+                localStorage.removeItem(key);
+                console.log('AdminDataContext: Removed', key, 'from localStorage');
+              }
+            });
+          }
+        }
         const [apiProductsRes, apiCategoriesRes, apiBrandsRes, apiPromosRes, apiTerrainTypesRes, apiVehicleTypesRes, apiVehiclesRes, apiContentRes, apiPopularProductsRes, apiFilterSettingsRes] = await Promise.allSettled([
           fetch('/api/products', { credentials: 'include' }),
           fetch('/api/categories', { credentials: 'include' }),
@@ -404,7 +423,28 @@ export const AdminDataProvider = ({ children }) => {
           if (Array.isArray(apiVehicles)) {
             console.log('AdminDataContext: Loaded', apiVehicles.length, 'vehicles from API');
             setVehicles(apiVehicles);
-            localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
+            try {
+              localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
+              console.log('AdminDataContext: Successfully saved vehicles to localStorage');
+            } catch (e) {
+              if (e.name === 'QuotaExceededError') {
+                console.error('AdminDataContext: Cannot save vehicles to localStorage - quota exceeded');
+                // Очищаем localStorage и пробуем снова
+                const criticalKeys = ['adminVehicles'];
+                const allKeys = Object.keys(localStorage);
+                allKeys.forEach(key => {
+                  if (!criticalKeys.includes(key)) {
+                    localStorage.removeItem(key);
+                  }
+                });
+                try {
+                  localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
+                  console.log('AdminDataContext: Successfully saved vehicles after cleanup');
+                } catch (e2) {
+                  console.error('AdminDataContext: Still cannot save vehicles after cleanup:', e2);
+                }
+              }
+            }
           } else {
             console.warn('AdminDataContext: API vehicles response is not an array:', apiVehicles);
           }
