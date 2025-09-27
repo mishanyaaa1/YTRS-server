@@ -326,9 +326,11 @@ export const AdminDataProvider = ({ children }) => {
         console.log('AdminDataContext: Starting API bootstrap...');
         logger.addLog('INFO', 'AdminDataContext: Starting API bootstrap...');
         
+        // Определяем мобильное устройство один раз
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
         // АГРЕССИВНАЯ очистка localStorage на мобильных устройствах
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        if (isMobile) {
+        if (isMobileDevice) {
           logger.addLog('WARN', 'Mobile device: performing aggressive localStorage cleanup');
           try {
             localStorage.clear();
@@ -348,8 +350,7 @@ export const AdminDataProvider = ({ children }) => {
             logger.addLog('WARN', 'localStorage is full, clearing old data...');
             
             // На мобильных устройствах очищаем ВСЕ данные
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (isMobile) {
+            if (isMobileDevice) {
               logger.addLog('WARN', 'Mobile device: clearing ALL localStorage data');
               localStorage.clear();
             } else {
@@ -367,8 +368,7 @@ export const AdminDataProvider = ({ children }) => {
         }
         
         // Очищаем localStorage перед загрузкой новых данных на мобильных устройствах
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        if (isMobile) {
+        if (isMobileDevice) {
           console.log('AdminDataContext: Mobile device detected, clearing localStorage before loading...');
           logger.addLog('INFO', 'Mobile device detected, clearing localStorage...');
           
