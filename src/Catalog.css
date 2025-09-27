@@ -736,9 +736,10 @@ input[type='number'] {
   }
   
   .catalog-card-list .catalog-card-price {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     white-space: nowrap;
     flex-shrink: 0;
+    line-height: 1.1;
   }
   
   .catalog-card-list .catalog-card-header h3 {
@@ -1341,6 +1342,10 @@ input[type='number'] {
 
 /* Дополнительные стили для экранов 400px */
 @media (max-width: 400px) {
+  .catalog-card-list .catalog-card-price {
+    font-size: 0.8rem;
+    line-height: 1.0;
+  }
   .catalog-wrapper {
     margin: 0.8rem 0 1.2rem 0;
     gap: 0.8rem;
@@ -1527,6 +1532,11 @@ input[type='number'] {
 }
 
 @media (max-width: 360px) {
+  .catalog-card-list .catalog-card-price {
+    font-size: 0.75rem;
+    line-height: 1.0;
+  }
+  
   .catalog-wrapper {
     margin: 0.8rem 0 1rem 0;
     gap: 0.8rem;
@@ -1722,7 +1732,8 @@ input[type='number'] {
   }
   
   .catalog-card-list .catalog-card-price {
-    font-size: 1rem;
+    font-size: 0.85rem;
+    line-height: 1.1;
   }
   
   .catalog-card-list .catalog-card-btn {
@@ -1785,6 +1796,11 @@ input[type='number'] {
 
 /* Дополнительные стили для очень маленьких экранов */
 @media (max-width: 320px) {
+  .catalog-card-list .catalog-card-price {
+    font-size: 0.7rem;
+    line-height: 1.0;
+  }
+  
   .catalog-wrapper {
     margin: 0.5rem 0 1rem 0;
     gap: 0.5rem;
