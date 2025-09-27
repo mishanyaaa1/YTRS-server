@@ -4,6 +4,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  position: relative; /* Убеждаемся что позиционирование относительно */
+  z-index: 1; /* Не перекрываем другие элементы */
 }
 
 .spinner {
@@ -13,6 +15,8 @@
   border-radius: 50%;
   border-top-color: #ffffff;
   animation: spin 1s ease-in-out infinite;
+  position: relative; /* Убираем абсолютное позиционирование */
+  display: inline-block; /* Делаем inline-block для правильного отображения */
 }
 
 .spinner-large {
@@ -69,6 +73,7 @@
     transparent
   );
   animation: shimmer 1.5s infinite;
+  z-index: 1; /* Убеждаемся что эффект остается внутри кнопки */
 }
 
 @keyframes shimmer {
@@ -201,6 +206,42 @@
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative; /* Убеждаемся что позиционирование относительно */
+  z-index: 1; /* Не перекрываем другие элементы */
+  overflow: hidden; /* Скрываем любые элементы, выходящие за границы */
+}
+
+/* Специфичные стили для анимации внутри модального окна */
+.checkout-modal .order-loading-steps {
+  position: relative !important;
+  z-index: 10 !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.checkout-modal .loading-spinner,
+.checkout-modal .spinner,
+.checkout-modal .loading-dots,
+.checkout-modal .wave-loading {
+  position: relative !important;
+  z-index: 1 !important;
+  display: inline-flex !important;
+}
+
+/* Дополнительная защита от неправильного позиционирования */
+.checkout-modal * {
+  position: relative !important;
+}
+
+.checkout-modal .loading-spinner,
+.checkout-modal .spinner,
+.checkout-modal .loading-dots,
+.checkout-modal .wave-loading,
+.checkout-modal .loading-progress,
+.checkout-modal .loading-step {
+  position: relative !important;
+  z-index: auto !important;
+  transform: none !important;
 }
 
 .loading-steps-list {

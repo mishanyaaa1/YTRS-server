@@ -587,6 +587,16 @@ input[type="number"].quantity-input,
   transform: scale(1.02);
 }
 
+/* Дополнительная защита от неправильного позиционирования анимации */
+.checkout-modal.loading {
+  overflow: hidden; /* Скрываем любые элементы, выходящие за границы */
+}
+
+.checkout-modal.loading * {
+  position: relative !important; /* Принудительно устанавливаем относительное позиционирование */
+  transform-origin: center center !important; /* Устанавливаем центр трансформации */
+}
+
 /* Стили для заблокированных полей во время загрузки */
 .checkout-modal.loading .form-group input,
 .checkout-modal.loading .form-group select,
@@ -611,6 +621,9 @@ input[type="number"].quantity-input,
   max-height: 90vh;
   overflow-y: auto;
   color: #ffffff;
+  position: relative; /* Убеждаемся что позиционирование относительно */
+  z-index: 1; /* Правильный z-index для контента */
+  isolation: isolate; /* Создаем новый контекст стекинга */
 }
 
 .checkout-content h2 {
