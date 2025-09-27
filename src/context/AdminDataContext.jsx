@@ -8,6 +8,7 @@ import {
   initialVehicles
 } from '../data/initialData.js';
 import { migrateProductImages } from '../utils/imageHelpers';
+import logger from '../utils/logger';
 
 // Вспомогательная функция для получения заголовков с токеном
 const getAuthHeaders = () => {
@@ -311,6 +312,7 @@ export const AdminDataProvider = ({ children }) => {
     const bootstrapFromApi = async () => {
       try {
         console.log('AdminDataContext: Starting API bootstrap...');
+        logger.addLog('INFO', 'AdminDataContext: Starting API bootstrap...');
         
         // Проверяем и очищаем localStorage если он переполнен
         try {
@@ -344,22 +346,53 @@ export const AdminDataProvider = ({ children }) => {
             }
           });
         }
+        logger.addLog('API', 'Starting parallel API requests...');
         const [apiProductsRes, apiCategoriesRes, apiBrandsRes, apiPromosRes, apiTerrainTypesRes, apiVehicleTypesRes, apiVehiclesRes, apiContentRes, apiPopularProductsRes, apiFilterSettingsRes] = await Promise.allSettled([
-          fetch('/api/products', { credentials: 'include' }),
-          fetch('/api/categories', { credentials: 'include' }),
-          fetch('/api/brands', { credentials: 'include' }),
-          fetch('/api/promotions', { credentials: 'include' }),
-          fetch('/api/terrain-types', { credentials: 'include' }),
-          fetch('/api/vehicle-types', { credentials: 'include' }),
-          fetch('/api/vehicles', { credentials: 'include' }),
-          fetch('/api/content', { credentials: 'include' }),
+          fetch('/api/products', { credentials: 'include' }).then(r => {
+            logger.addLog('API', `Products: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
+          }),
+          fetch('/api/categories', { credentials: 'include' }).then(r => {
+            logger.addLog('API', `Categories: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
+          }),
+          fetch('/api/brands', { credentials: 'include' }).then(r => {
+            logger.addLog('API', `Brands: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
+          }),
+          fetch('/api/promotions', { credentials: 'include' }).then(r => {
+            logger.addLog('API', `Promotions: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
+          }),
+          fetch('/api/terrain-types', { credentials: 'include' }).then(r => {
+            logger.addLog('API', `Terrain Types: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
+          }),
+          fetch('/api/vehicle-types', { credentials: 'include' }).then(r => {
+            logger.addLog('API', `Vehicle Types: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
+          }),
+          fetch('/api/vehicles', { credentials: 'include' }).then(r => {
+            logger.addLog('API', `Vehicles: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
+          }),
+          fetch('/api/content', { credentials: 'include' }).then(r => {
+            logger.addLog('API', `Content: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
+          }),
           fetch('/api/admin/popular-products', { 
             credentials: 'include',
             headers: getAuthHeaders()
+          }).then(r => {
+            logger.addLog('API', `Popular Products: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
           }),
           fetch('/api/admin/filter-settings', { 
             credentials: 'include',
             headers: getAuthHeaders()
+          }).then(r => {
+            logger.addLog('API', `Filter Settings: ${r.status} ${r.ok ? 'OK' : 'ERROR'}`);
+            return r;
           })
         ]);
 
@@ -461,8 +494,10 @@ export const AdminDataProvider = ({ children }) => {
         if (apiVehiclesRes.status === 'fulfilled' && apiVehiclesRes.value.ok) {
           const apiVehicles = await apiVehiclesRes.value.json();
           console.log('AdminDataContext: API vehicles response:', apiVehicles);
+          logger.addLog('API', `Vehicles data received: ${Array.isArray(apiVehicles) ? apiVehicles.length : 'not array'} items`);
           if (Array.isArray(apiVehicles)) {
             console.log('AdminDataContext: Loaded', apiVehicles.length, 'vehicles from API');
+            logger.addLog('API', `Successfully loaded ${apiVehicles.length} vehicles from API`);
             setVehicles(apiVehicles);
             try {
               localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
@@ -491,8 +526,10 @@ export const AdminDataProvider = ({ children }) => {
           }
         } else {
           console.warn('AdminDataContext: Failed to load vehicles from API:', apiVehiclesRes.status, apiVehiclesRes.reason);
+          logger.addLog('ERROR', `Failed to load vehicles from API: ${apiVehiclesRes.status} ${apiVehiclesRes.reason || ''}`);
           if (apiVehiclesRes.status === 'rejected') {
             console.error('AdminDataContext: Vehicles API error:', apiVehiclesRes.reason);
+            logger.addLog('ERROR', `Vehicles API error: ${apiVehiclesRes.reason}`);
           }
         }
 
@@ -559,7 +596,9 @@ export const AdminDataProvider = ({ children }) => {
         }
       } catch (e) {
         console.error('AdminDataContext: API bootstrap failed:', e);
+        logger.addLog('ERROR', `API bootstrap failed: ${e.message}`);
         console.warn('AdminDataContext: Using local data as fallback');
+        logger.addLog('WARN', 'Using local data as fallback');
       }
     };
     bootstrapFromApi();
