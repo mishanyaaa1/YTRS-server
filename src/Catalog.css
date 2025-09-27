@@ -572,6 +572,7 @@ input[type='number'] {
   margin-left: 0.25rem;
   height: 100%;
   justify-content: space-between;
+  min-width: 0;
 }
 
 .catalog-card-list .catalog-card-header {
@@ -595,7 +596,8 @@ input[type='number'] {
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
-  min-width: 120px;
+  min-width: 140px;
+  max-width: 140px;
   justify-content: flex-end;
 }
 
@@ -603,12 +605,14 @@ input[type='number'] {
   margin-bottom: 0;
   justify-content: flex-end;
   flex-shrink: 0;
-  min-width: 80px;
+  min-width: 90px;
+  max-width: 90px;
 }
 
 .catalog-card-list .catalog-card-btn {
   width: auto;
-  min-width: 60px;
+  min-width: 50px;
+  max-width: 50px;
   margin: 0;
   padding: 0.25rem 0.4rem;
   font-size: 0.65rem;
@@ -723,7 +727,8 @@ input[type='number'] {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 200px;
+    max-width: 180px;
+    min-width: 0;
   }
   
   .catalog-card-list .catalog-card-price {
@@ -738,11 +743,12 @@ input[type='number'] {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 150px;
+    max-width: 120px;
   }
   
   .catalog-card-list .catalog-card-btn {
     min-width: 40px;
+    max-width: 40px;
     width: 40px;
     padding: 0;
     font-size: 0;
@@ -752,6 +758,7 @@ input[type='number'] {
     justify-content: center;
     align-items: center;
     position: relative;
+    flex-shrink: 0;
   }
   
   .catalog-card-list .catalog-card-btn svg {
@@ -1307,6 +1314,27 @@ input[type='number'] {
   }
 }
 
+/* Стили для средних мобильных экранов */
+@media (max-width: 400px) and (min-width: 360px) {
+  .catalog-card-list .catalog-card-actions {
+    min-width: 125px;
+    max-width: 125px;
+  }
+  
+  .catalog-card-list .catalog-card-meta {
+    min-width: 80px;
+    max-width: 80px;
+  }
+  
+  .catalog-card-list .catalog-card-header h3 {
+    max-width: 105px;
+  }
+  
+  .catalog-card-list .catalog-card-info h3 {
+    max-width: 105px;
+  }
+}
+
 /* Дополнительные стили для экранов 400px */
 @media (max-width: 400px) {
   .catalog-wrapper {
@@ -1685,7 +1713,8 @@ input[type='number'] {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 120px;
+    max-width: 100px;
+    min-width: 0;
   }
   
   .catalog-card-list .catalog-card-price {
@@ -1694,6 +1723,7 @@ input[type='number'] {
   
   .catalog-card-list .catalog-card-btn {
     min-width: 36px;
+    max-width: 36px;
     width: 36px;
     padding: 0;
     font-size: 0;
@@ -1703,6 +1733,7 @@ input[type='number'] {
     justify-content: center;
     align-items: center;
     position: relative;
+    flex-shrink: 0;
   }
   
   .catalog-card-list .catalog-card-btn svg {
@@ -1722,7 +1753,29 @@ input[type='number'] {
   .catalog-card-list .catalog-card-meta {
     font-size: 0.75rem;
     min-width: 70px;
+    max-width: 70px;
     flex-shrink: 0;
+  }
+}
+
+/* Специальные стили для iPhone 15 Pro и современных устройств */
+@media (max-width: 430px) and (min-width: 390px) {
+  .catalog-card-list .catalog-card-actions {
+    min-width: 130px;
+    max-width: 130px;
+  }
+  
+  .catalog-card-list .catalog-card-meta {
+    min-width: 85px;
+    max-width: 85px;
+  }
+  
+  .catalog-card-list .catalog-card-header h3 {
+    max-width: 110px;
+  }
+  
+  .catalog-card-list .catalog-card-info h3 {
+    max-width: 110px;
   }
 }
 

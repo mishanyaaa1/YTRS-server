@@ -6,7 +6,8 @@ import Reveal from '../components/Reveal';
 import ImageModal from '../components/ImageModal';
 import { useAdminData } from '../context/AdminDataContext';
 import { useCartActions } from '../hooks/useCartActions';
-import { migrateProductImages, getMainImage } from '../utils/imageHelpers';
+import { migrateProductImages, getMainImage, isImageUrl } from '../utils/imageHelpers';
+import BrandMark from '../components/BrandMark';
 import './VehiclesPage.css';
 import '../Catalog.css';
 
@@ -240,7 +241,25 @@ function VehiclesPage() {
                           (vehicle.image.startsWith('data:image') || 
                            vehicle.image.startsWith('http') || 
                            vehicle.image.startsWith('/img/vehicles/') ||
-                           vehicle.image.startsWith('/uploads/'))) {
+                           vehicle.image.startsWith('/uploads/')) &&
+                           isImageUrl(vehicle.image)) {
+                        
+                        // Проверяем, что это НЕ изображение "фотография отсутствует"
+                        const imageData = vehicle.image.toLowerCase();
+                        if (imageData.includes('фотография отсутствует') || 
+                            imageData.includes('фото отсутствует') || 
+                            imageData.includes('нет фото') ||
+                            imageData.includes('no-image') ||
+                            imageData.includes('placeholder') ||
+                            imageData.includes('отсутствует')) {
+                          console.log('🚫 Пропускаем изображение "фотография отсутствует" для вездехода:', vehicle.name);
+                          return (
+                            <span className="catalog-card-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64 }} />
+                            </span>
+                          );
+                        }
+                        
                         return (
                           <img 
                             src={vehicle.image} 
@@ -251,10 +270,12 @@ function VehiclesPage() {
                           />
                         );
                       }
+                      
+                      // Если нет изображения или оно невалидное, показываем логотип компании
                       return (
-                        <div className="vehicle-placeholder">
-                          <FaTruck />
-                        </div>
+                        <span className="catalog-card-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64 }} />
+                        </span>
                       );
                     })()}
 
