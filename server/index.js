@@ -1104,6 +1104,13 @@ window.telegramPixel = {
 console.log('Loading vehicles API endpoints...');
 app.get('/api/vehicles', async (req, res) => {
   try {
+    // Отключаем кэширование для вездеходов
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    
     const rows = await all(
       `SELECT v.*, vt.name AS vehicle_type_name, tt.name AS terrain_type_name
        FROM vehicles v

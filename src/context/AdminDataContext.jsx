@@ -111,7 +111,7 @@ export const AdminDataProvider = ({ children }) => {
 
   const [vehicles, setVehicles] = useState(() => {
     const saved = localStorage.getItem('adminVehicles');
-    return saved ? JSON.parse(saved) : initialVehicles;
+    return saved ? JSON.parse(saved) : []; // Не используем initialVehicles по умолчанию
   });
 
   // Типы местности и вездеходов
@@ -405,6 +405,10 @@ export const AdminDataProvider = ({ children }) => {
           }
         } else {
           console.warn('AdminDataContext: Failed to load vehicles from API:', apiVehiclesRes.status);
+          // Не используем initialVehicles как fallback, оставляем пустой массив
+          console.log('AdminDataContext: Using empty vehicles array instead of initial data');
+          setVehicles([]);
+          localStorage.setItem('adminVehicles', JSON.stringify([]));
         }
 
         if (apiContentRes.status === 'fulfilled' && apiContentRes.value.ok) {
