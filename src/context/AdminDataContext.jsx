@@ -492,13 +492,16 @@ export const AdminDataProvider = ({ children }) => {
         }
 
         if (apiVehiclesRes.status === 'fulfilled' && apiVehiclesRes.value.ok) {
+          logger.addLog('API', 'Processing vehicles data...');
           const apiVehicles = await apiVehiclesRes.value.json();
           console.log('AdminDataContext: API vehicles response:', apiVehicles);
           logger.addLog('API', `Vehicles data received: ${Array.isArray(apiVehicles) ? apiVehicles.length : 'not array'} items`);
           if (Array.isArray(apiVehicles)) {
             console.log('AdminDataContext: Loaded', apiVehicles.length, 'vehicles from API');
             logger.addLog('API', `Successfully loaded ${apiVehicles.length} vehicles from API`);
+            logger.addLog('API', 'Setting vehicles state...');
             setVehicles(apiVehicles);
+            logger.addLog('API', 'Vehicles state set successfully');
             try {
               localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
               console.log('AdminDataContext: Successfully saved vehicles to localStorage');
@@ -594,6 +597,9 @@ export const AdminDataProvider = ({ children }) => {
         } else {
           console.warn('AdminDataContext: Failed to load filter settings from API:', apiFilterSettingsRes.status);
         }
+        
+        logger.addLog('API', 'API bootstrap completed successfully');
+        console.log('AdminDataContext: API bootstrap completed');
       } catch (e) {
         console.error('AdminDataContext: API bootstrap failed:', e);
         logger.addLog('ERROR', `API bootstrap failed: ${e.message}`);
