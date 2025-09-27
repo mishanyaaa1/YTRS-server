@@ -10,12 +10,12 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://83.166.247.112:3001',
         changeOrigin: true,
         ws: false
       },
       '/uploads': {
-        target: 'http://localhost:3001',
+        target: 'http://83.166.247.112:3001',
         changeOrigin: true
       }
     }
