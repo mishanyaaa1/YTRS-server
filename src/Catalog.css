@@ -609,6 +609,10 @@ input[type='number'] {
   max-width: 90px;
 }
 
+.catalog-card-list .catalog-card-meta span {
+  white-space: nowrap;
+}
+
 .catalog-card-list .catalog-card-btn {
   width: auto;
   min-width: 50px;

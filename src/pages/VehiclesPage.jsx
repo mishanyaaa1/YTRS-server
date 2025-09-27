@@ -241,8 +241,7 @@ function VehiclesPage() {
                           (vehicle.image.startsWith('data:image') || 
                            vehicle.image.startsWith('http') || 
                            vehicle.image.startsWith('/img/vehicles/') ||
-                           vehicle.image.startsWith('/uploads/')) &&
-                           isImageUrl(vehicle.image)) {
+                           vehicle.image.startsWith('/uploads/'))) {
                         
                         // Проверяем, что это НЕ изображение "фотография отсутствует"
                         const imageData = vehicle.image.toLowerCase();
@@ -260,18 +259,32 @@ function VehiclesPage() {
                           );
                         }
                         
+                        // Показываем реальное изображение вездехода с fallback
                         return (
-                          <img 
-                            src={vehicle.image} 
-                            alt={vehicle.name} 
-                            className="catalog-product-image" 
-                            onClick={(e) => handleImageClick(vehicle, e)}
-                            style={{ cursor: 'pointer' }}
-                          />
+                          <>
+                            <img 
+                              src={vehicle.image} 
+                              alt={vehicle.name} 
+                              className="catalog-product-image" 
+                              onClick={(e) => handleImageClick(vehicle, e)}
+                              style={{ cursor: 'pointer' }}
+                              onError={(e) => {
+                                console.log('🚫 Ошибка загрузки изображения для вездехода:', vehicle.name, vehicle.image);
+                                e.target.style.display = 'none';
+                                e.target.nextElementSibling.style.display = 'flex';
+                              }}
+                            />
+                            <span 
+                              className="catalog-card-icon brand-mark-fallback" 
+                              style={{ display: 'none', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                              <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64 }} />
+                            </span>
+                          </>
                         );
                       }
                       
-                      // Если нет изображения или оно невалидное, показываем логотип компании
+                      // Если нет изображения, показываем логотип компании
                       return (
                         <span className="catalog-card-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64 }} />
