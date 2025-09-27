@@ -1,12 +1,30 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import BrandLogo from '../../components/BrandLogo';
-import AdminLogout from '../../components/AdminLogout';
 
 function SimpleAdminDashboard() {
   const navigate = useNavigate();
 
-  // Удаляем старую проверку авторизации, так как теперь используется ProtectedRoute
+  useEffect(() => {
+    let canceled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/me', { credentials: 'include' });
+        if (!res.ok) throw new Error('unauth');
+      } catch (_) {
+        if (!canceled) navigate('/admin');
+      }
+    })();
+    return () => { canceled = true; };
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    } finally {
+      navigate('/admin');
+    }
+  };
 
   return (
     <div style={{
@@ -35,17 +53,30 @@ function SimpleAdminDashboard() {
           />
           <h1 style={{ margin: 0, fontSize: '1.2rem' }}>Панель администратора</h1>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div>
           <Link 
             to="/" 
             style={{ 
               color: '#e6a34a', 
-              textDecoration: 'none'
+              textDecoration: 'none', 
+              marginRight: '20px' 
             }}
           >
             На сайт
           </Link>
-          <AdminLogout />
+          <button 
+            onClick={handleLogout}
+            style={{
+              background: '#ff4444',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Выйти
+          </button>
         </div>
       </header>
 

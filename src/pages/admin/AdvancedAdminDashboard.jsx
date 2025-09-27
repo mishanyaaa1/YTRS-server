@@ -19,14 +19,32 @@ import BrandMark from '../../components/BrandMark';
 import { FaHome, FaBox, FaTags, FaUsers, FaChartBar, FaSignOutAlt, FaEdit, FaStar, FaShoppingCart, FaAd, FaFilter, FaTag, FaTruck, FaRobot, FaCog } from 'react-icons/fa';
 import './AdvancedAdminDashboard.css';
 import BrandLogo from '../../components/BrandLogo';
-import AdminLogout from '../../components/AdminLogout';
 
 function AdvancedAdminDashboard() {
   const navigate = useNavigate();
   const { products, promotions, promocodes, vehicles, popularProductIds } = useAdminData();
   const [activeSection, setActiveSection] = useState('overview');
 
-  // Удаляем старую проверку авторизации, так как теперь используется ProtectedRoute
+  useEffect(() => {
+    let canceled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/me', { credentials: 'include' });
+        if (!res.ok) throw new Error('unauth');
+      } catch (_) {
+        if (!canceled) navigate('/admin');
+      }
+    })();
+    return () => { canceled = true; };
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    } finally {
+      navigate('/admin');
+    }
+  };
 
   const menuItems = [
     { id: 'overview', label: 'Обзор', icon: <FaChartBar /> },
@@ -232,9 +250,10 @@ function AdvancedAdminDashboard() {
             <FaHome />
             <span>На сайт</span>
           </Link>
-          <div className="logout-container">
-            <AdminLogout />
-          </div>
+          <button onClick={handleLogout} className="nav-item logout">
+            <FaSignOutAlt />
+            <span>Выйти</span>
+          </button>
         </div>
       </aside>
 
