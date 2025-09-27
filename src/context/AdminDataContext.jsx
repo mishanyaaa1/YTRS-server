@@ -319,15 +319,15 @@ export const AdminDataProvider = ({ children }) => {
         } catch (e) {
           if (e.name === 'QuotaExceededError') {
             console.warn('AdminDataContext: localStorage is full, clearing old data...');
-            // Очищаем старые данные, оставляя только критически важные
-            const criticalKeys = ['adminVehicles', 'adminProducts'];
-            const allKeys = Object.keys(localStorage);
-            allKeys.forEach(key => {
-              if (!criticalKeys.includes(key) && key.startsWith('admin')) {
-                localStorage.removeItem(key);
-                console.log('AdminDataContext: Removed', key, 'from localStorage');
-              }
-            });
+        // Очищаем старые данные, оставляя только критически важные
+        const criticalKeys = ['adminVehicles', 'adminProducts', 'adminCategories', 'adminBrands'];
+        const allKeys = Object.keys(localStorage);
+        allKeys.forEach(key => {
+          if (!criticalKeys.includes(key) && key.startsWith('admin')) {
+            localStorage.removeItem(key);
+            console.log('AdminDataContext: Removed', key, 'from localStorage');
+          }
+        });
           }
         }
         const [apiProductsRes, apiCategoriesRes, apiBrandsRes, apiPromosRes, apiTerrainTypesRes, apiVehicleTypesRes, apiVehiclesRes, apiContentRes, apiPopularProductsRes, apiFilterSettingsRes] = await Promise.allSettled([
@@ -460,7 +460,17 @@ export const AdminDataProvider = ({ children }) => {
           if (apiContent && apiContent.aboutContent) {
             console.log('AdminDataContext: Loaded content from API');
             setAboutContent(apiContent.aboutContent);
-            localStorage.setItem('adminAboutContent', JSON.stringify(apiContent.aboutContent));
+            try {
+              localStorage.setItem('adminAboutContent', JSON.stringify(apiContent.aboutContent));
+              console.log('AdminDataContext: Successfully saved about content to localStorage');
+            } catch (e) {
+              if (e.name === 'QuotaExceededError') {
+                console.warn('AdminDataContext: Cannot save about content to localStorage - quota exceeded, skipping');
+                // Не сохраняем aboutContent если localStorage переполнен
+              } else {
+                console.error('AdminDataContext: Error saving about content:', e);
+              }
+            }
           }
         } else {
           console.warn('AdminDataContext: Failed to load content from API:', apiContentRes.status);
@@ -472,7 +482,16 @@ export const AdminDataProvider = ({ children }) => {
             const productIds = apiPopularProducts.map(p => p.id).filter(id => id);
             console.log('AdminDataContext: Loaded', productIds.length, 'popular products from API');
             setPopularProductIds(productIds);
-            localStorage.setItem('adminPopularProducts', JSON.stringify(productIds));
+            try {
+              localStorage.setItem('adminPopularProducts', JSON.stringify(productIds));
+              console.log('AdminDataContext: Successfully saved popular products to localStorage');
+            } catch (e) {
+              if (e.name === 'QuotaExceededError') {
+                console.warn('AdminDataContext: Cannot save popular products to localStorage - quota exceeded, skipping');
+              } else {
+                console.error('AdminDataContext: Error saving popular products:', e);
+              }
+            }
           }
         } else {
           console.warn('AdminDataContext: Failed to load popular products from API:', apiPopularProductsRes.status);
@@ -483,7 +502,16 @@ export const AdminDataProvider = ({ children }) => {
           if (apiFilterSettings && typeof apiFilterSettings === 'object') {
             console.log('AdminDataContext: Loaded filter settings from API');
             setFilterSettings(apiFilterSettings);
-            localStorage.setItem('adminFilterSettings', JSON.stringify(apiFilterSettings));
+            try {
+              localStorage.setItem('adminFilterSettings', JSON.stringify(apiFilterSettings));
+              console.log('AdminDataContext: Successfully saved filter settings to localStorage');
+            } catch (e) {
+              if (e.name === 'QuotaExceededError') {
+                console.warn('AdminDataContext: Cannot save filter settings to localStorage - quota exceeded, skipping');
+              } else {
+                console.error('AdminDataContext: Error saving filter settings:', e);
+              }
+            }
           }
         } else {
           console.warn('AdminDataContext: Failed to load filter settings from API:', apiFilterSettingsRes.status);
