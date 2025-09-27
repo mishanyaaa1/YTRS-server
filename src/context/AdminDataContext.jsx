@@ -111,7 +111,9 @@ export const AdminDataProvider = ({ children }) => {
 
   const [vehicles, setVehicles] = useState(() => {
     const saved = localStorage.getItem('adminVehicles');
-    return saved ? JSON.parse(saved) : initialVehicles; // Используем initialVehicles как fallback, как у товаров
+    const result = saved ? JSON.parse(saved) : initialVehicles;
+    console.log('AdminDataContext: Initial vehicles state:', result.length, 'vehicles from', saved ? 'localStorage' : 'initialVehicles');
+    return result;
   });
 
   // Типы местности и вездеходов
@@ -398,13 +400,19 @@ export const AdminDataProvider = ({ children }) => {
 
         if (apiVehiclesRes.status === 'fulfilled' && apiVehiclesRes.value.ok) {
           const apiVehicles = await apiVehiclesRes.value.json();
+          console.log('AdminDataContext: API vehicles response:', apiVehicles);
           if (Array.isArray(apiVehicles)) {
             console.log('AdminDataContext: Loaded', apiVehicles.length, 'vehicles from API');
             setVehicles(apiVehicles);
             localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
+          } else {
+            console.warn('AdminDataContext: API vehicles response is not an array:', apiVehicles);
           }
         } else {
-          console.warn('AdminDataContext: Failed to load vehicles from API:', apiVehiclesRes.status);
+          console.warn('AdminDataContext: Failed to load vehicles from API:', apiVehiclesRes.status, apiVehiclesRes.reason);
+          if (apiVehiclesRes.status === 'rejected') {
+            console.error('AdminDataContext: Vehicles API error:', apiVehiclesRes.reason);
+          }
         }
 
         if (apiContentRes.status === 'fulfilled' && apiContentRes.value.ok) {
