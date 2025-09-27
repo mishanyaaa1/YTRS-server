@@ -19,6 +19,18 @@ const getAuthHeaders = () => {
   };
 };
 
+// Безопасное сохранение в localStorage
+const safeSetItem = (key, value, logMessage = '') => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    if (logMessage) {
+      logger.addLog('API', logMessage);
+    }
+  } catch (e) {
+    logger.addLog('WARN', `Cannot save ${key} to localStorage: ${e.message}`);
+  }
+};
+
 const AdminDataContext = createContext();
 
 // Нормализуем любые форматы категорий к виду { [name]: string[] }
@@ -314,6 +326,18 @@ export const AdminDataProvider = ({ children }) => {
         console.log('AdminDataContext: Starting API bootstrap...');
         logger.addLog('INFO', 'AdminDataContext: Starting API bootstrap...');
         
+        // АГРЕССИВНАЯ очистка localStorage на мобильных устройствах
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+          logger.addLog('WARN', 'Mobile device: performing aggressive localStorage cleanup');
+          try {
+            localStorage.clear();
+            logger.addLog('INFO', 'localStorage cleared completely on mobile');
+          } catch (e) {
+            logger.addLog('ERROR', `Failed to clear localStorage: ${e.message}`);
+          }
+        }
+        
         // Проверяем и очищаем localStorage если он переполнен
         try {
           localStorage.setItem('test', 'test');
@@ -422,8 +446,11 @@ export const AdminDataProvider = ({ children }) => {
             ? apiProducts.map(p => migrateProductImages(p)).sort((a, b) => (a.id || 0) - (b.id || 0))
             : [];
           console.log('AdminDataContext: Loaded', normalized.length, 'products from API');
+          logger.addLog('API', `Loaded ${normalized.length} products from API`);
           setProducts(normalized);
-          localStorage.setItem('adminProducts', JSON.stringify(normalized));
+          
+          // Безопасное сохранение в localStorage
+          safeSetItem('adminProducts', normalized, 'Products saved to localStorage');
         } else {
           console.warn('AdminDataContext: Failed to load products from API:', apiProductsRes.status);
         }
@@ -433,8 +460,10 @@ export const AdminDataProvider = ({ children }) => {
           const normalizedCats = normalizeCategories(apiCats);
           if (normalizedCats && typeof normalizedCats === 'object') {
             console.log('AdminDataContext: Loaded categories from API');
+            logger.addLog('API', 'Categories loaded from API');
             setCategories(normalizedCats);
-            localStorage.setItem('adminCategories', JSON.stringify(normalizedCats));
+            
+            safeSetItem('adminCategories', normalizedCats, 'Categories saved to localStorage');
           }
         } else {
           console.warn('AdminDataContext: Failed to load categories from API:', apiCategoriesRes.status);
@@ -444,8 +473,10 @@ export const AdminDataProvider = ({ children }) => {
           const apiBrands = await apiBrandsRes.value.json();
           if (Array.isArray(apiBrands) && apiBrands.length) {
             console.log('AdminDataContext: Loaded brands from API');
+            logger.addLog('API', `Loaded ${apiBrands.length} brands from API`);
             setBrands(apiBrands);
-            localStorage.setItem('adminBrands', JSON.stringify(apiBrands));
+            
+            safeSetItem('adminBrands', apiBrands, 'Brands saved to localStorage');
           }
         } else {
           console.warn('AdminDataContext: Failed to load brands from API:', apiBrandsRes.status);
@@ -522,41 +553,7 @@ export const AdminDataProvider = ({ children }) => {
             logger.addLog('API', 'Setting vehicles state...');
             setVehicles(apiVehicles);
             logger.addLog('API', 'Vehicles state set successfully');
-            try {
-              localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
-              console.log('AdminDataContext: Successfully saved vehicles to localStorage');
-              logger.addLog('API', 'Vehicles saved to localStorage successfully');
-            } catch (e) {
-              if (e.name === 'QuotaExceededError') {
-                console.error('AdminDataContext: Cannot save vehicles to localStorage - quota exceeded');
-                logger.addLog('ERROR', 'Cannot save vehicles - localStorage quota exceeded');
-                
-                // На мобильных устройствах очищаем ВСЕ данные
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                if (isMobile) {
-                  logger.addLog('WARN', 'Mobile: clearing ALL localStorage and retrying');
-                  localStorage.clear();
-                } else {
-                  // На десктопе очищаем только неважные данные
-                  const criticalKeys = ['adminVehicles'];
-                  const allKeys = Object.keys(localStorage);
-                  allKeys.forEach(key => {
-                    if (!criticalKeys.includes(key)) {
-                      localStorage.removeItem(key);
-                    }
-                  });
-                }
-                
-                try {
-                  localStorage.setItem('adminVehicles', JSON.stringify(apiVehicles));
-                  console.log('AdminDataContext: Successfully saved vehicles after cleanup');
-                  logger.addLog('API', 'Vehicles saved after localStorage cleanup');
-                } catch (e2) {
-                  console.error('AdminDataContext: Still cannot save vehicles after cleanup:', e2);
-                  logger.addLog('ERROR', `Still cannot save vehicles: ${e2.message}`);
-                }
-              }
-            }
+            safeSetItem('adminVehicles', apiVehicles, 'Vehicles saved to localStorage successfully');
           } else {
             console.warn('AdminDataContext: API vehicles response is not an array:', apiVehicles);
           }
