@@ -226,8 +226,8 @@ export const CartProvider = ({ children }) => {
           subcategory: product.subcategory,
           brand: product.brand,
           available: product.available,
-          image: product.image, // Основное изображение
-          images: product.images, // Массив изображений
+          image: product.image || null, // Основное изображение (null если нет)
+          images: product.images || null, // Массив изображений (null если нет)
           type: product.type, // Добавляем тип (vehicle/product)
           description: product.description,
           specifications: product.specifications,
