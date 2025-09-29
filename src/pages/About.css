@@ -486,35 +486,35 @@
   box-shadow: 0 20px 40px rgba(230, 163, 74, 0.1);
 }
 
-/* Позиционирование плашек согласно схеме 1->2->4->3->5->6 */
+/* Позиционирование плашек согласно схеме 1->2->3->4->5->6 */
 .step-1 {
   grid-column: 1;
   grid-row: 1;
 }
 
 .step-2 {
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1;
 }
 
 .step-3 {
-  grid-column: 1;
-  grid-row: 2;
+  grid-column: 3;
+  grid-row: 1;
 }
 
 .step-4 {
-  grid-column: 3;
+  grid-column: 1;
   grid-row: 2;
 }
 
 .step-5 {
-  grid-column: 1;
-  grid-row: 3;
+  grid-column: 2;
+  grid-row: 2;
 }
 
 .step-6 {
   grid-column: 3;
-  grid-row: 3;
+  grid-row: 2;
 }
 
 /* Стрелочки между этапами */
@@ -538,37 +538,37 @@
   border-right: none;
 }
 
-/* Стрелка от 2 к 4 (вниз) */
+/* Стрелка от 2 к 3 (вправо) */
 .step-2::after {
-  bottom: -1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  border-top: 15px solid #e6a34a;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-bottom: none;
-}
-
-/* Стрелка от 4 к 3 (влево) */
-.step-4::after {
-  left: -1rem;
+  right: -1rem;
   top: 50%;
   transform: translateY(-50%);
-  border-right: 15px solid #e6a34a;
+  border-left: 15px solid #e6a34a;
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
-  border-left: none;
+  border-right: none;
 }
 
-/* Стрелка от 3 к 5 (вниз) */
+/* Стрелка от 3 к 4 (вниз-влево) */
 .step-3::after {
   bottom: -1rem;
-  left: 50%;
+  left: 0;
   transform: translateX(-50%);
   border-top: 15px solid #e6a34a;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: none;
+}
+
+/* Стрелка от 4 к 5 (вправо) */
+.step-4::after {
+  right: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 15px solid #e6a34a;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: none;
 }
 
 /* Стрелка от 5 к 6 (вправо) */
@@ -753,14 +753,16 @@
   
   .step-2::after {
     bottom: -0.75rem;
-  }
-  
-  .step-4::after {
-    left: -0.75rem;
+    left: 0;
   }
   
   .step-3::after {
+    right: -0.75rem;
+  }
+  
+  .step-4::after {
     bottom: -0.75rem;
+    left: 0;
   }
   
   .step-5::after {
