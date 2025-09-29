@@ -507,6 +507,17 @@
   border-right: none;
 }
 
+/* Стрелка влево */
+.arrow-left::after {
+  left: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right: 15px solid #e6a34a;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: none;
+}
+
 /* Стрелка вниз */
 .arrow-down::after {
   bottom: -1rem;
@@ -669,6 +680,10 @@
   /* Адаптируем стрелочки для планшетов */
   .arrow-right::after {
     right: -0.75rem;
+  }
+  
+  .arrow-left::after {
+    left: -0.75rem;
   }
   
   .arrow-down::after {

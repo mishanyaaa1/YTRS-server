@@ -354,15 +354,22 @@ export default function About() {
                       { year: "2024", title: "Инновации и будущее", description: "Внедрение ИИ для подбора запчастей, развитие экологически чистых технологий. Планы выхода на международный рынок" }
                     ];
                 
-                // Функция для определения позиции в сетке
+                // Функция для определения позиции в сетке (змейка)
                 const getStepPosition = (index, totalSteps) => {
                   const stepsPerRow = 3;
                   const row = Math.floor(index / stepsPerRow);
                   const col = index % stepsPerRow;
+                  
+                  // Если ряд четный (0, 2, 4...) - идем справа налево
+                  if (row % 2 === 1) {
+                    return { row: row + 1, col: stepsPerRow - col };
+                  }
+                  
+                  // Если ряд нечетный (1, 3, 5...) - идем слева направо
                   return { row: row + 1, col: col + 1 };
                 };
                 
-                // Функция для определения направления стрелочки
+                // Функция для определения направления стрелочки (змейка)
                 const getArrowDirection = (index, totalSteps) => {
                   const stepsPerRow = 3;
                   const row = Math.floor(index / stepsPerRow);
@@ -374,7 +381,10 @@ export default function About() {
                   // Если это последний пункт в ряду - стрелка вниз
                   if (col === stepsPerRow - 1) return 'down';
                   
-                  // Иначе - стрелка вправо
+                  // Если ряд четный (0, 2, 4...) - стрелка влево
+                  if (row % 2 === 1) return 'left';
+                  
+                  // Если ряд нечетный (1, 3, 5...) - стрелка вправо
                   return 'right';
                 };
                 
