@@ -12,12 +12,14 @@ import './VehiclesPage.css';
 import '../Catalog.css';
 
 function VehiclesPage() {
-  const { vehicles } = useAdminData();
+  const { vehicles, filterSettings } = useAdminData();
   const navigate = useNavigate();
   const { addToCartWithNotification } = useCartActions();
   const [selectedType, setSelectedType] = useState('Все');
   const [selectedTerrain, setSelectedTerrain] = useState('Все');
   const [priceRange, setPriceRange] = useState([0, 0]);
+  const [minPriceInput, setMinPriceInput] = useState('');
+  const [maxPriceInput, setMaxPriceInput] = useState('');
 
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -116,11 +118,54 @@ function VehiclesPage() {
   const vehicleTypes = ['Все', ...adminVehicleTypes];
   const terrainTypes = ['Все', ...adminTerrainTypes];
 
+  const minPrice = 0;
+  const maxPrice = 1000000000; // верхняя граница по умолчанию (1 млрд)
+
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+  const handleMinPriceChange = (e) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    setMinPriceInput(raw);
+    const num = raw === '' ? minPrice : parseInt(raw, 10);
+    setPriceRange(([_, r]) => [clamp(num, minPrice, r), r]);
+  };
+
+  const handleMaxPriceChange = (e) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    setMaxPriceInput(raw);
+    const num = raw === '' ? maxPrice : parseInt(raw, 10);
+    setPriceRange(([l, _]) => [l, clamp(num, l, maxPrice)]);
+  };
+
+  const normalizeMinOnBlur = () => {
+    if (minPriceInput === '') {
+      // оставляем поле пустым, фильтр остаётся по умолчанию
+      setPriceRange(([_, r]) => [minPrice, r]);
+      return;
+    }
+    const num = parseInt(minPriceInput, 10);
+    const clamped = clamp(isNaN(num) ? minPrice : num, minPrice, priceRange[1]);
+    setMinPriceInput(String(clamped));
+    setPriceRange(([_, r]) => [clamped, r]);
+  };
+
+  const normalizeMaxOnBlur = () => {
+    if (maxPriceInput === '') {
+      // Если поле пустое, устанавливаем 0 для отключения верхней границы
+      setPriceRange(([l, _]) => [l, 0]);
+      return;
+    }
+    const num = parseInt(maxPriceInput, 10);
+    const clamped = clamp(isNaN(num) ? 0 : num, priceRange[0], maxPrice);
+    setMaxPriceInput(String(clamped));
+    setPriceRange(([l, _]) => [l, clamped]);
+  };
+
   // Фильтрация вездеходов
   const filteredVehicles = vehicles.filter(vehicle => {
-    const matchesType = selectedType === 'Все' || vehicle.type === selectedType;
-    const matchesTerrain = selectedTerrain === 'Все' || vehicle.terrain === selectedTerrain;
-    const matchesPrice = vehicle.price >= priceRange[0] && (priceRange[1] === 0 || vehicle.price <= priceRange[1]);
+    const matchesType = !filterSettings.showCategoryFilter || selectedType === 'Все' || vehicle.type === selectedType;
+    const matchesTerrain = !filterSettings.showSubcategoryFilter || selectedTerrain === 'Все' || vehicle.terrain === selectedTerrain;
+    const matchesPrice = !filterSettings.showPriceFilter || (vehicle.price >= priceRange[0] && (priceRange[1] === 0 || vehicle.price <= priceRange[1]));
     return matchesType && matchesTerrain && matchesPrice;
   });
 
@@ -130,15 +175,28 @@ function VehiclesPage() {
   const paginatedVehicles = filteredVehicles.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const resetFilters = () => {
-    setSelectedType('Все');
-    setSelectedTerrain('Все');
-    setPriceRange([0, 0]);
+    if (filterSettings.showCategoryFilter) {
+      setSelectedType('Все');
+    }
+    if (filterSettings.showSubcategoryFilter) {
+      setSelectedTerrain('Все');
+    }
+    if (filterSettings.showPriceFilter) {
+      setPriceRange([minPrice, 0]);
+      setMinPriceInput('');
+      setMaxPriceInput('');
+    }
     setCurrentPage(1);
   };
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('ru-RU').format(price);
   };
+
+  // Сброс на первую страницу при изменении фильтров
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedType, selectedTerrain, priceRange]);
 
   return (
     <div className="vehicles-page">
@@ -156,66 +214,60 @@ function VehiclesPage() {
             
 
 
-            <div className="filter-group">
-              <label>Тип вездехода</label>
-              <select 
-                value={selectedType} 
-                onChange={(e) => {
-                  setSelectedType(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                {vehicleTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label>Тип местности</label>
-              <select 
-                value={selectedTerrain} 
-                onChange={(e) => {
-                  setSelectedTerrain(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
-                {terrainTypes.map(terrain => (
-                  <option key={terrain} value={terrain}>{terrain}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label>Цена, ₽</label>
-              <div className="price-range">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  placeholder="От"
-                  value={priceRange[0] || ''}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '');
-                    setPriceRange([parseInt(value) || 0, priceRange[1]]);
-                    setCurrentPage(1);
-                  }}
-                />
-                <span>-</span>
-                                 <input
-                   type="text"
-                   inputMode="numeric"
-                   pattern="[0-9]*"
-                   placeholder="До"
-                   value={priceRange[1] || ''}
-                   onChange={(e) => {
-                     const value = e.target.value.replace(/\D/g, '');
-                     setPriceRange([priceRange[0], parseInt(value) || 0]);
-                     setCurrentPage(1);
-                   }}
-                 />
+            {filterSettings.showCategoryFilter && (
+              <div className="filter-group">
+                <label>Тип вездехода</label>
+                <select 
+                  value={selectedType} 
+                  onChange={(e) => setSelectedType(e.target.value)}
+                >
+                  {vehicleTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
               </div>
-            </div>
+            )}
+
+            {filterSettings.showSubcategoryFilter && (
+              <div className="filter-group">
+                <label>Тип местности</label>
+                <select 
+                  value={selectedTerrain} 
+                  onChange={(e) => setSelectedTerrain(e.target.value)}
+                >
+                  {terrainTypes.map(terrain => (
+                    <option key={terrain} value={terrain}>{terrain}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {filterSettings.showPriceFilter && (
+              <div className="filter-group">
+                <label>Цена, ₽</label>
+                <div className="price-range" role="group" aria-label="Диапазон цены">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={minPriceInput}
+                    placeholder="От"
+                    onChange={handleMinPriceChange}
+                    onBlur={normalizeMinOnBlur}
+                  />
+                  <span>-</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={maxPriceInput}
+                    placeholder="До"
+                    onChange={handleMaxPriceChange}
+                    onBlur={normalizeMaxOnBlur}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="filter-actions">
               <button onClick={resetFilters} className="catalog-reset-btn">
