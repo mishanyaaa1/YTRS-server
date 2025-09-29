@@ -835,11 +835,11 @@ input[type="number"].quantity-input,
   .item-image {
     width: 60px;
     height: 60px;
-    align-self: center;
+    align-self: flex-start;
   }
   
   .item-info {
-    text-align: center;
+    text-align: left;
   }
   
   .item-info h3 {
@@ -855,17 +855,17 @@ input[type="number"].quantity-input,
   }
   
   .quantity-controls {
-    align-self: center;
+    align-self: flex-start;
   }
   
   .item-total {
     font-size: 1.1rem;
-    text-align: center;
+    text-align: left;
     min-width: auto;
   }
   
   .remove-btn {
-    align-self: center;
+    align-self: flex-start;
   }
   
   .summary-card {
