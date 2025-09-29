@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaSearch, FaTimes, FaShoppingCart, FaTruck, FaBox } from 'react-icons/fa';
 import { useAdminData } from '../context/AdminDataContext';
-import { getMainImage, migrateProductImages } from '../utils/imageHelpers';
+import { getMainImage } from '../utils/imageHelpers';
 import BrandMark from './BrandMark';
 import { useCartActions } from '../hooks/useCartActions';
 import './SearchModal.css';
@@ -130,17 +130,7 @@ export default function SearchModal({ isOpen, onClose }) {
 
   const handleAddToCart = (item) => {
     if (searchType === 'products') {
-      // Подготавливаем товар с правильным изображением для корзины
-      const migratedProduct = migrateProductImages(item);
-      const mainImage = getMainImage(migratedProduct);
-      
-      const cartProduct = {
-        ...item,
-        image: mainImage?.data || null,
-        images: migratedProduct.images || null
-      };
-      
-      addToCartWithNotification(cartProduct, 1);
+      addToCartWithNotification(item, 1);
     } else {
       // Для вездеходов создаем специальный объект корзины с полной информацией
       const cartItem = {

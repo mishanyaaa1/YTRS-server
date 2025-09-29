@@ -13,7 +13,8 @@ import {
 } from 'react-icons/fa';
 import { useAdminData } from '../context/AdminDataContext';
 import { useCartActions } from '../hooks/useCartActions';
-import { migrateProductImages, getMainImage, isImageUrl, resolveImageSrc } from '../utils/imageHelpers';
+// wishlist removed
+import { getMainImage, isImageUrl, resolveImageSrc } from '../utils/imageHelpers';
 import BrandMark from '../components/BrandMark';
 import { getIconForEmoji } from '../utils/iconMap.jsx';
 import Reveal from '../components/Reveal';
@@ -30,18 +31,7 @@ function Home() {
   const handleAddToCart = (product, e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // Подготавливаем товар с правильным изображением для корзины
-    const migratedProduct = migrateProductImages(product);
-    const mainImage = getMainImage(migratedProduct);
-    
-    const cartProduct = {
-      ...product,
-      image: mainImage?.data || null,
-      images: migratedProduct.images || null
-    };
-    
-    addToCartWithNotification(cartProduct, 1);
+    addToCartWithNotification(product, 1);
   };
   
   const features = [
