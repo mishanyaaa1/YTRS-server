@@ -390,28 +390,50 @@ function Cart() {
                         return <img src={item.image} alt={item.title} className="item-image-img" />;
                       }
                       
-                      // Если нет, ищем в товарах
-                      const productData = products.find(p => p.id === item.id);
-                      if (productData) {
-                        const mainImage = getMainImage(productData);
-                        if (mainImage?.data) {
+                      // Определяем тип товара и ищем в соответствующем массиве
+                      let foundData = null;
+                      
+                      if (item.type === 'vehicle' || item.category === 'Вездеходы') {
+                        // Для вездеходов ищем в массиве vehicles
+                        foundData = vehicles.find(v => v.id === item.id);
+                        if (foundData && foundData.image) {
                           if (
-                            typeof mainImage.data === 'string' &&
-                            (mainImage.data.startsWith('data:image') || mainImage.data.startsWith('/uploads/') || mainImage.data.startsWith('/img/vehicles/') || mainImage.data.startsWith('http'))
+                            typeof foundData.image === 'string' &&
+                            (foundData.image.startsWith('data:image') || foundData.image.startsWith('/uploads/') || foundData.image.startsWith('/img/vehicles/') || foundData.image.startsWith('http'))
                           ) {
-                            return <img src={mainImage.data} alt={item.title} className="item-image-img" />;
+                            return <img src={foundData.image} alt={item.title} className="item-image-img" />;
+                          }
+                        }
+                      } else {
+                        // Для обычных товаров ищем в массиве products
+                        foundData = products.find(p => p.id === item.id);
+                        if (foundData) {
+                          const mainImage = getMainImage(foundData);
+                          if (mainImage?.data) {
+                            if (
+                              typeof mainImage.data === 'string' &&
+                              (mainImage.data.startsWith('data:image') || mainImage.data.startsWith('/uploads/') || mainImage.data.startsWith('/img/vehicles/') || mainImage.data.startsWith('http'))
+                            ) {
+                              return <img src={mainImage.data} alt={item.title} className="item-image-img" />;
+                            }
                           }
                         }
                       }
                       
-                      // Если не нашли в товарах, ищем в вездеходах
-                      const vehicleData = vehicles.find(v => v.id === item.id);
-                      if (vehicleData && vehicleData.image) {
-                        if (
-                          typeof vehicleData.image === 'string' &&
-                          (vehicleData.image.startsWith('data:image') || vehicleData.image.startsWith('/uploads/') || vehicleData.image.startsWith('/img/vehicles/') || vehicleData.image.startsWith('http'))
-                        ) {
-                          return <img src={vehicleData.image} alt={item.title} className="item-image-img" />;
+                      // Если не нашли по типу, пробуем найти в любом массиве (fallback)
+                      if (!foundData) {
+                        foundData = products.find(p => p.id === item.id) || vehicles.find(v => v.id === item.id);
+                        if (foundData) {
+                          if (foundData.image && typeof foundData.image === 'string' &&
+                              (foundData.image.startsWith('data:image') || foundData.image.startsWith('/uploads/') || foundData.image.startsWith('/img/vehicles/') || foundData.image.startsWith('http'))) {
+                            return <img src={foundData.image} alt={item.title} className="item-image-img" />;
+                          } else if (foundData.images) {
+                            const mainImage = getMainImage(foundData);
+                            if (mainImage?.data && typeof mainImage.data === 'string' &&
+                                (mainImage.data.startsWith('data:image') || mainImage.data.startsWith('/uploads/') || mainImage.data.startsWith('/img/vehicles/') || mainImage.data.startsWith('http'))) {
+                              return <img src={mainImage.data} alt={item.title} className="item-image-img" />;
+                            }
+                          }
                         }
                       }
                       
