@@ -340,55 +340,42 @@ export default function About() {
             </div>
             
             <div className="timeline-steps">
-              {aboutContent.history?.milestones && aboutContent.history.milestones.items && aboutContent.history.milestones.items.length > 0 ? (
-                aboutContent.history.milestones.items.map((milestone, index) => (
-                  <motion.div 
-                    key={index}
-                    className={`timeline-step step-${index + 1}`}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: index * 0.2 }}
-                    viewport={{ once: true }}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <div className="step-number">{index + 1}</div>
-                    <div className="step-content">
-                      <div className="step-year">{milestone.year}</div>
-                      <h3 className="step-title">{milestone.title}</h3>
-                      <p className="step-description">{milestone.description}</p>
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                // Дефолтные этапы, если нет данных из админки
-                [
-                  { year: "2013", title: "Основание компании", description: "Открытие первого магазина в Челябинске. Начали с небольшого ассортимента запчастей для популярных моделей вездеходов." },
-                  { year: "2015", title: "Расширение ассортимента", description: "Добавление более 5000 наименований товаров. Начали работать с крупными поставщиками и дистрибьюторами." },
-                  { year: "2017", title: "Техническое развитие", description: "Внедрение современных систем учета и логистики. Открытие собственного сервисного центра." },
-                  { year: "2018", title: "Запуск интернет-магазина", description: "Начало онлайн-продаж по всей России. Развитие логистической сети для доставки в регионы." },
-                  { year: "2020", title: "Цифровизация процессов", description: "Внедрение CRM-системы, автоматизация процессов. Запуск мобильного приложения." },
-                  { year: "2022", title: "Региональное расширение", description: "Открытие филиалов в Екатеринбурге и Новосибирске. Развитие партнерской сети." },
-                  { year: "2023", title: "Лидер рынка", description: "Стали крупнейшим поставщиком запчастей для вездеходов в России. Более 50,000 довольных клиентов." },
-                  { year: "2024", title: "Инновации и будущее", description: "Внедрение ИИ для подбора запчастей, развитие экологически чистых технологий. Планы выхода на международный рынок" }
-                ].map((milestone, index) => (
-                  <motion.div 
-                    key={index}
-                    className={`timeline-step step-${index + 1}`}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: index * 0.2 }}
-                    viewport={{ once: true }}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <div className="step-number">{index + 1}</div>
-                    <div className="step-content">
-                      <div className="step-year">{milestone.year}</div>
-                      <h3 className="step-title">{milestone.title}</h3>
-                      <p className="step-description">{milestone.description}</p>
-                    </div>
-                  </motion.div>
-                ))
-              )}
+              {(() => {
+                const milestones = aboutContent.history?.milestones && aboutContent.history.milestones.items && aboutContent.history.milestones.items.length > 0 
+                  ? aboutContent.history.milestones.items 
+                  : [
+                      { year: "2013", title: "Основание компании", description: "Открытие первого магазина в Челябинске. Начали с небольшого ассортимента запчастей для популярных моделей вездеходов." },
+                      { year: "2015", title: "Расширение ассортимента", description: "Добавление более 5000 наименований товаров. Начали работать с крупными поставщиками и дистрибьюторами." },
+                      { year: "2017", title: "Техническое развитие", description: "Внедрение современных систем учета и логистики. Открытие собственного сервисного центра." },
+                      { year: "2018", title: "Запуск интернет-магазина", description: "Начало онлайн-продаж по всей России. Развитие логистической сети для доставки в регионы." },
+                      { year: "2020", title: "Цифровизация процессов", description: "Внедрение CRM-системы, автоматизация процессов. Запуск мобильного приложения." },
+                      { year: "2022", title: "Региональное расширение", description: "Открытие филиалов в Екатеринбурге и Новосибирске. Развитие партнерской сети." },
+                      { year: "2023", title: "Лидер рынка", description: "Стали крупнейшим поставщиком запчастей для вездеходов в России. Более 50,000 довольных клиентов." },
+                      { year: "2024", title: "Инновации и будущее", description: "Внедрение ИИ для подбора запчастей, развитие экологически чистых технологий. Планы выхода на международный рынок" }
+                    ];
+                
+                return milestones.map((milestone, index) => {
+                  const isLastStep = index === milestones.length - 1;
+                  return (
+                    <motion.div 
+                      key={index}
+                      className={`timeline-step step-${index + 1} ${isLastStep ? 'last-step' : ''}`}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, delay: index * 0.2 }}
+                      viewport={{ once: true }}
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <div className="step-number">{index + 1}</div>
+                      <div className="step-content">
+                        <div className="step-year">{milestone.year}</div>
+                        <h3 className="step-title">{milestone.title}</h3>
+                        <p className="step-description">{milestone.description}</p>
+                      </div>
+                    </motion.div>
+                  );
+                });
+              })()}
             </div>
           </motion.div>
         </div>

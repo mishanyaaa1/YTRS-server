@@ -657,7 +657,12 @@
 }
 
 /* Убираем оранжевый квадратик у последнего пункта */
-.step-8 .step-title::before {
+.last-step .step-title::before {
+  display: none;
+}
+
+/* Убираем стрелочку у последнего пункта */
+.last-step::after {
   display: none;
 }
 
