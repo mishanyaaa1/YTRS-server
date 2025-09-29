@@ -656,6 +656,11 @@
   line-height: 1.3;
 }
 
+/* Убираем оранжевый квадратик у последнего пункта */
+.step-8 .step-title::before {
+  display: none;
+}
+
 .step-description {
   color: #cccccc;
   margin: 0;
