@@ -215,6 +215,7 @@
   padding-left: 1.1rem;
   margin: 0;
   color: #cccccc;
+  text-align: left;
 }
 
 .method-card:hover {
@@ -227,6 +228,10 @@
 .payment-icon {}
 
 .method-list li::marker { color: #e6a34a; }
+
+.method-list li {
+  text-align: left;
+}
 
 .delivery-note {
   color: #cccccc;
