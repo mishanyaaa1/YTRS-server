@@ -627,15 +627,17 @@
   color: #ffffff;
 }
 
-.contact-link {
-  color: #e6a34a;
+.contact-info {
+  color: #cccccc;
   text-decoration: none;
-  font-weight: 500;
+  line-height: 1.8;
+  display: block;
+  margin-bottom: 0.5rem;
   transition: color 0.3s ease;
 }
 
-.contact-link:hover {
-  color: #ffffff;
+.contact-info:hover {
+  color: #e6a34a;
 }
 
 .contact-card p {
