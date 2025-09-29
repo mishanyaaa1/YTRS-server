@@ -354,12 +354,43 @@ export default function About() {
                       { year: "2024", title: "Инновации и будущее", description: "Внедрение ИИ для подбора запчастей, развитие экологически чистых технологий. Планы выхода на международный рынок" }
                     ];
                 
+                // Функция для определения позиции в сетке
+                const getStepPosition = (index, totalSteps) => {
+                  const stepsPerRow = 3;
+                  const row = Math.floor(index / stepsPerRow);
+                  const col = index % stepsPerRow;
+                  return { row: row + 1, col: col + 1 };
+                };
+                
+                // Функция для определения направления стрелочки
+                const getArrowDirection = (index, totalSteps) => {
+                  const stepsPerRow = 3;
+                  const row = Math.floor(index / stepsPerRow);
+                  const col = index % stepsPerRow;
+                  
+                  // Если это последний пункт - стрелочки нет
+                  if (index === totalSteps - 1) return 'none';
+                  
+                  // Если это последний пункт в ряду - стрелка вниз
+                  if (col === stepsPerRow - 1) return 'down';
+                  
+                  // Иначе - стрелка вправо
+                  return 'right';
+                };
+                
                 return milestones.map((milestone, index) => {
                   const isLastStep = index === milestones.length - 1;
+                  const position = getStepPosition(index, milestones.length);
+                  const arrowDirection = getArrowDirection(index, milestones.length);
+                  
                   return (
                     <motion.div 
                       key={index}
-                      className={`timeline-step step-${index + 1} ${isLastStep ? 'last-step' : ''}`}
+                      className={`timeline-step step-${index + 1} ${isLastStep ? 'last-step' : ''} arrow-${arrowDirection}`}
+                      style={{
+                        gridColumn: position.col,
+                        gridRow: position.row
+                      }}
                       initial={{ opacity: 0, scale: 0.8 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.6, delay: index * 0.2 }}
