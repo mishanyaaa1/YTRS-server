@@ -142,7 +142,6 @@
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  cursor: pointer;
   /* allow full height so content is not cut */
   max-height: none;
 }
@@ -388,7 +387,6 @@
   border-radius: 15px;
   padding: 1.5rem;
   transition: all 0.3s ease;
-  cursor: pointer;
 }
 
 .promotions-page .promotion-card:hover {

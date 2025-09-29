@@ -199,6 +199,7 @@
 
 .method-card {
   text-align: left;
+  cursor: default;
 }
 
 .method-card h4 {
@@ -379,7 +380,6 @@
   padding: 2rem;
   text-align: center;
   transition: all 0.3s ease;
-  cursor: pointer;
 }
 
 .team-card:hover {
@@ -472,7 +472,6 @@
   padding: 2rem;
   text-align: center;
   transition: all 0.3s ease;
-  cursor: pointer;
   position: relative;
   min-height: 200px;
   display: flex;
