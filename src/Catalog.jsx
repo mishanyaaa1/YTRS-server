@@ -57,25 +57,25 @@ export default function Catalog() {
   const handleMinPriceChange = (e) => {
     const raw = e.target.value.replace(/\D/g, '');
     setMinPriceInput(raw);
-    const num = raw === '' ? minPrice : parseInt(raw, 10);
-    setPriceRange(([_, r]) => [clamp(num, minPrice, r), r]);
+    const num = raw === '' ? 0 : parseInt(raw, 10);
+    setPriceRange(([_, r]) => [clamp(num, 0, r || maxPrice), r]);
   };
 
   const handleMaxPriceChange = (e) => {
     const raw = e.target.value.replace(/\D/g, '');
     setMaxPriceInput(raw);
-    const num = raw === '' ? maxPrice : parseInt(raw, 10);
-    setPriceRange(([l, _]) => [l, clamp(num, l, maxPrice)]);
+    const num = raw === '' ? 0 : parseInt(raw, 10);
+    setPriceRange(([l, _]) => [l, clamp(num, l || 0, maxPrice)]);
   };
 
   const normalizeMinOnBlur = () => {
     if (minPriceInput === '') {
-      // оставляем поле пустым, фильтр остаётся по умолчанию
-      setPriceRange(([_, r]) => [minPrice, r]);
+      // Если поле пустое, устанавливаем 0 для отключения нижней границы
+      setPriceRange(([_, r]) => [0, r]);
       return;
     }
     const num = parseInt(minPriceInput, 10);
-    const clamped = clamp(isNaN(num) ? minPrice : num, minPrice, priceRange[1]);
+    const clamped = clamp(isNaN(num) ? 0 : num, 0, priceRange[1] || maxPrice);
     setMinPriceInput(String(clamped));
     setPriceRange(([_, r]) => [clamped, r]);
   };
@@ -103,7 +103,7 @@ export default function Catalog() {
       setSelectedBrand('Все');
     }
     if (filterSettings.showPriceFilter) {
-      setPriceRange([minPrice, 0]);
+      setPriceRange([0, 0]);
       setMinPriceInput('');
       setMaxPriceInput('');
     }
