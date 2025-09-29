@@ -207,12 +207,28 @@ function ProductPage() {
   const safeSelectedIndex = Math.max(0, Math.min(selectedImageIndex, allImages.length - 1));
 
   const handleAddToCart = () => {
-    addToCartWithNotification(product, quantity);
+    // Подготавливаем товар с правильным изображением для корзины
+    const mainImage = migratedProduct.images.find(img => img.isMain);
+    const cartProduct = {
+      ...product,
+      image: mainImage?.data || null,
+      images: migratedProduct.images || null
+    };
+    
+    addToCartWithNotification(cartProduct, quantity);
   };
 
   const handleBuyNow = () => {
     try {
-      addToCartWithNotification(product, quantity);
+      // Подготавливаем товар с правильным изображением для корзины
+      const mainImage = migratedProduct.images.find(img => img.isMain);
+      const cartProduct = {
+        ...product,
+        image: mainImage?.data || null,
+        images: migratedProduct.images || null
+      };
+      
+      addToCartWithNotification(cartProduct, quantity);
       setTimeout(() => {
         navigate('/cart');
       }, 100);

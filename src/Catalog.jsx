@@ -186,7 +186,18 @@ export default function Catalog() {
   const handleAddToCart = (product, e) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCartWithNotification(product, 1);
+    
+    // Подготавливаем товар с правильным изображением для корзины
+    const migratedProduct = migrateProductImages(product);
+    const mainImage = getMainImage(migratedProduct);
+    
+    const cartProduct = {
+      ...product,
+      image: mainImage?.data || null, // Сохраняем изображение в поле image
+      images: migratedProduct.images || null
+    };
+    
+    addToCartWithNotification(cartProduct, 1);
   };
 
   // wishlist removed
