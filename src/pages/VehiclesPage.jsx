@@ -20,6 +20,7 @@ function VehiclesPage() {
   const [priceRange, setPriceRange] = useState([0, 0]);
   const [minPriceInput, setMinPriceInput] = useState('');
   const [maxPriceInput, setMaxPriceInput] = useState('');
+  const [inStock, setInStock] = useState(false);
 
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -166,7 +167,8 @@ function VehiclesPage() {
     const matchesType = !filterSettings.showCategoryFilter || selectedType === 'Все' || vehicle.type === selectedType;
     const matchesTerrain = !filterSettings.showSubcategoryFilter || selectedTerrain === 'Все' || vehicle.terrain === selectedTerrain;
     const matchesPrice = !filterSettings.showPriceFilter || (vehicle.price >= priceRange[0] && (priceRange[1] === 0 || vehicle.price <= priceRange[1]));
-    return matchesType && matchesTerrain && matchesPrice;
+    const matchesStock = !filterSettings.showStockFilter || !inStock || vehicle.available;
+    return matchesType && matchesTerrain && matchesPrice && matchesStock;
   });
 
   const ITEMS_PER_PAGE = 6;
@@ -186,6 +188,9 @@ function VehiclesPage() {
       setMinPriceInput('');
       setMaxPriceInput('');
     }
+    if (filterSettings.showStockFilter) {
+      setInStock(false);
+    }
     setCurrentPage(1);
   };
 
@@ -196,7 +201,7 @@ function VehiclesPage() {
   // Сброс на первую страницу при изменении фильтров
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedType, selectedTerrain, priceRange]);
+  }, [selectedType, selectedTerrain, priceRange, inStock]);
 
   return (
     <div className="vehicles-page">
@@ -266,6 +271,19 @@ function VehiclesPage() {
                     onBlur={normalizeMaxOnBlur}
                   />
                 </div>
+              </div>
+            )}
+
+            {filterSettings.showStockFilter && (
+              <div className="filter-group">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={inStock}
+                    onChange={e => setInStock(e.target.checked)}
+                  />
+                  Только в наличии
+                </label>
               </div>
             )}
 
