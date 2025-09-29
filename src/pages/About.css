@@ -486,7 +486,7 @@
   box-shadow: 0 20px 40px rgba(230, 163, 74, 0.1);
 }
 
-/* Позиционирование плашек согласно схеме 1->2->3->4->5->6 */
+/* Позиционирование плашек согласно схеме: 1->2->3, затем 3->4, потом 4->5->6, затем 6->7, и 7->8 */
 .step-1 {
   grid-column: 1;
   grid-row: 1;
@@ -503,7 +503,7 @@
 }
 
 .step-4 {
-  grid-column: 1;
+  grid-column: 3;
   grid-row: 2;
 }
 
@@ -513,8 +513,18 @@
 }
 
 .step-6 {
-  grid-column: 3;
+  grid-column: 1;
   grid-row: 2;
+}
+
+.step-7 {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.step-8 {
+  grid-column: 2;
+  grid-row: 3;
 }
 
 /* Стрелочки между этапами */
@@ -549,10 +559,10 @@
   border-right: none;
 }
 
-/* Стрелка от 3 к 4 (вниз-влево) */
+/* Стрелка от 3 к 4 (вниз) */
 .step-3::after {
   bottom: -1rem;
-  left: 0;
+  left: 50%;
   transform: translateX(-50%);
   border-top: 15px solid #e6a34a;
   border-left: 10px solid transparent;
@@ -560,19 +570,41 @@
   border-bottom: none;
 }
 
-/* Стрелка от 4 к 5 (вправо) */
+/* Стрелка от 4 к 5 (влево) */
 .step-4::after {
-  right: -1rem;
+  left: -1rem;
   top: 50%;
   transform: translateY(-50%);
-  border-left: 15px solid #e6a34a;
+  border-right: 15px solid #e6a34a;
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
-  border-right: none;
+  border-left: none;
 }
 
-/* Стрелка от 5 к 6 (вправо) */
+/* Стрелка от 5 к 6 (влево) */
 .step-5::after {
+  left: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right: 15px solid #e6a34a;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: none;
+}
+
+/* Стрелка от 6 к 7 (вниз) */
+.step-6::after {
+  bottom: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top: 15px solid #e6a34a;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: none;
+}
+
+/* Стрелка от 7 к 8 (вправо) */
+.step-7::after {
   right: -1rem;
   top: 50%;
   transform: translateY(-50%);
@@ -711,7 +743,7 @@
   
   .timeline-steps {
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     gap: 1.5rem;
   }
   
@@ -746,6 +778,16 @@
     grid-row: 3;
   }
   
+  .step-7 {
+    grid-column: 1;
+    grid-row: 4;
+  }
+  
+  .step-8 {
+    grid-column: 2;
+    grid-row: 4;
+  }
+  
   /* Адаптируем стрелочки для планшетов */
   .step-1::after {
     right: -0.75rem;
@@ -768,6 +810,15 @@
   .step-5::after {
     right: -0.75rem;
   }
+  
+  .step-6::after {
+    bottom: -0.75rem;
+    left: 0;
+  }
+  
+  .step-7::after {
+    right: -0.75rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -785,12 +836,12 @@
   
   .timeline-steps {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-rows: repeat(8, 1fr);
     gap: 1.5rem;
   }
   
   /* Мобильная версия - вертикальное расположение */
-  .step-1, .step-2, .step-3, .step-4, .step-5, .step-6 {
+  .step-1, .step-2, .step-3, .step-4, .step-5, .step-6, .step-7, .step-8 {
     grid-column: 1;
     grid-row: auto;
   }
