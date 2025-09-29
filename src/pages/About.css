@@ -437,52 +437,198 @@
   font-size: 3rem;
 }
 
-/* История компании */
-.story-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
+/* История компании - новая структура с плашками */
+.history-timeline {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.story-text h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  color: #e6a34a;
+.timeline-description {
+  text-align: center;
+  margin-bottom: 4rem;
 }
 
-.story-text p {
+.timeline-description p {
   color: #cccccc;
   line-height: 1.8;
-  margin-bottom: 1.5rem;
   font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.story-image {
+.timeline-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2rem;
+  position: relative;
+}
+
+/* Позиционирование плашек согласно схеме */
+.timeline-step {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  min-height: 200px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
 }
 
-.story-placeholder {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-  border-radius: 20px;
-  padding: 3rem;
-  text-align: center;
-  border: 1px solid rgba(230, 163, 74, 0.2);
-  width: 100%;
-  max-width: 400px;
+.timeline-step:hover {
+  border-color: #e6a34a;
+  background: rgba(230, 163, 74, 0.05);
+  box-shadow: 0 20px 40px rgba(230, 163, 74, 0.1);
 }
 
-.story-placeholder svg {
-  font-size: 4rem;
+/* Позиционирование плашек согласно схеме 1->2->4->3->5->6 */
+.step-1 {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.step-2 {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.step-3 {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.step-4 {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.step-5 {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.step-6 {
+  grid-column: 3;
+  grid-row: 3;
+}
+
+/* Стрелочки между этапами */
+.timeline-step::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 2px solid #e6a34a;
+  z-index: 1;
+}
+
+/* Стрелка от 1 к 2 (вправо) */
+.step-1::after {
+  right: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 15px solid #e6a34a;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: none;
+}
+
+/* Стрелка от 2 к 4 (вниз) */
+.step-2::after {
+  bottom: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top: 15px solid #e6a34a;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: none;
+}
+
+/* Стрелка от 4 к 3 (влево) */
+.step-4::after {
+  left: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right: 15px solid #e6a34a;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: none;
+}
+
+/* Стрелка от 3 к 5 (вниз) */
+.step-3::after {
+  bottom: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top: 15px solid #e6a34a;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: none;
+}
+
+/* Стрелка от 5 к 6 (вправо) */
+.step-5::after {
+  right: -1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 15px solid #e6a34a;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: none;
+}
+
+.step-number {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e6a34a 0%, #c97c1a 100%);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.2rem;
+  margin: 0 auto 1rem;
+  box-shadow: 0 4px 15px rgba(230, 163, 74, 0.3);
+}
+
+.step-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.step-year {
+  background: rgba(230, 163, 74, 0.1);
   color: #e6a34a;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
   margin-bottom: 1rem;
+  display: inline-block;
+  border: 1px solid rgba(230, 163, 74, 0.3);
 }
 
-.story-placeholder p {
+.step-title {
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.step-description {
   color: #cccccc;
   margin: 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 /* Контакты */
@@ -563,8 +709,62 @@
     font-size: 2.5rem;
   }
   
-  .story-content {
-    gap: 2rem;
+  .timeline-steps {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  /* Планшетная версия - 2 колонки */
+  .step-1 {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  
+  .step-2 {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  
+  .step-3 {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  .step-4 {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  
+  .step-5 {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  
+  .step-6 {
+    grid-column: 2;
+    grid-row: 3;
+  }
+  
+  /* Адаптируем стрелочки для планшетов */
+  .step-1::after {
+    right: -0.75rem;
+  }
+  
+  .step-2::after {
+    bottom: -0.75rem;
+  }
+  
+  .step-4::after {
+    left: -0.75rem;
+  }
+  
+  .step-3::after {
+    bottom: -0.75rem;
+  }
+  
+  .step-5::after {
+    right: -0.75rem;
   }
 }
 
@@ -581,9 +781,40 @@
     font-size: 2rem;
   }
   
-  .story-content {
+  .timeline-steps {
     grid-template-columns: 1fr;
-    text-align: center;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 1.5rem;
+  }
+  
+  /* Мобильная версия - вертикальное расположение */
+  .step-1, .step-2, .step-3, .step-4, .step-5, .step-6 {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  
+  /* Убираем стрелочки на мобильных */
+  .timeline-step::after {
+    display: none;
+  }
+  
+  .timeline-step {
+    min-height: 150px;
+    padding: 1.5rem;
+  }
+  
+  .step-number {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .step-title {
+    font-size: 1.1rem;
+  }
+  
+  .step-description {
+    font-size: 0.9rem;
   }
   
   .feature-item {

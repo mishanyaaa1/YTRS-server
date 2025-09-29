@@ -314,54 +314,81 @@ export default function About() {
       {/* О нас подробнее */}
       <section className="company-story">
         <div className="container">
-          <div className="story-content">
-            <motion.div 
-              className="story-text"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <h2>{aboutContent.history?.title || "История компании"}</h2>
-              <div className="history-content">
-                <p>
-                  {aboutContent.history?.content || 
-                    "Компания ВездеходЗапчасти была основана в 2013 году группой энтузиастов, увлеченных вездеходной техникой. Начав с небольшого магазина в Москве, мы постепенно расширили свою деятельность и сегодня являемся одним из ведущих поставщиков запчастей для вездеходов в России."
-                  }
-                </p>
-                
-                {aboutContent.history?.milestones && aboutContent.history.milestones.items && aboutContent.history.milestones.items.length > 0 && (
-                  <div className="milestones">
-                    <h3>{aboutContent.history.milestones.title || 'Основные этапы развития:'}</h3>
-                    <div className="milestones-list">
-                      {aboutContent.history.milestones.items.map((milestone, index) => (
-                        <div key={index} className="milestone-item">
-                          <div className="milestone-year">{milestone.year}</div>
-                          <div className="milestone-content">
-                            <h4>{milestone.title}</h4>
-                            <p>{milestone.description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
+          <motion.h2 
+            className="section-title"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            {aboutContent.history?.title || "История компании"}
+          </motion.h2>
+          
+          <motion.div 
+            className="history-timeline"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <div className="timeline-description">
+              <p>
+                {aboutContent.history?.content || 
+                  "Компания ВездеходЗапчасти была основана в 2013 году группой энтузиастов, увлеченных вездеходной техникой. Начав с небольшого магазина в Москве, мы постепенно расширили свою деятельность и сегодня являемся одним из ведущих поставщиков запчастей для вездеходов в России."
+                }
+              </p>
+            </div>
             
-            <motion.div 
-              className="story-image"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <div className="story-placeholder">
-                <FaTools />
-                <p>Наш склад с запчастями</p>
-              </div>
-            </motion.div>
-          </div>
+            <div className="timeline-steps">
+              {aboutContent.history?.milestones && aboutContent.history.milestones.items && aboutContent.history.milestones.items.length > 0 ? (
+                aboutContent.history.milestones.items.map((milestone, index) => (
+                  <motion.div 
+                    key={index}
+                    className={`timeline-step step-${index + 1}`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: index * 0.2 }}
+                    viewport={{ once: true }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="step-number">{index + 1}</div>
+                    <div className="step-content">
+                      <div className="step-year">{milestone.year}</div>
+                      <h3 className="step-title">{milestone.title}</h3>
+                      <p className="step-description">{milestone.description}</p>
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                // Дефолтные этапы, если нет данных из админки
+                [
+                  { year: "2013", title: "Основание компании", description: "Открытие первого магазина в Москве" },
+                  { year: "2015", title: "Расширение ассортимента", description: "Добавление запчастей для новых марок вездеходов" },
+                  { year: "2017", title: "Открытие склада", description: "Строительство собственного складского комплекса" },
+                  { year: "2019", title: "Выход в регионы", description: "Начало доставки по всей России" },
+                  { year: "2021", title: "Цифровизация", description: "Запуск интернет-магазина и онлайн-каталога" },
+                  { year: "2024", title: "Современные технологии", description: "Внедрение ИИ для подбора запчастей" }
+                ].map((milestone, index) => (
+                  <motion.div 
+                    key={index}
+                    className={`timeline-step step-${index + 1}`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: index * 0.2 }}
+                    viewport={{ once: true }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="step-number">{index + 1}</div>
+                    <div className="step-content">
+                      <div className="step-year">{milestone.year}</div>
+                      <h3 className="step-title">{milestone.title}</h3>
+                      <p className="step-description">{milestone.description}</p>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </div>
+          </motion.div>
         </div>
       </section>
 
