@@ -204,6 +204,53 @@
   }
 }
 
+/* Белая тема - окно авторизации как в темной теме */
+@media (prefers-color-scheme: light) {
+  .login-form-container {
+    background: #111111;
+  }
+  
+  .login-form-wrapper {
+    background: white;
+    color: #1f2937;
+  }
+  
+  .login-form-header h2 {
+    color: #1f2937;
+  }
+  
+  .login-form-header p {
+    color: #6b7280;
+  }
+  
+  .form-group label {
+    color: #374151;
+  }
+  
+  .form-group input {
+    background: #fafafa;
+    border-color: #e5e7eb;
+    color: #1f2937;
+  }
+  
+  .form-group input:focus {
+    background: white;
+    border-color: #e6a34a;
+  }
+  
+  .form-group input::placeholder {
+    color: #9ca3af;
+  }
+  
+  .login-form-footer {
+    border-top-color: #e5e7eb;
+  }
+  
+  .login-form-footer p {
+    color: #6b7280;
+  }
+}
+
 /* Темная тема (опционально) */
 @media (prefers-color-scheme: dark) {
   .login-form-wrapper {
