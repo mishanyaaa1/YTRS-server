@@ -1204,13 +1204,13 @@ html {
 /* Общие стили для уведомлений - не перекрывать шапку */
 [data-sonner-toaster] {
   top: 30px !important;
-  z-index: 10001 !important;
+  z-index: 99999 !important;
 }
 
 /* Альтернативный селектор для react-hot-toast */
 .go3958317564 {
   top: 30px !important;
-  z-index: 10001 !important;
+  z-index: 99999 !important;
 }
 
 /* Компактные стили для уведомлений */
@@ -1230,6 +1230,21 @@ html {
   line-height: 1.4 !important;
 }
 
+/* Дополнительные селекторы для react-hot-toast */
+[data-react-hot-toast] {
+  z-index: 99999 !important;
+}
+
+[data-react-hot-toast] > div {
+  z-index: 99999 !important;
+}
+
+/* Универсальный селектор для всех возможных контейнеров уведомлений */
+div[style*="z-index"]:has([data-react-hot-toast]),
+div[style*="z-index"]:has(.go3958317564) {
+  z-index: 99999 !important;
+}
+
 /* Стили для уведомлений на мобильных устройствах */
 @media (max-width: 768px) {
   /* Убеждаемся, что мобильное меню всегда выше уведомлений */
@@ -1245,13 +1260,13 @@ html {
   /* Уведомления не должны перекрывать шапку на мобильных */
   [data-sonner-toaster] {
     top: 30px !important;
-    z-index: 10001 !important;
+    z-index: 99999 !important;
   }
   
   /* Альтернативный селектор для react-hot-toast на мобильных */
   .go3958317564 {
     top: 30px !important;
-    z-index: 10001 !important;
+    z-index: 99999 !important;
   }
   
   /* Компактные стили для мобильных уведомлений */
@@ -1268,6 +1283,23 @@ html {
     max-width: 260px !important;
     line-height: 1.4 !important;
   }
+}
+
+/* КРИТИЧЕСКИ ВАЖНО: Максимальный z-index для всех уведомлений */
+/* Обеспечиваем, что уведомления всегда поверх всех модальных окон */
+[data-react-hot-toast],
+[data-sonner-toaster],
+.go3958317564,
+div[class*="toast"],
+div[class*="notification"],
+div[class*="alert"] {
+  z-index: 99999 !important;
+}
+
+/* Дополнительная защита для контейнеров уведомлений */
+body > div[style*="position: fixed"],
+body > div[style*="position: absolute"] {
+  z-index: 99999 !important;
 }
 
 /* Герой секция */
