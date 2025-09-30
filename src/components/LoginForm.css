@@ -231,7 +231,7 @@
   .form-group input {
     background: #fafafa;
     border-color: #e5e7eb;
-    color: #1f2937;
+    color: #000000;
   }
   
   .form-group input:focus {
