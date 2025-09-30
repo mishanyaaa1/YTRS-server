@@ -1213,6 +1213,60 @@ export const AdminDataProvider = ({ children }) => {
     }
   };
 
+  // Функция для обновления данных с сервера
+  const refreshFromApi = async () => {
+    try {
+      console.log('AdminDataContext: Refreshing data from API...');
+      const [p, cRaw, b, pr, pc, t, v, vehicles, content] = await Promise.allSettled([
+        fetch('/api/products', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
+        fetch('/api/categories', { credentials: 'include' }).then(r => r.ok ? r.json() : categoryStructure),
+        fetch('/api/brands', { credentials: 'include' }).then(r => r.ok ? r.json() : initialBrands),
+        fetch('/api/promotions', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
+        fetch('/api/promocodes', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
+        fetch('/api/terrain-types', { credentials: 'include' }).then(r => r.ok ? r.json() : ['Снег', 'Болото', 'Вода', 'Горы', 'Лес', 'Пустыня']),
+        fetch('/api/vehicle-types', { credentials: 'include' }).then(r => r.ok ? r.json() : ['Гусеничный', 'Колесный', 'Плавающий']),
+        fetch('/api/vehicles', { credentials: 'include' }).then(r => r.ok ? r.json() : initialVehicles),
+        fetch('/api/content', { credentials: 'include' }).then(r => r.ok ? r.json() : {})
+      ]);
+      
+      // Обрабатываем результаты
+      const normalized = Array.isArray(p.value) ? p.value.map(migrateProductImages).sort((a, b) => (a.id || 0) - (b.id || 0)) : [];
+      const c = normalizeCategories(cRaw.value);
+      
+      console.log('AdminDataContext: Refreshed data - products:', normalized.length, 'categories:', Object.keys(c).length, 'vehicles:', vehicles.value?.length || 0);
+      
+      setProducts(normalized);
+      setCategories(c);
+      setBrands(b.value);
+      setPromotions(pr.value);
+      setPromocodes(pc.value);
+      setTerrainTypes(t.value);
+      setVehicleTypes(v.value);
+      setVehicles(vehicles.value || initialVehicles);
+      
+      // Обновляем контент
+      if (content.value && content.value.about_content) {
+        setAboutContent(content.value.about_content);
+      }
+      
+      localStorage.setItem('adminProducts', JSON.stringify(normalized));
+      localStorage.setItem('adminCategories', JSON.stringify(c));
+      localStorage.setItem('adminBrands', JSON.stringify(b.value));
+      localStorage.setItem('adminPromotions', JSON.stringify(pr.value));
+      localStorage.setItem('adminPromocodes', JSON.stringify(pc.value));
+      localStorage.setItem('adminTerrainTypes', JSON.stringify(t.value));
+      localStorage.setItem('adminVehicleTypes', JSON.stringify(v.value));
+      localStorage.setItem('adminVehicles', JSON.stringify(vehicles.value || initialVehicles));
+      if (content.value && content.value.about_content) {
+        localStorage.setItem('adminAboutContent', JSON.stringify(content.value.about_content));
+      }
+    } catch (error) {
+      console.error('AdminDataContext: Error refreshing data:', error);
+    } finally {
+      // setIsLoading(false); // Удалено
+    }
+  };
+
   const value = {
     // Данные
     products,
@@ -1227,58 +1281,7 @@ export const AdminDataProvider = ({ children }) => {
     terrainTypes,
     vehicleTypes,
     data: { categoryStructure: categories },
-    refreshFromApi: async () => {
-      try {
-        console.log('AdminDataContext: Refreshing data from API...');
-        const [p, cRaw, b, pr, pc, t, v, vehicles, content] = await Promise.allSettled([
-          fetch('/api/products', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
-          fetch('/api/categories', { credentials: 'include' }).then(r => r.ok ? r.json() : categoryStructure),
-          fetch('/api/brands', { credentials: 'include' }).then(r => r.ok ? r.json() : initialBrands),
-          fetch('/api/promotions', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
-          fetch('/api/promocodes', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
-          fetch('/api/terrain-types', { credentials: 'include' }).then(r => r.ok ? r.json() : ['Снег', 'Болото', 'Вода', 'Горы', 'Лес', 'Пустыня']),
-          fetch('/api/vehicle-types', { credentials: 'include' }).then(r => r.ok ? r.json() : ['Гусеничный', 'Колесный', 'Плавающий']),
-          fetch('/api/vehicles', { credentials: 'include' }).then(r => r.ok ? r.json() : initialVehicles),
-          fetch('/api/content', { credentials: 'include' }).then(r => r.ok ? r.json() : {})
-        ]);
-        
-        // Обрабатываем результаты
-        const normalized = Array.isArray(p.value) ? p.value.map(migrateProductImages).sort((a, b) => (a.id || 0) - (b.id || 0)) : [];
-        const c = normalizeCategories(cRaw.value);
-        
-        console.log('AdminDataContext: Refreshed data - products:', normalized.length, 'categories:', Object.keys(c).length, 'vehicles:', vehicles.value?.length || 0);
-        
-        setProducts(normalized);
-        setCategories(c);
-        setBrands(b.value);
-        setPromotions(pr.value);
-        setPromocodes(pc.value);
-        setTerrainTypes(t.value);
-        setVehicleTypes(v.value);
-        setVehicles(vehicles.value || initialVehicles);
-        
-        // Обновляем контент
-        if (content.value && content.value.about_content) {
-          setAboutContent(content.value.about_content);
-        }
-        
-        localStorage.setItem('adminProducts', JSON.stringify(normalized));
-        localStorage.setItem('adminCategories', JSON.stringify(c));
-        localStorage.setItem('adminBrands', JSON.stringify(b.value));
-        localStorage.setItem('adminPromotions', JSON.stringify(pr.value));
-        localStorage.setItem('adminPromocodes', JSON.stringify(pc.value));
-        localStorage.setItem('adminTerrainTypes', JSON.stringify(t.value));
-        localStorage.setItem('adminVehicleTypes', JSON.stringify(v.value));
-        localStorage.setItem('adminVehicles', JSON.stringify(vehicles.value || initialVehicles));
-        if (content.value && content.value.about_content) {
-          localStorage.setItem('adminAboutContent', JSON.stringify(content.value.about_content));
-        }
-      } catch (error) {
-        console.error('AdminDataContext: Error refreshing data:', error);
-      } finally {
-        // setIsLoading(false); // Удалено
-      }
-    },
+    refreshFromApi,
     
     // Функции для товаров
     addProduct,
