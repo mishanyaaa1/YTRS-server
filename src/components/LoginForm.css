@@ -231,12 +231,13 @@
   .form-group input {
     background: #fafafa;
     border-color: #e5e7eb;
-    color: #000000;
+    color: #000000 !important;
   }
   
   .form-group input:focus {
     background: white;
     border-color: #e6a34a;
+    color: #000000 !important;
   }
   
   .form-group input::placeholder {
