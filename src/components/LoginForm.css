@@ -248,6 +248,26 @@
     color: #000000 !important;
   }
   
+  .form-group input[type="text"],
+  .form-group input[type="password"] {
+    color: #000000 !important;
+  }
+  
+  .form-group input[type="text"]:focus,
+  .form-group input[type="password"]:focus {
+    color: #000000 !important;
+  }
+  
+  .form-group input[type="text"]:not(:placeholder-shown),
+  .form-group input[type="password"]:not(:placeholder-shown) {
+    color: #000000 !important;
+  }
+  
+  .form-group input[type="text"]:valid,
+  .form-group input[type="password"]:valid {
+    color: #000000 !important;
+  }
+  
   .login-form-footer {
     border-top-color: #e5e7eb;
   }
