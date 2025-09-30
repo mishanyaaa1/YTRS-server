@@ -1204,11 +1204,13 @@ html {
 /* Общие стили для уведомлений - не перекрывать шапку */
 [data-sonner-toaster] {
   top: 30px !important;
+  z-index: 10001 !important;
 }
 
 /* Альтернативный селектор для react-hot-toast */
 .go3958317564 {
   top: 30px !important;
+  z-index: 10001 !important;
 }
 
 /* Компактные стили для уведомлений */
@@ -1243,11 +1245,13 @@ html {
   /* Уведомления не должны перекрывать шапку на мобильных */
   [data-sonner-toaster] {
     top: 30px !important;
+    z-index: 10001 !important;
   }
   
   /* Альтернативный селектор для react-hot-toast на мобильных */
   .go3958317564 {
     top: 30px !important;
+    z-index: 10001 !important;
   }
   
   /* Компактные стили для мобильных уведомлений */

@@ -326,7 +326,7 @@ function App() {
             borderRadius: '8px',
             boxShadow:
               '0 8px 12px -3px rgba(0,0,0,0.1), 0 3px 5px -2px rgba(0,0,0,0.1)',
-            zIndex: isMobileMenuOpen ? 1000 : 1500,
+            zIndex: isMobileMenuOpen ? 1000 : 10001,
             marginTop: '30px',
             padding: '8px 12px',
             fontSize: '15px',
