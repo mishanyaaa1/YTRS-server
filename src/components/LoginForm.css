@@ -244,6 +244,10 @@
     color: #9ca3af;
   }
   
+  .form-group input[value] {
+    color: #000000 !important;
+  }
+  
   .login-form-footer {
     border-top-color: #e5e7eb;
   }
