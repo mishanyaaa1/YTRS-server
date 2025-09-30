@@ -230,12 +230,12 @@ function VehicleDetailPage() {
                 {(() => {
                   if (vehicle.description && vehicle.description.includes('\n')) {
                     return vehicle.description.split('\n').map((line, index) => (
-                      <p key={index} style={{ margin: index > 0 ? '0.05em 0 0 0' : '0' }}>
+                      <h4 key={index} style={{ margin: index > 0 ? '0.05em 0 0 0' : '0' }}>
                         {line}
-                      </p>
+                      </h4>
                     ));
                   }
-                  return <p>{vehicle.description}</p>;
+                  return <h4>{vehicle.description}</h4>;
                 })()}
               </div>
             </Reveal>
