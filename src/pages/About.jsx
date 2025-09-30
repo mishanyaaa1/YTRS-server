@@ -547,30 +547,20 @@ export default function About() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -5 }}
+                onClick={() => {
+                  if (contact.title === "Адрес") {
+                    window.open('https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17', '_blank');
+                  } else if (contact.link) {
+                    window.open(contact.link, '_blank');
+                  }
+                }}
+                style={{ cursor: contact.link || contact.title === "Адрес" ? 'pointer' : 'default' }}
               >
                 <div className="contact-icon">
                   {contact.icon}
                 </div>
                 <h3>{contact.title}</h3>
-                {contact.title === "Адрес" ? (
-                  <a 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.open('https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17', '_blank');
-                    }}
-                    className="contact-info"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {contact.info}
-                  </a>
-                ) : contact.link ? (
-                  <a href={contact.link} className="contact-info">
-                    {contact.info}
-                  </a>
-                ) : (
-                  <p className="contact-info">{contact.info}</p>
-                )}
+                <p className="contact-info">{contact.info}</p>
               </motion.div>
             ))}
           </div>

@@ -612,10 +612,31 @@
   padding: 2rem;
   text-align: center;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .contact-card:hover {
   border-color: #e6a34a;
+  box-shadow: 0 20px 40px rgba(230, 163, 74, 0.1);
+  transform: translateY(-5px);
+  background: rgba(230, 163, 74, 0.05);
+}
+
+.contact-card:active {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(230, 163, 74, 0.2);
+}
+
+/* Стили для неактивных карточек (без ссылок) */
+.contact-card[style*="cursor: default"]:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.contact-card[style*="cursor: default"]:active {
+  transform: none;
   box-shadow: 0 20px 40px rgba(230, 163, 74, 0.1);
 }
 
