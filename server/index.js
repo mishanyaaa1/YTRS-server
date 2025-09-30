@@ -737,6 +737,25 @@ app.post('/api/orders', async (req, res) => {
       return res.status(400).json({ error: 'Не указаны имя или телефон клиента' });
     }
 
+    // Валидация российского номера телефона на сервере
+    const phone = orderForm.phone.trim().replace(/[\s\-\(\)]/g, '');
+    const russianPhoneRegex = /^(\+7|7|8)?[0-9]{10}$/;
+    
+    if (!russianPhoneRegex.test(phone)) {
+      return res.status(400).json({ error: 'Некорректный российский номер телефона' });
+    }
+    
+    // Проверяем, что номер начинается с 7, 8 или +7
+    if (!phone.startsWith('+7') && !phone.startsWith('7') && !phone.startsWith('8')) {
+      return res.status(400).json({ error: 'Номер телефона должен начинаться с +7, 7 или 8' });
+    }
+    
+    // Проверяем длину (должно быть 11 цифр для России)
+    const digitsOnly = phone.replace(/^\+/, '');
+    if (digitsOnly.length !== 11) {
+      return res.status(400).json({ error: 'Российский номер телефона должен содержать 11 цифр' });
+    }
+
     // Валидация корзины
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
       return res.status(400).json({ error: 'Корзина пуста' });
@@ -800,6 +819,41 @@ app.post('/api/orders', async (req, res) => {
           `INSERT INTO order_items (order_id, product_id, title, price, quantity) VALUES ($1, $2, $3, $4, $5)`,
           [id, it.id ?? null, it.title, it.price, it.quantity]
         );
+        
+        // Обновляем количество товара на складе
+        if (it.id) {
+          if (it.type === 'vehicle' || it.category === 'Вездеходы') {
+            // Обновляем количество вездехода
+            await run(
+              `UPDATE vehicles SET quantity = quantity - $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+              [it.quantity, it.id]
+            );
+            
+            // Проверяем, не закончился ли товар, и обновляем статус
+            const vehicle = await get(`SELECT quantity FROM vehicles WHERE id = $1`, [it.id]);
+            if (vehicle && vehicle.quantity <= 0) {
+              await run(
+                `UPDATE vehicles SET available = false, updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+                [it.id]
+              );
+            }
+          } else {
+            // Обновляем количество обычного товара
+            await run(
+              `UPDATE products SET quantity = quantity - $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+              [it.quantity, it.id]
+            );
+            
+            // Проверяем, не закончился ли товар, и обновляем статус
+            const product = await get(`SELECT quantity FROM products WHERE id = $1`, [it.id]);
+            if (product && product.quantity <= 0) {
+              await run(
+                `UPDATE products SET available = false, updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+                [it.id]
+              );
+            }
+          }
+        }
       }
     }
 

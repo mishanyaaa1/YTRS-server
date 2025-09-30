@@ -168,7 +168,11 @@ function VehiclesPage() {
     const matchesTerrain = !filterSettings.showSubcategoryFilter || selectedTerrain === 'Все' || vehicle.terrain === selectedTerrain;
     const matchesPrice = !filterSettings.showPriceFilter || (vehicle.price >= priceRange[0] && (priceRange[1] === 0 || vehicle.price <= priceRange[1]));
     const matchesStock = !filterSettings.showStockFilter || !inStock || vehicle.available;
-    return matchesType && matchesTerrain && matchesPrice && matchesStock;
+    
+    // Скрываем вездеходы без остатков на складе
+    const hasStock = vehicle.quantity === undefined || vehicle.quantity === null || vehicle.quantity > 0;
+    
+    return matchesType && matchesTerrain && matchesPrice && matchesStock && hasStock;
   });
 
   const ITEMS_PER_PAGE = 6;

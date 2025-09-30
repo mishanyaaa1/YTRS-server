@@ -1331,7 +1331,10 @@ export const AdminDataProvider = ({ children }) => {
 
     // Функции для типов вездеходов
     addVehicleType,
-    deleteVehicleType
+    deleteVehicleType,
+    
+    // Функция для обновления данных
+    refreshData: refreshFromApi
   };
 
   return (

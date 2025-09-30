@@ -1482,3 +1482,12 @@ input[type="number"].quantity-input,
   font-weight: 600;
   font-size: 0.9rem;
 }
+
+/* Стили для подсказок в форме */
+.form-hint {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  font-style: italic;
+}

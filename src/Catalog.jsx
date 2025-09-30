@@ -145,7 +145,11 @@ export default function Catalog() {
     const byBrand = !filterSettings.showBrandFilter || selectedBrand === 'Все' || product.brand === selectedBrand;
     const byPrice = !filterSettings.showPriceFilter || (product.price >= priceRange[0] && (priceRange[1] === 0 || product.price <= priceRange[1]));
     const byStock = !filterSettings.showStockFilter || !inStock || product.available;
-    return byCategory && bySubcategory && byBrand && byPrice && byStock;
+    
+    // Скрываем товары без остатков на складе
+    const hasStock = product.quantity === undefined || product.quantity === null || product.quantity > 0;
+    
+    return byCategory && bySubcategory && byBrand && byPrice && byStock && hasStock;
   });
 
   // Логика пагинации

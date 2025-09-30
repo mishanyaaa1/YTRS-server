@@ -22,7 +22,7 @@ function Cart() {
     isInitialized
   } = useCart();
   
-  const { promotions, promocodes, products, vehicles, updatePromocodeUsage } = useAdminData();
+  const { promotions, promocodes, products, vehicles, updatePromocodeUsage, refreshData } = useAdminData();
   const { createOrder } = useOrders();
   const navigate = useNavigate();
   
@@ -329,10 +329,25 @@ function Cart() {
       return;
     }
     
-    // Валидация номера телефона (базовая проверка)
-    const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
-    if (!phoneRegex.test(orderForm.phone.trim())) {
-      alert('Пожалуйста, введите корректный номер телефона');
+    // Валидация российского номера телефона
+    const phone = orderForm.phone.trim().replace(/[\s\-\(\)]/g, '');
+    const russianPhoneRegex = /^(\+7|7|8)?[0-9]{10}$/;
+    
+    if (!russianPhoneRegex.test(phone)) {
+      alert('Пожалуйста, введите корректный российский номер телефона (например: +79123456789, 89123456789, 79123456789)');
+      return;
+    }
+    
+    // Проверяем, что номер начинается с 7, 8 или +7
+    if (!phone.startsWith('+7') && !phone.startsWith('7') && !phone.startsWith('8')) {
+      alert('Номер телефона должен начинаться с +7, 7 или 8');
+      return;
+    }
+    
+    // Проверяем длину (должно быть 11 цифр для России)
+    const digitsOnly = phone.replace(/^\+/, '');
+    if (digitsOnly.length !== 11) {
+      alert('Российский номер телефона должен содержать 11 цифр');
       return;
     }
     
@@ -412,6 +427,16 @@ function Cart() {
       } else {
         console.error('Ошибка отправки в Telegram:', result.error);
         alert(`Заказ #${orderNumber} оформлен, но возникла ошибка при отправке уведомления. Мы обязательно с вами свяжемся!`);
+      }
+      
+      // Обновляем данные о товарах после успешного оформления заказа
+      if (refreshData) {
+        try {
+          await refreshData();
+          console.log('Данные о товарах обновлены после оформления заказа');
+        } catch (error) {
+          console.error('Ошибка при обновлении данных о товарах:', error);
+        }
       }
       
       // Очищаем корзину и переходим на главную
@@ -803,10 +828,20 @@ function Cart() {
                       id="phone"
                       name="phone"
                       value={orderForm.phone}
-                      onChange={handleFormChange}
+                      onChange={(e) => {
+                        // Очищаем ввод от некорректных символов, оставляем только цифры, +, -, (, ), пробелы
+                        const cleaned = e.target.value.replace(/[^0-9+\-\(\)\s]/g, '');
+                        setOrderForm({
+                          ...orderForm,
+                          phone: cleaned
+                        });
+                      }}
+                      placeholder="+79123456789 или 89123456789"
                       required
                       disabled={isSubmittingOrder}
+                      maxLength="20"
                     />
+                    <small className="form-hint">Формат: +79123456789, 89123456789 или 79123456789</small>
                   </div>
                   
                   <div className="form-group">
