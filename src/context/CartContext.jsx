@@ -207,13 +207,47 @@ export const CartProvider = ({ children }) => {
   }, [cartItems, isInitialized, storageAvailable]);
 
   const addToCart = useCallback((product, quantity = 1) => {
+    // Валидация количества
+    if (quantity < 1) {
+      console.warn('Количество не может быть меньше 1');
+      return;
+    }
+    
+    if (quantity > 999999) {
+      console.warn('Максимальное количество товара: 999,999 штук');
+      return;
+    }
+    
+    // Проверка наличия товара на складе
+    if (product.quantity !== undefined && product.quantity !== null) {
+      if (quantity > product.quantity) {
+        console.warn(`В наличии только ${product.quantity} штук. Недостаточно товара на складе.`);
+        return;
+      }
+    }
+    
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
       
       if (existingItem) {
+        const newQuantity = existingItem.quantity + quantity;
+        
+        // Проверяем общее количество после добавления
+        if (product.quantity !== undefined && product.quantity !== null) {
+          if (newQuantity > product.quantity) {
+            console.warn(`В наличии только ${product.quantity} штук. Недостаточно товара на складе.`);
+            return prevItems; // Не изменяем корзину
+          }
+        }
+        
+        if (newQuantity > 999999) {
+          console.warn('Максимальное количество товара: 999,999 штук');
+          return prevItems; // Не изменяем корзину
+        }
+        
         return prevItems.map(item =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: newQuantity }
             : item
         );
       } else {
@@ -246,6 +280,12 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = useCallback((productId, quantity) => {
     if (quantity <= 0) {
       removeFromCart(productId);
+      return;
+    }
+
+    // Валидация количества
+    if (quantity > 999999) {
+      console.warn('Максимальное количество товара: 999,999 штук');
       return;
     }
 

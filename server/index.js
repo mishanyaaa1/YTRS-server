@@ -727,6 +727,57 @@ app.post('/api/orders', async (req, res) => {
   try {
     const { orderForm, cartItems, priceCalculation, orderNumber } = req.body;
 
+    // Валидация входных данных
+    if (!orderForm || !cartItems || !priceCalculation || !orderNumber) {
+      return res.status(400).json({ error: 'Отсутствуют обязательные данные заказа' });
+    }
+
+    // Валидация данных клиента
+    if (!orderForm.name || !orderForm.phone) {
+      return res.status(400).json({ error: 'Не указаны имя или телефон клиента' });
+    }
+
+    // Валидация корзины
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
+      return res.status(400).json({ error: 'Корзина пуста' });
+    }
+
+    // Проверка корректности товаров в корзине
+    for (const item of cartItems) {
+      if (!item.id || !item.title || !item.price || !item.quantity) {
+        return res.status(400).json({ error: 'Некорректные данные товара в корзине' });
+      }
+
+      if (item.quantity < 1 || item.quantity > 999999) {
+        return res.status(400).json({ error: `Некорректное количество товара: ${item.title}` });
+      }
+
+      if (item.price < 0) {
+        return res.status(400).json({ error: `Некорректная цена товара: ${item.title}` });
+      }
+
+      // Проверка наличия товара на складе
+      let product = null;
+      if (item.type === 'vehicle' || item.category === 'Вездеходы') {
+        product = await get(`SELECT quantity FROM vehicles WHERE id = $1`, [item.id]);
+      } else {
+        product = await get(`SELECT quantity FROM products WHERE id = $1`, [item.id]);
+      }
+
+      if (product && product.quantity !== undefined && product.quantity !== null) {
+        if (item.quantity > product.quantity) {
+          return res.status(400).json({ 
+            error: `Недостаточно товара на складе: ${item.title}. В наличии: ${product.quantity} штук` 
+          });
+        }
+      }
+    }
+
+    // Проверка корректности цен
+    if (priceCalculation.total < 0) {
+      return res.status(400).json({ error: 'Некорректная сумма заказа' });
+    }
+
     // customer
     let customerId = null;
     if (orderForm) {

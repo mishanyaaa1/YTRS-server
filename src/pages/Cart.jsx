@@ -158,6 +158,36 @@ function Cart() {
   }
 
   const handleQuantityChange = (productId, newQuantity) => {
+    // Валидация количества
+    if (newQuantity < 1) {
+      alert('Количество не может быть меньше 1');
+      return;
+    }
+    
+    if (newQuantity > 999999) {
+      alert('Максимальное количество товара: 999,999 штук');
+      return;
+    }
+    
+    // Проверка наличия товара на складе
+    const cartItem = cartItems.find(item => item.id === productId);
+    if (cartItem) {
+      // Ищем товар в базе данных для проверки наличия
+      let product = null;
+      if (cartItem.type === 'vehicle' || cartItem.category === 'Вездеходы') {
+        product = vehicles.find(v => v.id === productId);
+      } else {
+        product = products.find(p => p.id === productId);
+      }
+      
+      if (product && product.quantity !== undefined && product.quantity !== null) {
+        if (newQuantity > product.quantity) {
+          alert(`В наличии только ${product.quantity} штук. Недостаточно товара на складе.`);
+          return;
+        }
+      }
+    }
+    
     updateQuantity(productId, newQuantity);
   };
 
@@ -287,6 +317,69 @@ function Cart() {
     e.preventDefault();
     
     if (isSubmittingOrder) return; // Предотвращаем повторную отправку
+    
+    // Валидация данных заказа
+    if (!orderForm.name.trim()) {
+      alert('Пожалуйста, введите ваше имя');
+      return;
+    }
+    
+    if (!orderForm.phone.trim()) {
+      alert('Пожалуйста, введите номер телефона');
+      return;
+    }
+    
+    // Валидация номера телефона (базовая проверка)
+    const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
+    if (!phoneRegex.test(orderForm.phone.trim())) {
+      alert('Пожалуйста, введите корректный номер телефона');
+      return;
+    }
+    
+    if (orderForm.deliveryMethod === 'delivery' && !orderForm.address.trim()) {
+      alert('Пожалуйста, введите адрес доставки');
+      return;
+    }
+    
+    // Проверка корректности корзины
+    if (!cartItems || cartItems.length === 0) {
+      alert('Корзина пуста');
+      return;
+    }
+    
+    // Проверка количества товаров в корзине
+    for (const item of cartItems) {
+      if (!item.quantity || item.quantity < 1) {
+        alert(`Некорректное количество товара: ${item.title}`);
+        return;
+      }
+      
+      if (item.quantity > 999999) {
+        alert(`Слишком большое количество товара: ${item.title}. Максимум: 999,999 штук`);
+        return;
+      }
+      
+      // Проверка наличия товара на складе
+      let product = null;
+      if (item.type === 'vehicle' || item.category === 'Вездеходы') {
+        product = vehicles.find(v => v.id === item.id);
+      } else {
+        product = products.find(p => p.id === item.id);
+      }
+      
+      if (product && product.quantity !== undefined && product.quantity !== null) {
+        if (item.quantity > product.quantity) {
+          alert(`Недостаточно товара на складе: ${item.title}. В наличии: ${product.quantity} штук`);
+          return;
+        }
+      }
+    }
+    
+    // Проверка корректности цен
+    if (priceCalculation.total < 0) {
+      alert('Некорректная сумма заказа. Пожалуйста, обновите корзину');
+      return;
+    }
     
     setIsSubmittingOrder(true);
     
@@ -454,6 +547,31 @@ function Cart() {
                     <h3>{item.title}</h3>
                     {item.brand && item.brand.trim() && <p className="item-brand">{item.brand}</p>}
                     <p className="item-price">{item.price.toLocaleString()} ₽</p>
+                    {(() => {
+                      // Показываем информацию о наличии товара
+                      let product = null;
+                      if (item.type === 'vehicle' || item.category === 'Вездеходы') {
+                        product = vehicles.find(v => v.id === item.id);
+                      } else {
+                        product = products.find(p => p.id === item.id);
+                      }
+                      
+                      if (product && product.quantity !== undefined && product.quantity !== null) {
+                        const isLowStock = product.quantity <= 5;
+                        const isOutOfStock = product.quantity === 0;
+                        const isOverOrdered = item.quantity > product.quantity;
+                        
+                        return (
+                          <p className={`item-stock ${isOutOfStock ? 'out-of-stock' : isLowStock ? 'low-stock' : isOverOrdered ? 'over-ordered' : 'in-stock'}`}>
+                            {isOutOfStock ? 'Нет в наличии' : 
+                             isOverOrdered ? `В наличии только ${product.quantity} шт` :
+                             isLowStock ? `Осталось ${product.quantity} шт` :
+                             `В наличии ${product.quantity} шт`}
+                          </p>
+                        );
+                      }
+                      return null;
+                    })()}
                   </div>
                   
                   <div className="item-controls">
@@ -484,6 +602,11 @@ function Cart() {
                           }
                           const value = parseInt(inputValue);
                           if (!isNaN(value)) {
+                            // Ограничиваем максимальное значение при вводе
+                            if (value > 999999) {
+                              alert('Максимальное количество товара: 999,999 штук');
+                              return;
+                            }
                             handleQuantityChange(item.id, value);
                           }
                         }}
@@ -497,6 +620,7 @@ function Cart() {
                         onFocus={(e) => e.target.select()}
                         placeholder="1"
                         className="quantity-input"
+                        maxLength="6"
                       />
                       <button
                         onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
@@ -758,12 +882,31 @@ function Cart() {
                   <div className="order-summary">
                     <h4>Ваш заказ:</h4>
                     <div className="order-items">
-                      {cartItems.map((item) => (
-                        <div key={item.id} className="order-item">
-                          <span>{item.title} × {item.quantity}</span>
-                          <span>{(item.price * item.quantity).toLocaleString()} ₽</span>
-                        </div>
-                      ))}
+                      {cartItems.map((item) => {
+                        // Проверяем наличие товара на складе
+                        let product = null;
+                        if (item.type === 'vehicle' || item.category === 'Вездеходы') {
+                          product = vehicles.find(v => v.id === item.id);
+                        } else {
+                          product = products.find(p => p.id === item.id);
+                        }
+                        
+                        const isOverOrdered = product && product.quantity !== undefined && product.quantity !== null && item.quantity > product.quantity;
+                        
+                        return (
+                          <div key={item.id} className={`order-item ${isOverOrdered ? 'over-ordered' : ''}`}>
+                            <span>
+                              {item.title} × {item.quantity}
+                              {isOverOrdered && (
+                                <span className="over-order-warning">
+                                  {' '}(В наличии только {product.quantity} шт)
+                                </span>
+                              )}
+                            </span>
+                            <span>{(item.price * item.quantity).toLocaleString()} ₽</span>
+                          </div>
+                        );
+                      })}
                     </div>
                     {priceCalculation.appliedPromotion && (
                       <div className="discount-info">
@@ -798,7 +941,20 @@ function Cart() {
                     <button 
                       type="submit" 
                       className="submit-btn"
-                      disabled={isSubmittingOrder}
+                      disabled={isSubmittingOrder || cartItems.some(item => {
+                        // Проверяем, есть ли товары с некорректным количеством
+                        let product = null;
+                        if (item.type === 'vehicle' || item.category === 'Вездеходы') {
+                          product = vehicles.find(v => v.id === item.id);
+                        } else {
+                          product = products.find(p => p.id === item.id);
+                        }
+                        
+                        if (product && product.quantity !== undefined && product.quantity !== null) {
+                          return item.quantity > product.quantity;
+                        }
+                        return false;
+                      })}
                     >
                       {isSubmittingOrder ? 'Обработка...' : 'Подтвердить заказ'}
                     </button>
