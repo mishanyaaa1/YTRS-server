@@ -737,12 +737,12 @@ app.post('/api/orders', async (req, res) => {
       return res.status(400).json({ error: 'Не указаны имя или телефон клиента' });
     }
 
-    // Валидация российского номера телефона на сервере
+    // Валидация номера телефона на сервере
     const phone = orderForm.phone.trim().replace(/[\s\-\(\)]/g, '');
-    const russianPhoneRegex = /^(\+7|7|8)?[0-9]{10}$/;
+    const phoneRegex = /^(\+7|7|8)?[0-9]{10}$/;
     
-    if (!russianPhoneRegex.test(phone)) {
-      return res.status(400).json({ error: 'Некорректный российский номер телефона' });
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({ error: 'Некорректный номер телефона' });
     }
     
     // Проверяем, что номер начинается с 7, 8 или +7
@@ -750,10 +750,10 @@ app.post('/api/orders', async (req, res) => {
       return res.status(400).json({ error: 'Номер телефона должен начинаться с +7, 7 или 8' });
     }
     
-    // Проверяем длину (должно быть 11 цифр для России)
+    // Проверяем длину (должно быть 11 цифр)
     const digitsOnly = phone.replace(/^\+/, '');
     if (digitsOnly.length !== 11) {
-      return res.status(400).json({ error: 'Российский номер телефона должен содержать 11 цифр' });
+      return res.status(400).json({ error: 'Номер телефона должен содержать 11 цифр' });
     }
 
     // Валидация корзины

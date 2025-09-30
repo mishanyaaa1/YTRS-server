@@ -330,12 +330,12 @@ function Cart() {
       return;
     }
     
-    // Валидация российского номера телефона
+    // Валидация номера телефона
     const phone = orderForm.phone.trim().replace(/[\s\-\(\)]/g, '');
-    const russianPhoneRegex = /^(\+7|7|8)?[0-9]{10}$/;
+    const phoneRegex = /^(\+7|7|8)?[0-9]{10}$/;
     
-    if (!russianPhoneRegex.test(phone)) {
-      alert('Пожалуйста, введите корректный российский номер телефона (например: +79123456789, 89123456789, 79123456789)');
+    if (!phoneRegex.test(phone)) {
+      alert('Пожалуйста, введите корректный номер телефона (например: +79123456789, 89123456789, 79123456789)');
       return;
     }
     
@@ -345,10 +345,10 @@ function Cart() {
       return;
     }
     
-    // Проверяем длину (должно быть 11 цифр для России)
+    // Проверяем длину (должно быть 11 цифр)
     const digitsOnly = phone.replace(/^\+/, '');
     if (digitsOnly.length !== 11) {
-      alert('Российский номер телефона должен содержать 11 цифр');
+      alert('Номер телефона должен содержать 11 цифр');
       return;
     }
     
@@ -838,10 +838,10 @@ function Cart() {
                         // Удаляем пробелы и скобки для подсчета цифр
                         const digitsOnly = value.replace(/[\s\-\(\)]/g, '');
                         
-                        // Ограничиваем количество цифр (максимум 11 для российского номера)
+                        // Ограничиваем количество цифр (максимум 11)
                         if (digitsOnly.length > 11) {
                           // Показываем предупреждение
-                          setPhoneError('Российский номер телефона должен содержать не более 11 цифр');
+                          setPhoneError('Номер телефона должен содержать не более 11 цифр');
                           
                           // Если больше 11 цифр, обрезаем до 11
                           const phoneWithoutSpaces = value.replace(/[\s\-\(\)]/g, '');
@@ -861,8 +861,19 @@ function Cart() {
                             value = value.substring(0, cutIndex);
                           }
                         } else {
-                          // Убираем предупреждение, если количество цифр корректное
-                          setPhoneError('');
+                          // Проверяем формат номера
+                          if (digitsOnly.length > 0) {
+                            // Проверяем, что номер начинается с правильного префикса
+                            if (!digitsOnly.startsWith('+7') && !digitsOnly.startsWith('7') && !digitsOnly.startsWith('8')) {
+                              setPhoneError('Введите корректный номер телефона');
+                            } else if (digitsOnly.length < 11) {
+                              setPhoneError('Номер телефона должен содержать 11 цифр');
+                            } else {
+                              setPhoneError('');
+                            }
+                          } else {
+                            setPhoneError('');
+                          }
                         }
                         
                         setOrderForm({
