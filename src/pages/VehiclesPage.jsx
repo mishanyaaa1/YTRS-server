@@ -374,6 +374,9 @@ function VehiclesPage() {
                       <>
                         <div className="catalog-card-header">
                           <h3>{vehicle.name}</h3>
+                          {vehicle.description && (
+                            <h4 className="catalog-card-description">{vehicle.description}</h4>
+                          )}
                         </div>
                         
                         <div className="catalog-card-price-section">
@@ -383,6 +386,9 @@ function VehiclesPage() {
                     ) : (
                       <div className="catalog-card-header">
                         <h3>{vehicle.name}</h3>
+                        {vehicle.description && (
+                          <h4 className="catalog-card-description">{vehicle.description}</h4>
+                        )}
                         <div className="catalog-card-price">{formatPrice(vehicle.price)} ₽</div>
                       </div>
                     )}

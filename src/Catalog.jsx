@@ -333,6 +333,9 @@ export default function Catalog() {
                     <>
                       <div className="catalog-card-header">
                         <h3>{product.title}</h3>
+                        {product.description && (
+                          <h4 className="catalog-card-description">{product.description}</h4>
+                        )}
                       </div>
                       
                       <div className="catalog-card-price-section">
@@ -342,6 +345,9 @@ export default function Catalog() {
                   ) : (
                     <div className="catalog-card-header">
                       <h3>{product.title}</h3>
+                      {product.description && (
+                        <h4 className="catalog-card-description">{product.description}</h4>
+                      )}
                       <div className="catalog-card-price">{product.price.toLocaleString()} ₽</div>
                     </div>
                   )}

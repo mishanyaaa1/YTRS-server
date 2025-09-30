@@ -358,6 +358,19 @@ input[type='number'] {
   overflow-wrap: break-word;
 }
 
+.catalog-card-description {
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin: 0.5rem 0 0 0;
+  color: #cccccc;
+  line-height: 1.3;
+  text-align: left;
+  letter-spacing: 0.3px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  opacity: 0.9;
+}
+
 .catalog-card-price-section {
   margin-bottom: 0.75rem;
   text-align: center;
@@ -372,6 +385,24 @@ input[type='number'] {
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
+}
+
+.catalog-card-list .catalog-card-description {
+  font-size: 0.7rem;
+  font-weight: 400;
+  margin: 0.3rem 0 0 0;
+  color: #cccccc;
+  line-height: 1.2;
+  text-align: left;
+  letter-spacing: 0.2px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  opacity: 0.8;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .catalog-card-price {
@@ -735,6 +766,14 @@ input[type='number'] {
     min-width: 0;
   }
   
+  .catalog-card-list .catalog-card-description {
+    font-size: 0.75rem;
+    margin: 0.2rem 0 0 0;
+    color: #cccccc;
+    opacity: 0.8;
+    display: none; /* Скрываем описание на мобильных в режиме списка */
+  }
+  
   .catalog-card-list .catalog-card-price {
     font-size: 0.9rem;
     white-space: nowrap;
@@ -1091,6 +1130,18 @@ input[type='number'] {
     line-height: 1.4;
     color: #cccccc;
     margin-bottom: 0.8rem;
+  }
+  
+  .catalog-card-description {
+    font-size: 0.75rem;
+    margin: 0.4rem 0 0 0;
+    color: #cccccc;
+    opacity: 0.8;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .product-price {
