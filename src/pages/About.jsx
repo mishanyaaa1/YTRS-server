@@ -140,7 +140,7 @@ export default function About() {
             <div className="hero-content">
               <h1 className="about-title">
                 {(() => {
-                  const title = aboutContent.title || "О компании ВездеходЗапчасти";
+                  const title = aboutContent.title || "О компании ЮТОРС";
                   if (title.includes('\n')) {
                     return title.split('\n').map((line, index) => (
                       <span key={index} style={{ display: 'block' }}>
@@ -334,7 +334,7 @@ export default function About() {
             <div className="timeline-description">
               <p>
                 {aboutContent.history?.content || 
-                  "Компания ВездеходЗапчасти была основана в 2013 году группой энтузиастов, увлеченных вездеходной техникой. Начав с небольшого магазина в Москве, мы постепенно расширили свою деятельность и сегодня являемся одним из ведущих поставщиков запчастей для вездеходов в России."
+                  "Компания ЮТОРС была основана в 2013 году группой энтузиастов, увлеченных вездеходной техникой. Начав с небольшого магазина в Москве, мы постепенно расширили свою деятельность и сегодня являемся одним из ведущих поставщиков запчастей для вездеходов в России."
                 }
               </p>
             </div>

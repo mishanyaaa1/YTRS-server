@@ -1335,7 +1335,7 @@ export default function ContentManagement() {
                     ...prev,
                     footer: { ...prev.footer, copyright: e.target.value }
                   }))}
-                  placeholder="© 2024 ВездеходЗапчасти. Все права защищены."
+                  placeholder="© 2024 ЮТОРС. Все права защищены."
                 />
               </div>
             </div>

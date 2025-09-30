@@ -111,7 +111,7 @@ function AdminOverviewAdvanced() {
   return (
     <div className="admin-overview-advanced">
       <div className="overview-header">
-        <p>Добро пожаловать в панель управления сайтом ВездеходЗапчасти</p>
+        <p>Добро пожаловать в панель управления сайтом ЮТОРС</p>
       </div>
 
       {/* Статистика */}
