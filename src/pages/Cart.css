@@ -1491,3 +1491,12 @@ input[type="number"].quantity-input,
   color: #9ca3af;
   font-style: italic;
 }
+
+/* Стили для ошибок в форме */
+.form-error {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: #ef4444;
+  font-weight: 500;
+}

@@ -45,6 +45,7 @@ function Cart() {
     comment: ''
   });
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
 
   // ВСЕ ХУКИ ДОЛЖНЫ БЫТЬ ВЫЗВАНЫ ДО УСЛОВНЫХ ВОЗВРАТОВ
   // Расчет применимых скидок
@@ -829,19 +830,76 @@ function Cart() {
                       name="phone"
                       value={orderForm.phone}
                       onChange={(e) => {
+                        let value = e.target.value;
+                        
                         // Очищаем ввод от некорректных символов, оставляем только цифры, +, -, (, ), пробелы
-                        const cleaned = e.target.value.replace(/[^0-9+\-\(\)\s]/g, '');
+                        value = value.replace(/[^0-9+\-\(\)\s]/g, '');
+                        
+                        // Удаляем пробелы и скобки для подсчета цифр
+                        const digitsOnly = value.replace(/[\s\-\(\)]/g, '');
+                        
+                        // Ограничиваем количество цифр (максимум 11 для российского номера)
+                        if (digitsOnly.length > 11) {
+                          // Показываем предупреждение
+                          setPhoneError('Российский номер телефона должен содержать не более 11 цифр');
+                          
+                          // Если больше 11 цифр, обрезаем до 11
+                          const phoneWithoutSpaces = value.replace(/[\s\-\(\)]/g, '');
+                          if (phoneWithoutSpaces.length > 11) {
+                            // Находим позицию 11-й цифры и обрезаем
+                            let digitCount = 0;
+                            let cutIndex = 0;
+                            for (let i = 0; i < value.length; i++) {
+                              if (/\d/.test(value[i])) {
+                                digitCount++;
+                                if (digitCount === 11) {
+                                  cutIndex = i + 1;
+                                  break;
+                                }
+                              }
+                            }
+                            value = value.substring(0, cutIndex);
+                          }
+                        } else {
+                          // Убираем предупреждение, если количество цифр корректное
+                          setPhoneError('');
+                        }
+                        
                         setOrderForm({
                           ...orderForm,
-                          phone: cleaned
+                          phone: value
                         });
                       }}
-                      placeholder="+79123456789 или 89123456789"
+                      onBlur={(e) => {
+                        // Форматируем номер при потере фокуса
+                        let phone = e.target.value.trim();
+                        const digitsOnly = phone.replace(/[\s\-\(\)]/g, '');
+                        
+                        if (digitsOnly.length === 11) {
+                          // Форматируем российский номер
+                          if (digitsOnly.startsWith('8')) {
+                            phone = '+7' + digitsOnly.substring(1);
+                          } else if (digitsOnly.startsWith('7')) {
+                            phone = '+' + digitsOnly;
+                          }
+                          // Очищаем ошибку, если номер корректный
+                          setPhoneError('');
+                        }
+                        
+                        setOrderForm({
+                          ...orderForm,
+                          phone: phone
+                        });
+                      }}
+                      placeholder=""
                       required
                       disabled={isSubmittingOrder}
                       maxLength="20"
                     />
-                    <small className="form-hint">Формат: +79123456789, 89123456789 или 79123456789</small>
+                    {phoneError && (
+                      <small className="form-error">{phoneError}</small>
+                    )}
+                    <small className="form-hint">Формат: +79...., 89.... или 79....</small>
                   </div>
                   
                   <div className="form-group">
