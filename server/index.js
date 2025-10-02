@@ -208,70 +208,140 @@ app.get('/api/_debug/download', (req, res) => {
   res.download(full);
 });
 
+// Test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Server is working', timestamp: new Date().toISOString() });
+});
+
 // Upload image (admin only)
-app.post('/api/upload/image', upload.single('image'), (req, res) => {
-  console.log('Upload request received:', req.file ? 'File present' : 'No file');
+app.post('/api/upload/image', (req, res) => {
+  console.log('=== UPLOAD REQUEST START ===');
+  console.log('Headers:', req.headers);
+  console.log('Content-Type:', req.get('Content-Type'));
   
-  if (!req.file) {
-    console.error('No file uploaded');
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
-  
-  console.log('File details:', {
-    originalname: req.file.originalname,
-    filename: req.file.filename,
-    path: req.file.path,
-    size: req.file.size
-  });
-  
-  try {
-    const fs = require('fs');
-    const path = require('path');
-    
-    // Сначала пробуем сохранить в uploads папку (как было раньше)
-    const uploadsDir = path.join(__dirname, 'uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-      console.log('Created uploads directory:', uploadsDir);
+  // Обработка multer
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ 
+        error: 'File upload error',
+        details: err.message 
+      });
     }
     
-    // Копируем файл в uploads папку
-    const sourcePath = req.file.path;
-    const targetPath = path.join(uploadsDir, req.file.filename);
+    console.log('Upload request received:', req.file ? 'File present' : 'No file');
     
-    console.log('Copying file from:', sourcePath, 'to:', targetPath);
-    fs.copyFileSync(sourcePath, targetPath);
-    
-    // Удаляем временный файл
-    if (fs.existsSync(sourcePath)) {
-      fs.unlinkSync(sourcePath);
-      console.log('Removed temporary file:', sourcePath);
+    if (!req.file) {
+      console.error('No file uploaded');
+      return res.status(400).json({ error: 'No file uploaded' });
     }
     
-    // Возвращаем URL для uploads папки
-    const url = `/uploads/${req.file.filename}`;
-    console.log('Upload successful, returning URL:', url);
-    res.status(201).json({ url });
-    
-  } catch (error) {
-    console.error('Error during image upload:', error);
-    console.error('Error stack:', error.stack);
-    
-    // Пытаемся удалить временный файл
-    try {
-      if (req.file && req.file.path && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-        console.log('Cleaned up temporary file after error');
-      }
-    } catch (cleanupError) {
-      console.error('Error cleaning up temporary file:', cleanupError);
-    }
-    
-    res.status(500).json({ 
-      error: 'Failed to upload image',
-      details: error.message 
+    console.log('File details:', {
+      originalname: req.file.originalname,
+      filename: req.file.filename,
+      path: req.file.path,
+      size: req.file.size,
+      mimetype: req.file.mimetype
     });
-  }
+    
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Проверяем, что файл существует
+      if (!fs.existsSync(req.file.path)) {
+        console.error('Temporary file does not exist:', req.file.path);
+        return res.status(500).json({ 
+          error: 'Temporary file not found',
+          details: 'The uploaded file was not saved properly'
+        });
+      }
+      
+      // Создаем папку uploads если её нет
+      const uploadsDir = path.join(__dirname, 'uploads');
+      console.log('Uploads directory path:', uploadsDir);
+      
+      if (!fs.existsSync(uploadsDir)) {
+        console.log('Creating uploads directory...');
+        fs.mkdirSync(uploadsDir, { recursive: true });
+        console.log('Created uploads directory successfully');
+      } else {
+        console.log('Uploads directory already exists');
+      }
+      
+      // Проверяем права на запись
+      try {
+        fs.accessSync(uploadsDir, fs.constants.W_OK);
+        console.log('Uploads directory is writable');
+      } catch (accessError) {
+        console.error('Uploads directory is not writable:', accessError);
+        return res.status(500).json({ 
+          error: 'Permission denied',
+          details: 'Cannot write to uploads directory'
+        });
+      }
+      
+      // Копируем файл в uploads папку
+      const sourcePath = req.file.path;
+      const targetPath = path.join(uploadsDir, req.file.filename);
+      
+      console.log('Copying file from:', sourcePath);
+      console.log('Copying file to:', targetPath);
+      
+      fs.copyFileSync(sourcePath, targetPath);
+      console.log('File copied successfully');
+      
+      // Проверяем, что файл скопировался
+      if (!fs.existsSync(targetPath)) {
+        console.error('Target file was not created:', targetPath);
+        return res.status(500).json({ 
+          error: 'File copy failed',
+          details: 'The file was not copied to the target location'
+        });
+      }
+      
+      // Удаляем временный файл
+      try {
+        if (fs.existsSync(sourcePath)) {
+          fs.unlinkSync(sourcePath);
+          console.log('Removed temporary file:', sourcePath);
+        }
+      } catch (unlinkError) {
+        console.warn('Could not remove temporary file:', unlinkError);
+      }
+      
+      // Возвращаем URL для uploads папки
+      const url = `/uploads/${req.file.filename}`;
+      console.log('Upload successful, returning URL:', url);
+      console.log('=== UPLOAD REQUEST END ===');
+      
+      res.status(201).json({ url });
+      
+    } catch (error) {
+      console.error('Error during image upload:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      // Пытаемся удалить временный файл
+      try {
+        if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+          console.log('Cleaned up temporary file after error');
+        }
+      } catch (cleanupError) {
+        console.error('Error cleaning up temporary file:', cleanupError);
+      }
+      
+      console.log('=== UPLOAD REQUEST END (ERROR) ===');
+      
+      res.status(500).json({ 
+        error: 'Failed to upload image',
+        details: error.message,
+        type: error.name
+      });
+    }
+  });
 });
 
 // Brands
