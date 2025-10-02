@@ -7,6 +7,7 @@ import './ContentManagement.css';
 export default function ContentManagement() {
   const { aboutContent, updateAboutContent } = useAdminData();
   const [activeTab, setActiveTab] = useState('basic');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [formData, setFormData] = useState({
     homeHero: aboutContent.homeHero || {
       title: 'Запчасти для вездеходов',
@@ -555,11 +556,12 @@ export default function ContentManagement() {
                     onChange={async (e) => {
                       const file = e.target.files[0];
                       if (file) {
+                        setIsUploadingImage(true);
                         const formData = new FormData();
                         formData.append('image', file);
                         
                         try {
-                          const response = await fetch('/api/upload', {
+                          const response = await fetch('/api/upload/image', {
                             method: 'POST',
                             body: formData
                           });
@@ -573,12 +575,17 @@ export default function ContentManagement() {
                                 backgroundImage: result.url
                               }
                             }));
+                            console.log('Изображение успешно загружено:', result.url);
                           } else {
-                            alert('Ошибка при загрузке изображения');
+                            const errorData = await response.json().catch(() => ({}));
+                            console.error('Ошибка загрузки изображения:', response.status, errorData);
+                            alert(`Ошибка при загрузке изображения: ${errorData.error || 'Неизвестная ошибка'}`);
                           }
                         } catch (error) {
-                          console.error('Error uploading image:', error);
-                          alert('Ошибка при загрузке изображения');
+                          console.error('Ошибка при загрузке изображения:', error);
+                          alert('Ошибка при загрузке изображения. Проверьте подключение к серверу.');
+                        } finally {
+                          setIsUploadingImage(false);
                         }
                       }
                     }}
@@ -588,8 +595,9 @@ export default function ContentManagement() {
                     type="button"
                     className="upload-image-btn"
                     onClick={() => document.getElementById('hero-background-upload').click()}
+                    disabled={isUploadingImage}
                   >
-                    <FaUpload /> {formData.homeHero.backgroundImage ? 'Изменить изображение' : 'Загрузить изображение'}
+                    <FaUpload /> {isUploadingImage ? 'Загрузка...' : (formData.homeHero.backgroundImage ? 'Изменить изображение' : 'Загрузить изображение')}
                   </button>
                 </div>
                 
