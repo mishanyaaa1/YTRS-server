@@ -18,7 +18,8 @@ export default function ContentManagement() {
       imageCaption: 'Надёжные запчасти для вашего вездехода',
       heroEffect: 'particles',
       visualButtons: [{ text: 'Подробнее', link: '/catalog' }],
-      visualImage: ''
+      visualImage: '',
+      backgroundImage: ''
     },
     title: aboutContent.title || '',
     description: aboutContent.description || '',
@@ -55,7 +56,8 @@ export default function ContentManagement() {
         imageCaption: 'Надёжные запчасти для вашего вездехода',
         heroEffect: 'particles',
         visualButtons: [{ text: 'Подробнее', link: '/catalog' }],
-        visualImage: ''
+        visualImage: '',
+        backgroundImage: ''
       },
       title: aboutContent.title || '',
       description: aboutContent.description || '',
@@ -516,6 +518,84 @@ export default function ContentManagement() {
                   onChange={handleHomeHeroChange}
                   placeholder="/about#contacts"
                 />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Фоновое изображение главной страницы:</label>
+              <div className="image-upload-section">
+                {formData.homeHero.backgroundImage && (
+                  <div className="current-image-preview">
+                    <img 
+                      src={formData.homeHero.backgroundImage} 
+                      alt="Текущее фоновое изображение" 
+                      className="background-preview"
+                    />
+                    <button 
+                      type="button" 
+                      className="remove-image-btn"
+                      onClick={() => setFormData(prev => ({
+                        ...prev,
+                        homeHero: {
+                          ...prev.homeHero,
+                          backgroundImage: ''
+                        }
+                      }))}
+                    >
+                      <FaTrash /> Удалить изображение
+                    </button>
+                  </div>
+                )}
+                
+                <div className="image-upload-controls">
+                  <input
+                    type="file"
+                    id="hero-background-upload"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const formData = new FormData();
+                        formData.append('image', file);
+                        
+                        try {
+                          const response = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData
+                          });
+                          
+                          if (response.ok) {
+                            const result = await response.json();
+                            setFormData(prev => ({
+                              ...prev,
+                              homeHero: {
+                                ...prev.homeHero,
+                                backgroundImage: result.url
+                              }
+                            }));
+                          } else {
+                            alert('Ошибка при загрузке изображения');
+                          }
+                        } catch (error) {
+                          console.error('Error uploading image:', error);
+                          alert('Ошибка при загрузке изображения');
+                        }
+                      }
+                    }}
+                    style={{ display: 'none' }}
+                  />
+                  <button
+                    type="button"
+                    className="upload-image-btn"
+                    onClick={() => document.getElementById('hero-background-upload').click()}
+                  >
+                    <FaUpload /> {formData.homeHero.backgroundImage ? 'Изменить изображение' : 'Загрузить изображение'}
+                  </button>
+                </div>
+                
+                <small style={{ color: '#666', fontSize: '12px', marginTop: '8px', display: 'block' }}>
+                  💡 Рекомендуемый размер: 1920x1080px или больше. Форматы: JPG, PNG, WebP
+                </small>
               </div>
             </div>
 

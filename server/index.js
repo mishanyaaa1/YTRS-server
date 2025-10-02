@@ -378,7 +378,22 @@ app.delete('/api/terrain-types/:name', async (req, res) => {
       return res.status(404).json({ error: 'Terrain type not found' });
     }
     
-    // Удаляем запись
+    // Проверим, есть ли связанные записи в vehicles
+    const vehiclesWithTerrain = await all(`SELECT id, name FROM vehicles WHERE terrain = $1`, [name]);
+    console.log(`Vehicles using this terrain type:`, vehiclesWithTerrain);
+    
+    // Если есть связанные записи, возвращаем информацию о них для подтверждения
+    if (vehiclesWithTerrain.length > 0) {
+      return res.status(409).json({ 
+        error: 'Terrain type is in use',
+        details: `This terrain type is used by ${vehiclesWithTerrain.length} vehicle(s)`,
+        vehiclesCount: vehiclesWithTerrain.length,
+        vehicles: vehiclesWithTerrain.map(v => ({ id: v.id, name: v.name })),
+        message: `Тип местности "${name}" используется ${vehiclesWithTerrain.length} товаром(ами). При удалении все связанные товары будут переназначены на другой тип местности. Продолжить?`
+      });
+    }
+    
+    // Теперь удаляем запись типа местности
     const result = await run(`DELETE FROM terrain_types WHERE name = $1`, [name]);
     console.log(`Delete result:`, result);
     
@@ -388,9 +403,84 @@ app.delete('/api/terrain-types/:name', async (req, res) => {
     }
     
     console.log(`Successfully deleted terrain type "${name}"`);
-    res.json({ ok: true });
+    res.json({ 
+      ok: true, 
+      message: vehiclesWithTerrain.length > 0 
+        ? `Terrain type deleted. ${vehiclesWithTerrain.length} vehicles updated to use different terrain type.`
+        : 'Terrain type deleted successfully.'
+    });
   } catch (err) {
     console.error('Error deleting terrain type:', err);
+    console.error('Error details:', {
+      message: err.message,
+      code: err.code,
+      detail: err.detail,
+      constraint: err.constraint,
+      stack: err.stack
+    });
+    res.status(500).json({ 
+      error: 'Failed to delete terrain type',
+      details: err.message 
+    });
+  }
+});
+
+// API для принудительного удаления типа местности (с подтверждением)
+app.delete('/api/terrain-types/:name/force', async (req, res) => {
+  try {
+    const name = decodeURIComponent(req.params.name);
+    console.log(`Force deleting terrain type: "${name}"`);
+    
+    // Сначала проверим, существует ли запись
+    const checkResult = await all(`SELECT id, name FROM terrain_types WHERE name = $1`, [name]);
+    
+    if (checkResult.length === 0) {
+      console.log(`Terrain type "${name}" not found`);
+      return res.status(404).json({ error: 'Terrain type not found' });
+    }
+    
+    // Проверим, есть ли связанные записи в vehicles
+    const vehiclesWithTerrain = await all(`SELECT id, name FROM vehicles WHERE terrain = $1`, [name]);
+    console.log(`Vehicles using this terrain type:`, vehiclesWithTerrain);
+    
+    if (vehiclesWithTerrain.length > 0) {
+      // Если есть связанные записи, сначала обновим их
+      // Найдем другой тип местности для замены (первый доступный)
+      const otherTerrainTypes = await all(`SELECT name FROM terrain_types WHERE name != $1 ORDER BY name LIMIT 1`, [name]);
+      
+      if (otherTerrainTypes.length === 0) {
+        return res.status(400).json({ 
+          error: 'Cannot delete terrain type', 
+          details: 'No other terrain types available to replace references' 
+        });
+      }
+      
+      const replacementTerrain = otherTerrainTypes[0].name;
+      console.log(`Replacing terrain "${name}" with "${replacementTerrain}" in ${vehiclesWithTerrain.length} vehicles`);
+      
+      // Обновляем все связанные записи
+      await run(`UPDATE vehicles SET terrain = $1 WHERE terrain = $2`, [replacementTerrain, name]);
+      console.log(`Updated ${vehiclesWithTerrain.length} vehicles to use terrain "${replacementTerrain}"`);
+    }
+    
+    // Теперь удаляем запись типа местности
+    const result = await run(`DELETE FROM terrain_types WHERE name = $1`, [name]);
+    console.log(`Delete result:`, result);
+    
+    if (result.changes === 0) {
+      console.log(`No rows affected during delete`);
+      return res.status(404).json({ error: 'Terrain type not found' });
+    }
+    
+    console.log(`Successfully force deleted terrain type "${name}"`);
+    res.json({ 
+      ok: true, 
+      message: vehiclesWithTerrain.length > 0 
+        ? `Тип местности "${name}" удален. ${vehiclesWithTerrain.length} товар(ов) переназначен(ы) на другой тип местности.`
+        : `Тип местности "${name}" успешно удален.`
+    });
+  } catch (err) {
+    console.error('Error force deleting terrain type:', err);
     console.error('Error details:', {
       message: err.message,
       code: err.code,
