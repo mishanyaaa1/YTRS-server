@@ -65,15 +65,9 @@
   font-size: 0.9rem;
 }
 
-.upload-image-btn:hover:not(:disabled) {
+.upload-image-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(230, 163, 74, 0.4);
-}
-
-.upload-image-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
 }
 
 /* Стили для управления контентом */
