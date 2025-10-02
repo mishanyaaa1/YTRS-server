@@ -573,64 +573,34 @@ export default function ContentManagement() {
                         formData.append('image', file);
                         
                         try {
-                          console.log('Starting image upload...');
                           const response = await fetch('/api/upload/image', {
                             method: 'POST',
                             body: formData
                           });
                           
-                          console.log('Upload response status:', response.status);
-                          console.log('Upload response headers:', response.headers);
-                          
                           if (response.ok) {
-                            let result;
-                            try {
-                              result = await response.json();
-                              console.log('Upload response data:', result);
-                            } catch (parseError) {
-                              console.error('Failed to parse success response:', parseError);
-                              throw new Error('Сервер вернул некорректный ответ');
-                            }
-                            
-                            if (result && result.url) {
-                              setFormData(prev => ({
-                                ...prev,
-                                homeHero: {
-                                  ...prev.homeHero,
-                                  backgroundImage: result.url
-                                }
-                              }));
-                              console.log('Изображение успешно загружено:', result.url);
-                            } else {
-                              throw new Error('Сервер не вернул URL изображения');
-                            }
+                            const result = await response.json();
+                            setFormData(prev => ({
+                              ...prev,
+                              homeHero: {
+                                ...prev.homeHero,
+                                backgroundImage: result.url
+                              }
+                            }));
+                            console.log('Изображение успешно загружено:', result.url);
                           } else {
                             let errorData = {};
-                            let errorText = '';
-                            
                             try {
-                              const contentType = response.headers.get('content-type');
-                              console.log('Error response content-type:', contentType);
-                              
-                              if (contentType && contentType.includes('application/json')) {
-                                errorData = await response.json();
-                                console.log('Parsed error response:', errorData);
-                              } else {
-                                errorText = await response.text();
-                                console.log('Error response text:', errorText);
-                              }
-                            } catch (parseError) {
-                              console.error('Failed to parse error response:', parseError);
-                              errorText = 'Не удалось обработать ответ сервера';
+                              errorData = await response.json();
+                            } catch (e) {
+                              console.error('Failed to parse error response:', e);
                             }
-                            
-                            const errorMessage = errorData.error || errorData.details || errorText || 'Неизвестная ошибка';
                             console.error('Ошибка загрузки изображения:', response.status, errorData);
-                            alert(`Ошибка при загрузке изображения (${response.status}): ${errorMessage}`);
+                            alert(`Ошибка при загрузке изображения (${response.status}): ${errorData.error || errorData.details || 'Неизвестная ошибка'}`);
                           }
                         } catch (error) {
                           console.error('Ошибка при загрузке изображения:', error);
-                          alert(`Ошибка при загрузке изображения: ${error.message || 'Проверьте подключение к серверу'}`);
+                          alert('Ошибка при загрузке изображения. Проверьте подключение к серверу.');
                         } finally {
                           setIsUploadingImage(false);
                         }
