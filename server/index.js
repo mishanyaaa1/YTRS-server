@@ -364,17 +364,44 @@ app.post('/api/terrain-types', async (req, res) => {
 
 app.delete('/api/terrain-types/:name', async (req, res) => {
   try {
-    const name = req.params.name;
-    const result = await run( `DELETE FROM terrain_types WHERE name = $1`, [name]);
+    const name = decodeURIComponent(req.params.name);
+    console.log(`Attempting to delete terrain type: "${name}"`);
+    console.log(`Original param: "${req.params.name}"`);
+    console.log(`Decoded name: "${name}"`);
     
-    if (result.changes === 0) {
+    // Сначала проверим, существует ли запись
+    const checkResult = await all(`SELECT id, name FROM terrain_types WHERE name = $1`, [name]);
+    console.log(`Check result:`, checkResult);
+    
+    if (checkResult.length === 0) {
+      console.log(`Terrain type "${name}" not found`);
       return res.status(404).json({ error: 'Terrain type not found' });
     }
     
+    // Удаляем запись
+    const result = await run(`DELETE FROM terrain_types WHERE name = $1`, [name]);
+    console.log(`Delete result:`, result);
+    
+    if (result.changes === 0) {
+      console.log(`No rows affected during delete`);
+      return res.status(404).json({ error: 'Terrain type not found' });
+    }
+    
+    console.log(`Successfully deleted terrain type "${name}"`);
     res.json({ ok: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to delete terrain type' });
+    console.error('Error deleting terrain type:', err);
+    console.error('Error details:', {
+      message: err.message,
+      code: err.code,
+      detail: err.detail,
+      constraint: err.constraint,
+      stack: err.stack
+    });
+    res.status(500).json({ 
+      error: 'Failed to delete terrain type',
+      details: err.message 
+    });
   }
 });
 

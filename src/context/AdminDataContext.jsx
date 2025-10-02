@@ -1159,18 +1159,23 @@ export const AdminDataProvider = ({ children }) => {
 
   const deleteTerrainType = async (typeName) => {
     try {
+      console.log(`Deleting terrain type: "${typeName}"`);
       const response = await fetch(`/api/terrain-types/${encodeURIComponent(typeName)}`, {
         method: 'DELETE',
         credentials: 'include'
       });
       
       if (response.ok) {
+        console.log(`Successfully deleted terrain type: "${typeName}"`);
         setTerrainTypes(prev => prev.filter(t => t !== typeName));
+      } else {
+        const errorData = await response.json();
+        console.error('Server error deleting terrain type:', errorData);
+        alert(`Ошибка удаления типа местности: ${errorData.error || 'Неизвестная ошибка'}`);
       }
     } catch (error) {
       console.error('Error deleting terrain type:', error);
-      // Fallback на локальное удаление
-      setTerrainTypes(prev => prev.filter(t => t !== typeName));
+      alert(`Ошибка удаления типа местности: ${error.message}`);
     }
   };
 
