@@ -556,18 +556,6 @@ export default function ContentManagement() {
                     onChange={async (e) => {
                       const file = e.target.files[0];
                       if (file) {
-                        // Проверяем размер файла (10MB лимит)
-                        if (file.size > 10 * 1024 * 1024) {
-                          alert('Файл слишком большой. Максимальный размер: 10MB');
-                          return;
-                        }
-                        
-                        // Проверяем тип файла
-                        if (!file.type.startsWith('image/')) {
-                          alert('Пожалуйста, выберите изображение (JPG, PNG, WebP)');
-                          return;
-                        }
-                        
                         setIsUploadingImage(true);
                         const formData = new FormData();
                         formData.append('image', file);
@@ -589,14 +577,9 @@ export default function ContentManagement() {
                             }));
                             console.log('Изображение успешно загружено:', result.url);
                           } else {
-                            let errorData = {};
-                            try {
-                              errorData = await response.json();
-                            } catch (e) {
-                              console.error('Failed to parse error response:', e);
-                            }
+                            const errorData = await response.json().catch(() => ({}));
                             console.error('Ошибка загрузки изображения:', response.status, errorData);
-                            alert(`Ошибка при загрузке изображения (${response.status}): ${errorData.error || errorData.details || 'Неизвестная ошибка'}`);
+                            alert(`Ошибка при загрузке изображения: ${errorData.error || 'Неизвестная ошибка'}`);
                           }
                         } catch (error) {
                           console.error('Ошибка при загрузке изображения:', error);
