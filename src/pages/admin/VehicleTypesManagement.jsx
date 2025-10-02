@@ -214,13 +214,6 @@ function VehicleTypesManagement() {
                       {getTypeIcon()}
                     </div>
                     <h3 className="type-name">{type}</h3>
-                    {isUsed && (
-                      <div className="usage-indicator">
-                        <span className="usage-text">
-                          Используется в {vehiclesUsingType.length} вездеход{vehiclesUsingType.length === 1 ? 'е' : vehiclesUsingType.length < 5 ? 'ах' : 'ах'}
-                        </span>
-                      </div>
-                    )}
                   </div>
                   
                   <div className="type-actions">
