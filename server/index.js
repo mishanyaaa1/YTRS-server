@@ -708,7 +708,7 @@ app.get('/api/orders', async (req, res) => {
         id: o.id,
         orderNumber: o.order_number,
         status: o.status,
-        pricing: JSON.parse(o.pricing_json),
+        pricing: o.pricing_json ? JSON.parse(o.pricing_json) : {},
         items: orderIdToItems.get(o.id) || [],
         customerInfo: customer || { name: '', phone: '', email: null, address: null },
         notes: orderIdToNotes.get(o.id) || [],
@@ -1000,7 +1000,7 @@ app.get('/api/admin/advertising', async (req, res) => {
       try {
         result[row.platform] = {
           enabled: Boolean(row.enabled),
-          ...JSON.parse(row.settings_json)
+          ...(row.settings_json ? JSON.parse(row.settings_json) : {})
         };
       } catch (e) {
         console.error(`Failed to parse settings for ${row.platform}:`, e);
@@ -1092,7 +1092,7 @@ app.get('/api/advertising/scripts', async (req, res) => {
     
     for (const row of rows) {
       try {
-        const settings = JSON.parse(row.settings_json);
+        const settings = row.settings_json ? JSON.parse(row.settings_json) : {};
         
         switch (row.platform) {
           case 'yandexDirect':
@@ -1312,7 +1312,7 @@ app.get('/api/content', async (req, res) => {
     
     for (const row of rows) {
       try {
-        result[row.content_key] = JSON.parse(row.content_data);
+        result[row.content_key] = row.content_data ? JSON.parse(row.content_data) : {};
       } catch (e) {
         console.error(`Failed to parse content for key ${row.content_key}:`, e);
         result[row.content_key] = {};
@@ -1336,7 +1336,7 @@ app.get('/api/content/:key', async (req, res) => {
     }
     
     try {
-      const content = JSON.parse(row.content_data);
+      const content = row.content_data ? JSON.parse(row.content_data) : {};
       res.json(content);
     } catch (e) {
       console.error(`Failed to parse content for key ${key}:`, e);

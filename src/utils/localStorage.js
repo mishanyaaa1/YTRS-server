@@ -44,14 +44,19 @@ export const safeGetItem = (key, defaultValue = null) => {
   try {
     const item = localStorage.getItem(key);
     console.log(`localStorage: Читаем ${key}:`, item);
-    if (item === null) {
+    
+    // Проверяем на null, undefined и строку "undefined"
+    if (item === null || item === undefined || item === 'undefined' || item === 'null') {
       return defaultValue;
     }
+    
     const parsed = JSON.parse(item);
     console.log(`localStorage: Распарсено ${key}:`, parsed);
     return parsed;
   } catch (error) {
     console.error(`Ошибка при чтении из localStorage (${key}):`, error);
+    // Удаляем поврежденные данные
+    localStorage.removeItem(key);
     return defaultValue;
   }
 };
@@ -75,6 +80,45 @@ export const safeRemoveItem = (key) => {
 export const clearAppData = () => {
   Object.values(STORAGE_KEYS).forEach(key => {
     safeRemoveItem(key);
+  });
+};
+
+// Очистка поврежденных данных из localStorage
+export const cleanupCorruptedData = () => {
+  if (!isLocalStorageAvailable()) {
+    return;
+  }
+  
+  const adminKeys = [
+    'adminProducts',
+    'adminCategories', 
+    'adminBrands',
+    'adminPromotions',
+    'adminPromocodes',
+    'adminVehicles',
+    'adminTerrainTypes',
+    'adminVehicleTypes',
+    'adminAboutContent',
+    'adminFilterSettings',
+    'adminPopularProducts',
+    'admin_token',
+    'auth_session'
+  ];
+  
+  adminKeys.forEach(key => {
+    try {
+      const item = localStorage.getItem(key);
+      if (item === 'undefined' || item === 'null') {
+        localStorage.removeItem(key);
+        console.log(`Очищен поврежденный ключ: ${key}`);
+      } else if (item) {
+        // Проверяем, можно ли распарсить
+        JSON.parse(item);
+      }
+    } catch (error) {
+      localStorage.removeItem(key);
+      console.log(`Очищен поврежденный ключ: ${key} (${error.message})`);
+    }
   });
 };
 

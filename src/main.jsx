@@ -5,6 +5,7 @@ import { IconContext } from 'react-icons'
 import './index.css'
 import './global-input-styles.css'
 import App from './App.jsx'
+import { cleanupCorruptedData } from './utils/localStorage.js'
 import Home from './pages/Home.jsx'
 import CatalogPage from './pages/CatalogPage.jsx'
 import ProductPage from './pages/ProductPage.jsx'
@@ -105,6 +106,9 @@ const router = createBrowserRouter([
     )
   }
 ]);
+
+// Очищаем поврежденные данные при загрузке приложения
+cleanupCorruptedData();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

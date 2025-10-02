@@ -88,7 +88,7 @@ export const CartProvider = ({ children }) => {
     if (!storageAvailable) return;
 
     const handleStorageChange = (e) => {
-      if (e.key === STORAGE_KEYS.CART && e.newValue !== null) {
+      if (e.key === STORAGE_KEYS.CART && e.newValue !== null && e.newValue !== 'undefined' && e.newValue !== 'null') {
         try {
           const newCart = JSON.parse(e.newValue);
           if (Array.isArray(newCart)) {

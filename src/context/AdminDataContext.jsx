@@ -18,6 +18,20 @@ const getAuthHeaders = () => {
   };
 };
 
+// Безопасная функция для парсинга localStorage данных
+const safeParseFromStorage = (key, defaultValue) => {
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved === null || saved === undefined || saved === 'undefined' || saved === 'null') {
+      return defaultValue;
+    }
+    return JSON.parse(saved);
+  } catch (error) {
+    console.error(`Ошибка при парсинге ${key}:`, error);
+    return defaultValue;
+  }
+};
+
 // Безопасное сохранение в localStorage
 const safeSetItem = (key, value) => {
   try {
@@ -78,8 +92,7 @@ export const useAdminData = () => {
 export const AdminDataProvider = ({ children }) => {
   // Состояние данных
   const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('adminProducts');
-    let productsData = saved ? JSON.parse(saved) : initialProducts;
+    let productsData = safeParseFromStorage('adminProducts', initialProducts);
     
     // Автоматически мигрируем products при первой загрузке
     productsData = productsData.map(product => migrateProductImages(product));
@@ -88,8 +101,7 @@ export const AdminDataProvider = ({ children }) => {
   });
 
   const [categories, setCategories] = useState(() => {
-    const saved = localStorage.getItem('adminCategories');
-    const initial = saved ? JSON.parse(saved) : categoryStructure;
+    const initial = safeParseFromStorage('adminCategories', categoryStructure);
     return normalizeCategories(initial);
   });
 
@@ -103,44 +115,36 @@ export const AdminDataProvider = ({ children }) => {
   }, [categories]);
 
   const [brands, setBrands] = useState(() => {
-    const saved = localStorage.getItem('adminBrands');
-    return saved ? JSON.parse(saved) : initialBrands;
+    return safeParseFromStorage('adminBrands', initialBrands);
   });
 
   const [promotions, setPromotions] = useState(() => {
-    const saved = localStorage.getItem('adminPromotions');
     // По умолчанию пустой список — никаких демо-акций
-    return saved ? JSON.parse(saved) : [];
+    return safeParseFromStorage('adminPromotions', []);
   });
 
   const [promocodes, setPromocodes] = useState(() => {
-    const saved = localStorage.getItem('adminPromocodes');
-    return saved ? JSON.parse(saved) : [];
+    return safeParseFromStorage('adminPromocodes', []);
   });
 
   const [vehicles, setVehicles] = useState(() => {
-    const saved = localStorage.getItem('adminVehicles');
-    const result = saved ? JSON.parse(saved) : initialVehicles;
-    console.log('AdminDataContext: Initial vehicles state:', result.length, 'vehicles from', saved ? 'localStorage' : 'initialVehicles');
+    const result = safeParseFromStorage('adminVehicles', initialVehicles);
+    console.log('AdminDataContext: Initial vehicles state:', result.length, 'vehicles from localStorage');
     return result;
   });
 
   // Типы местности и вездеходов
   const [terrainTypes, setTerrainTypes] = useState(() => {
-    const saved = localStorage.getItem('adminTerrainTypes');
-    return saved ? JSON.parse(saved) : ['Снег', 'Болото', 'Вода', 'Горы', 'Лес', 'Пустыня'];
+    return safeParseFromStorage('adminTerrainTypes', ['Снег', 'Болото', 'Вода', 'Горы', 'Лес', 'Пустыня']);
   });
 
   const [vehicleTypes, setVehicleTypes] = useState(() => {
-    const saved = localStorage.getItem('adminVehicleTypes');
-    return saved ? JSON.parse(saved) : ['Гусеничный', 'Колесный', 'Плавающий'];
+    return safeParseFromStorage('adminVehicleTypes', ['Гусеничный', 'Колесный', 'Плавающий']);
   });
 
   const [aboutContent, setAboutContent] = useState(() => {
-    const saved = localStorage.getItem('adminAboutContent');
-    if (saved) {
-      try {
-        const parsedContent = JSON.parse(saved);
+    const parsedContent = safeParseFromStorage('adminAboutContent', initialAboutContent);
+    if (parsedContent !== initialAboutContent) {
 
         // Миграция deliveryAndPayment: аккуратно объединяем методы доставки по заголовку
         const initialDAP = initialAboutContent.deliveryAndPayment || {};
@@ -211,25 +215,20 @@ export const AdminDataProvider = ({ children }) => {
         };
         console.log('AdminDataContext: Loaded and migrated about content:', migratedContent);
         return migratedContent;
-      } catch (error) {
-        console.error('AdminDataContext: Error parsing saved about content:', error);
-        return initialAboutContent;
-      }
     }
     console.log('AdminDataContext: Using initial about content');
-    return initialAboutContent;
+    return parsedContent;
   });
 
   // Настройки фильтров каталога
   const [filterSettings, setFilterSettings] = useState(() => {
-    const saved = localStorage.getItem('adminFilterSettings');
-    return saved ? JSON.parse(saved) : {
+    return safeParseFromStorage('adminFilterSettings', {
       showBrandFilter: true, // По умолчанию фильтр производителя включен
       showCategoryFilter: true,
       showSubcategoryFilter: true,
       showPriceFilter: true,
       showStockFilter: true
-    };
+    });
   });
 
   // Сохраняем настройки фильтров в localStorage
@@ -311,8 +310,7 @@ export const AdminDataProvider = ({ children }) => {
   }, [promocodes]);
 
   const [popularProductIds, setPopularProductIds] = useState(() => {
-    const saved = localStorage.getItem('adminPopularProducts');
-    return saved ? JSON.parse(saved) : [11, 1, 8, 2]; // ID популярных товаров по умолчанию
+    return safeParseFromStorage('adminPopularProducts', [11, 1, 8, 2]); // ID популярных товаров по умолчанию
   });
 
   // Первичная загрузка из API (fallback на локальные данные)

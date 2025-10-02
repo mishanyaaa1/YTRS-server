@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = () => {
       try {
         const storedAuth = localStorage.getItem(AUTH_CONFIG.sessionKey);
-        if (storedAuth) {
+        if (storedAuth && storedAuth !== 'undefined' && storedAuth !== 'null') {
           const authData = JSON.parse(storedAuth);
           // Проверяем, что данные валидны и не истекли
           if (authData.authenticated && authData.timestamp) {
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
     if (isAuthenticated) {
       try {
         const storedAuth = localStorage.getItem(AUTH_CONFIG.sessionKey);
-        if (storedAuth) {
+        if (storedAuth && storedAuth !== 'undefined' && storedAuth !== 'null') {
           const authData = JSON.parse(storedAuth);
           authData.timestamp = Date.now();
           localStorage.setItem(AUTH_CONFIG.sessionKey, JSON.stringify(authData));
