@@ -39,6 +39,10 @@ COPY --from=client-build /app/dist ./public
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodejs -u 1001
 
+# Создаем папки для загрузок с правильными правами
+RUN mkdir -p /tmp/uploads /app/uploads /app/backups
+RUN chown -R nodejs:nodejs /tmp/uploads /app/uploads /app/backups
+
 # Меняем владельца файлов
 RUN chown -R nodejs:nodejs /app
 USER nodejs

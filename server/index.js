@@ -69,6 +69,7 @@ app.use(express.json({ limit: '25mb' }));
 
 // Статическая раздача загруженных файлов
 const uploadsDir = path.join(__dirname, 'uploads');
+const tmpUploadsDir = path.join('/tmp', 'uploads');
 const backupsDir = path.join(__dirname, 'backups');
 
 console.log('Checking uploads directory:', uploadsDir);
@@ -80,6 +81,15 @@ if (!fs.existsSync(uploadsDir)) {
   console.log('Uploads directory already exists');
 }
 
+console.log('Checking tmp uploads directory:', tmpUploadsDir);
+if (!fs.existsSync(tmpUploadsDir)) {
+  console.log('Creating tmp uploads directory...');
+  fs.mkdirSync(tmpUploadsDir, { recursive: true });
+  console.log('Tmp uploads directory created successfully');
+} else {
+  console.log('Tmp uploads directory already exists');
+}
+
 if (!fs.existsSync(backupsDir)) {
   console.log('Creating backups directory...');
   fs.mkdirSync(backupsDir, { recursive: true });
@@ -87,7 +97,10 @@ if (!fs.existsSync(backupsDir)) {
 } else {
   console.log('Backups directory already exists');
 }
+
+// Раздаем файлы из обеих папок
 app.use('/uploads', express.static(uploadsDir));
+app.use('/uploads', express.static(tmpUploadsDir));
 
 // В продакшене раздаем статические файлы клиента
 if (NODE_ENV === 'production') {
@@ -257,8 +270,8 @@ app.post('/api/upload/image', (req, res) => {
         });
       }
       
-      // Создаем папку uploads если её нет
-      const uploadsDir = path.join(__dirname, 'uploads');
+      // Используем папку tmp для загрузки файлов (всегда доступна для записи)
+      const uploadsDir = path.join('/tmp', 'uploads');
       console.log('Uploads directory path:', uploadsDir);
       
       if (!fs.existsSync(uploadsDir)) {
@@ -275,10 +288,34 @@ app.post('/api/upload/image', (req, res) => {
         console.log('Uploads directory is writable');
       } catch (accessError) {
         console.error('Uploads directory is not writable:', accessError);
-        return res.status(500).json({ 
-          error: 'Permission denied',
-          details: 'Cannot write to uploads directory'
-        });
+        // Fallback на папку public/img/vehicles
+        const fallbackDir = path.join(__dirname, '..', 'public', 'img', 'vehicles');
+        console.log('Trying fallback directory:', fallbackDir);
+        
+        if (!fs.existsSync(fallbackDir)) {
+          fs.mkdirSync(fallbackDir, { recursive: true });
+        }
+        
+        try {
+          fs.accessSync(fallbackDir, fs.constants.W_OK);
+          console.log('Fallback directory is writable');
+          const fallbackTargetPath = path.join(fallbackDir, req.file.filename);
+          fs.copyFileSync(sourcePath, fallbackTargetPath);
+          
+          if (fs.existsSync(sourcePath)) {
+            fs.unlinkSync(sourcePath);
+          }
+          
+          const url = `/img/vehicles/${req.file.filename}`;
+          console.log('Upload successful (fallback), returning URL:', url);
+          return res.status(201).json({ url });
+        } catch (fallbackError) {
+          console.error('Fallback directory also not writable:', fallbackError);
+          return res.status(500).json({ 
+            error: 'Permission denied',
+            details: 'Cannot write to any upload directory'
+          });
+        }
       }
       
       // Копируем файл в uploads папку

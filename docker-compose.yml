@@ -53,6 +53,7 @@ services:
     volumes:
       - ./server/uploads:/app/uploads
       - ./server/backups:/app/backups
+      - ./server/uploads:/tmp/uploads
     networks:
       - ytorsweb_network
 
