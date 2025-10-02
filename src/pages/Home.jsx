@@ -22,11 +22,9 @@ import './Home.css';
 
 function Home() {
   const navigate = useNavigate();
+  const HERO_IMAGE_URL = 'https://images.pexels.com/photos/162553/engine-displacement-piston-162553.jpeg?auto=compress&cs=tinysrgb&w=1600';
   const { products, popularProductIds, aboutContent } = useAdminData();
   const { addToCartWithNotification } = useCartActions();
-  
-  // Получаем URL фонового изображения из админки или используем дефолтное
-  const heroBackgroundImage = aboutContent?.homeHero?.backgroundImage || '/uploads/atv_background.jpg';
   
   // wishlist removed
   
@@ -109,20 +107,7 @@ function Home() {
     <div>
       {(() => {
         return (
-          <section 
-            className="hero"
-            style={{
-              background: `
-                linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-                url('${heroBackgroundImage}'),
-                linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 30%, #2a2a2a 70%, #0a0a0a 100%)
-              `,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              backgroundAttachment: 'fixed'
-            }}
-          >
+          <section className="hero">
             <div className="container">
               <div className="hero-content">
                 <div className="hero-text">

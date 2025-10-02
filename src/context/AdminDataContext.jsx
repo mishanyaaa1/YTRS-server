@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import ConfirmationDialog from '../components/ConfirmationDialog';
 import { 
   categoryStructure, 
   initialProducts, 
@@ -142,15 +141,6 @@ export const AdminDataProvider = ({ children }) => {
   const [vehicleTypes, setVehicleTypes] = useState(() => {
     return safeParseFromStorage('adminVehicleTypes', ['Гусеничный', 'Колесный', 'Плавающий']);
   });
-  
-  // Состояние для диалога подтверждения
-  const [confirmationDialog, setConfirmationDialog] = useState({
-    isOpen: false,
-    title: '',
-    message: '',
-    onConfirm: null,
-    type: 'warning'
-  });
 
   const [aboutContent, setAboutContent] = useState(() => {
     const parsedContent = safeParseFromStorage('adminAboutContent', initialAboutContent);
@@ -192,7 +182,6 @@ export const AdminDataProvider = ({ children }) => {
             ...initialAboutContent.homeHero,
             ...(parsedContent.homeHero || {}),
             heroEffect: (parsedContent?.homeHero?.heroEffect) || initialAboutContent.homeHero.heroEffect || 'particles',
-            backgroundImage: (parsedContent?.homeHero?.backgroundImage) || initialAboutContent.homeHero.backgroundImage || '/uploads/atv_background.jpg',
             // миграция одиночной кнопки в массив
             visualButtons: Array.isArray(parsedContent?.homeHero?.visualButtons)
               ? parsedContent.homeHero.visualButtons
@@ -714,7 +703,6 @@ export const AdminDataProvider = ({ children }) => {
         ...initialAboutContent.homeHero,
         ...(newContent.homeHero || {}),
         heroEffect: (newContent?.homeHero?.heroEffect) || initialAboutContent.homeHero.heroEffect || 'particles',
-        backgroundImage: (newContent?.homeHero?.backgroundImage) || initialAboutContent.homeHero.backgroundImage || '/uploads/atv_background.jpg',
         visualButtons: Array.isArray(newContent?.homeHero?.visualButtons)
           ? newContent.homeHero.visualButtons
           : []
@@ -1178,70 +1166,16 @@ export const AdminDataProvider = ({ children }) => {
       });
       
       if (response.ok) {
-        const responseData = await response.json();
         console.log(`Successfully deleted terrain type: "${typeName}"`);
-        console.log('Server response:', responseData);
         setTerrainTypes(prev => prev.filter(t => t !== typeName));
-        
-        // Показываем информативное сообщение пользователю
-        if (responseData.message) {
-          alert(`Тип местности "${typeName}" успешно удален.\n\n${responseData.message}`);
-        } else {
-          alert(`Тип местности "${typeName}" успешно удален.`);
-        }
-      } else if (response.status === 409) {
-        // Тип местности используется товарами - показываем диалог подтверждения
-        const errorData = await response.json();
-        console.log('Terrain type is in use:', errorData);
-        
-        const confirmMessage = errorData.message || 
-          `Тип местности "${typeName}" используется ${errorData.vehiclesCount || 0} товаром(ами).\n\nПри удалении все связанные товары будут переназначены на другой тип местности.`;
-        
-        setConfirmationDialog({
-          isOpen: true,
-          title: 'Подтвердите удаление',
-          message: confirmMessage,
-          type: 'warning',
-          onConfirm: () => {
-            setConfirmationDialog({ isOpen: false, title: '', message: '', onConfirm: null, type: 'warning' });
-            forceDeleteTerrainType(typeName);
-          }
-        });
       } else {
         const errorData = await response.json();
         console.error('Server error deleting terrain type:', errorData);
-        alert(`Ошибка удаления типа местности: ${errorData.error || 'Неизвестная ошибка'}\n\nДетали: ${errorData.details || 'Нет дополнительной информации'}`);
+        alert(`Ошибка удаления типа местности: ${errorData.error || 'Неизвестная ошибка'}`);
       }
     } catch (error) {
       console.error('Error deleting terrain type:', error);
       alert(`Ошибка удаления типа местности: ${error.message}`);
-    }
-  };
-
-  const forceDeleteTerrainType = async (typeName) => {
-    try {
-      console.log(`Force deleting terrain type: "${typeName}"`);
-      const response = await fetch(`/api/terrain-types/${encodeURIComponent(typeName)}/force`, {
-        method: 'DELETE',
-        credentials: 'include'
-      });
-      
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log(`Successfully force deleted terrain type: "${typeName}"`);
-        console.log('Server response:', responseData);
-        setTerrainTypes(prev => prev.filter(t => t !== typeName));
-        
-        // Показываем информативное сообщение пользователю
-        alert(`Тип местности "${typeName}" удален.\n\n${responseData.message}`);
-      } else {
-        const errorData = await response.json();
-        console.error('Server error force deleting terrain type:', errorData);
-        alert(`Ошибка принудительного удаления типа местности: ${errorData.error || 'Неизвестная ошибка'}\n\nДетали: ${errorData.details || 'Нет дополнительной информации'}`);
-      }
-    } catch (error) {
-      console.error('Error force deleting terrain type:', error);
-      alert(`Ошибка принудительного удаления типа местности: ${error.message}`);
     }
   };
 
@@ -1412,16 +1346,6 @@ export const AdminDataProvider = ({ children }) => {
   return (
     <AdminDataContext.Provider value={value}>
       {children}
-      <ConfirmationDialog
-        isOpen={confirmationDialog.isOpen}
-        title={confirmationDialog.title}
-        message={confirmationDialog.message}
-        onConfirm={confirmationDialog.onConfirm}
-        onCancel={() => setConfirmationDialog({ isOpen: false, title: '', message: '', onConfirm: null, type: 'warning' })}
-        confirmText="Удалить"
-        cancelText="Отмена"
-        type={confirmationDialog.type}
-      />
     </AdminDataContext.Provider>
   );
 };
