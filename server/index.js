@@ -70,11 +70,22 @@ app.use(express.json({ limit: '25mb' }));
 // Статическая раздача загруженных файлов
 const uploadsDir = path.join(__dirname, 'uploads');
 const backupsDir = path.join(__dirname, 'backups');
+
+console.log('Checking uploads directory:', uploadsDir);
 if (!fs.existsSync(uploadsDir)) {
+  console.log('Creating uploads directory...');
   fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('Uploads directory created successfully');
+} else {
+  console.log('Uploads directory already exists');
 }
+
 if (!fs.existsSync(backupsDir)) {
+  console.log('Creating backups directory...');
   fs.mkdirSync(backupsDir, { recursive: true });
+  console.log('Backups directory created successfully');
+} else {
+  console.log('Backups directory already exists');
 }
 app.use('/uploads', express.static(uploadsDir));
 
@@ -199,31 +210,67 @@ app.get('/api/_debug/download', (req, res) => {
 
 // Upload image (admin only)
 app.post('/api/upload/image', upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file' });
+  console.log('Upload request received:', req.file ? 'File present' : 'No file');
+  
+  if (!req.file) {
+    console.error('No file uploaded');
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+  
+  console.log('File details:', {
+    originalname: req.file.originalname,
+    filename: req.file.filename,
+    path: req.file.path,
+    size: req.file.size
+  });
   
   try {
     const fs = require('fs');
     const path = require('path');
     
-    // Создаем папку public/img/vehicles если её нет
-    const publicVehiclesDir = path.join(__dirname, '..', 'public', 'img', 'vehicles');
-    if (!fs.existsSync(publicVehiclesDir)) {
-      fs.mkdirSync(publicVehiclesDir, { recursive: true });
+    // Сначала пробуем сохранить в uploads папку (как было раньше)
+    const uploadsDir = path.join(__dirname, 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      console.log('Created uploads directory:', uploadsDir);
     }
     
-    // Копируем файл в public/img/vehicles
+    // Копируем файл в uploads папку
     const sourcePath = req.file.path;
-    const targetPath = path.join(publicVehiclesDir, req.file.filename);
+    const targetPath = path.join(uploadsDir, req.file.filename);
+    
+    console.log('Copying file from:', sourcePath, 'to:', targetPath);
     fs.copyFileSync(sourcePath, targetPath);
     
-    // Возвращаем URL для public папки
-    const url = `/img/vehicles/${req.file.filename}`;
-    res.status(201).json({ url });
-  } catch (error) {
-    console.error('Error copying image to public folder:', error);
-    // Fallback на старый URL
+    // Удаляем временный файл
+    if (fs.existsSync(sourcePath)) {
+      fs.unlinkSync(sourcePath);
+      console.log('Removed temporary file:', sourcePath);
+    }
+    
+    // Возвращаем URL для uploads папки
     const url = `/uploads/${req.file.filename}`;
+    console.log('Upload successful, returning URL:', url);
     res.status(201).json({ url });
+    
+  } catch (error) {
+    console.error('Error during image upload:', error);
+    console.error('Error stack:', error.stack);
+    
+    // Пытаемся удалить временный файл
+    try {
+      if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+        console.log('Cleaned up temporary file after error');
+      }
+    } catch (cleanupError) {
+      console.error('Error cleaning up temporary file:', cleanupError);
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to upload image',
+      details: error.message 
+    });
   }
 });
 
