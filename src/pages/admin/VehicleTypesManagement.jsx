@@ -7,6 +7,7 @@ function VehicleTypesManagement() {
   const { 
     vehicleTypes, 
     terrainTypes, 
+    vehicles,
     addVehicleType, 
     updateVehicleType, 
     deleteVehicleType,
@@ -21,6 +22,11 @@ function VehicleTypesManagement() {
   const [formData, setFormData] = useState({
     name: ''
   });
+
+  // Функция для проверки использования типа местности в вездеходах
+  const getVehiclesUsingTerrainType = (terrainType) => {
+    return vehicles.filter(vehicle => vehicle.terrain === terrainType);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -61,11 +67,28 @@ function VehicleTypesManagement() {
 
   const handleDelete = (type, name) => {
     const typeName = activeTab === 'vehicleTypes' ? 'тип вездехода' : 'тип местности';
-    if (window.confirm(`Вы уверены, что хотите удалить ${typeName} "${name}"?`)) {
-      if (activeTab === 'vehicleTypes') {
-        deleteVehicleType(name);
+    
+    if (activeTab === 'terrainTypes') {
+      // Проверяем, используется ли тип местности в вездеходах
+      const vehiclesUsingTerrain = getVehiclesUsingTerrainType(name);
+      
+      if (vehiclesUsingTerrain.length > 0) {
+        const vehicleNames = vehiclesUsingTerrain.map(v => v.name).join(', ');
+        const confirmMessage = `⚠️ ВНИМАНИЕ!\n\nТип местности "${name}" используется в следующих вездеходах:\n${vehicleNames}\n\nУдаление этого типа местности может привести к ошибкам отображения вездеходов.\n\nВы точно хотите удалить тип местности "${name}"?`;
+        
+        if (window.confirm(confirmMessage)) {
+          deleteTerrainType(name);
+        }
       } else {
-        deleteTerrainType(name);
+        // Обычное подтверждение, если тип местности не используется
+        if (window.confirm(`Вы уверены, что хотите удалить ${typeName} "${name}"?`)) {
+          deleteTerrainType(name);
+        }
+      }
+    } else {
+      // Для типов вездеходов оставляем обычное подтверждение
+      if (window.confirm(`Вы уверены, что хотите удалить ${typeName} "${name}"?`)) {
+        deleteVehicleType(name);
       }
     }
   };
@@ -179,33 +202,46 @@ function VehicleTypesManagement() {
           </div>
         ) : (
           <div className="types-grid">
-            {getCurrentTypes().map((type, index) => (
-              <div key={index} className="type-card">
-                <div className="type-content">
-                  <div className="type-icon">
-                    {getTypeIcon()}
+            {getCurrentTypes().map((type, index) => {
+              // Проверяем использование типа местности в вездеходах
+              const vehiclesUsingType = activeTab === 'terrainTypes' ? getVehiclesUsingTerrainType(type) : [];
+              const isUsed = vehiclesUsingType.length > 0;
+              
+              return (
+                <div key={index} className={`type-card ${isUsed ? 'type-in-use' : ''}`}>
+                  <div className="type-content">
+                    <div className="type-icon">
+                      {getTypeIcon()}
+                    </div>
+                    <h3 className="type-name">{type}</h3>
+                    {isUsed && (
+                      <div className="usage-indicator">
+                        <span className="usage-text">
+                          Используется в {vehiclesUsingType.length} вездеход{vehiclesUsingType.length === 1 ? 'е' : vehiclesUsingType.length < 5 ? 'ах' : 'ах'}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <h3 className="type-name">{type}</h3>
+                  
+                  <div className="type-actions">
+                    <button 
+                      className="action-btn edit-btn"
+                      onClick={() => handleEdit(type, type)}
+                      title={`Редактировать ${getTypeLabel()}`}
+                    >
+                      <FaEdit />
+                    </button>
+                    <button 
+                      className={`action-btn delete-btn ${isUsed ? 'delete-warning' : ''}`}
+                      onClick={() => handleDelete(type, type)}
+                      title={isUsed ? `Удалить ${getTypeLabel()} (используется в вездеходах)` : `Удалить ${getTypeLabel()}`}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
                 </div>
-                
-                <div className="type-actions">
-                  <button 
-                    className="action-btn edit-btn"
-                    onClick={() => handleEdit(type, type)}
-                    title={`Редактировать ${getTypeLabel()}`}
-                  >
-                    <FaEdit />
-                  </button>
-                  <button 
-                    className="action-btn delete-btn"
-                    onClick={() => handleDelete(type, type)}
-                    title={`Удалить ${getTypeLabel()}`}
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -224,7 +260,7 @@ function VehicleTypesManagement() {
           </div>
         </div>
         <div className="warning">
-          <p><strong>⚠️ Внимание:</strong> Удаление типа, который используется в существующих вездеходах, может привести к ошибкам отображения.</p>
+          <p><strong>⚠️ Внимание:</strong> Удаление типа местности, который используется в существующих вездеходах, может привести к ошибкам отображения. Система автоматически предупредит вас о связанных вездеходах перед удалением.</p>
         </div>
       </div>
     </div>
