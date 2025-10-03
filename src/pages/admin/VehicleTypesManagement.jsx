@@ -23,10 +23,6 @@ function VehicleTypesManagement() {
     name: ''
   });
 
-  // Функция для проверки использования типа местности в вездеходах
-  const getVehiclesUsingTerrainType = (terrainType) => {
-    return vehicles.filter(vehicle => vehicle.terrain === terrainType);
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -68,27 +64,11 @@ function VehicleTypesManagement() {
   const handleDelete = (type, name) => {
     const typeName = activeTab === 'vehicleTypes' ? 'тип вездехода' : 'тип местности';
     
-    if (activeTab === 'terrainTypes') {
-      // Проверяем, используется ли тип местности в вездеходах
-      const vehiclesUsingTerrain = getVehiclesUsingTerrainType(name);
-      
-      if (vehiclesUsingTerrain.length > 0) {
-        const vehicleNames = vehiclesUsingTerrain.map(v => v.name).join(', ');
-        const confirmMessage = `⚠️ ВНИМАНИЕ!\n\nТип местности "${name}" используется в следующих вездеходах:\n${vehicleNames}\n\nУдаление этого типа местности может привести к ошибкам отображения вездеходов.\n\nВы точно хотите удалить тип местности "${name}"?`;
-        
-        if (window.confirm(confirmMessage)) {
-          deleteTerrainType(name);
-        }
-      } else {
-        // Обычное подтверждение, если тип местности не используется
-        if (window.confirm(`Вы уверены, что хотите удалить ${typeName} "${name}"?`)) {
-          deleteTerrainType(name);
-        }
-      }
-    } else {
-      // Для типов вездеходов оставляем обычное подтверждение
-      if (window.confirm(`Вы уверены, что хотите удалить ${typeName} "${name}"?`)) {
+    if (window.confirm(`Вы уверены, что хотите удалить ${typeName} "${name}"?`)) {
+      if (activeTab === 'vehicleTypes') {
         deleteVehicleType(name);
+      } else {
+        deleteTerrainType(name);
       }
     }
   };
@@ -203,12 +183,8 @@ function VehicleTypesManagement() {
         ) : (
           <div className="types-grid">
             {getCurrentTypes().map((type, index) => {
-              // Проверяем использование типа местности в вездеходах
-              const vehiclesUsingType = activeTab === 'terrainTypes' ? getVehiclesUsingTerrainType(type) : [];
-              const isUsed = vehiclesUsingType.length > 0;
-              
               return (
-                <div key={index} className={`type-card ${isUsed ? 'type-in-use' : ''}`}>
+                <div key={index} className="type-card">
                   <div className="type-content">
                     <div className="type-icon">
                       {getTypeIcon()}
@@ -225,9 +201,9 @@ function VehicleTypesManagement() {
                       <FaEdit />
                     </button>
                     <button 
-                      className={`action-btn delete-btn ${isUsed ? 'delete-warning' : ''}`}
+                      className="action-btn delete-btn"
                       onClick={() => handleDelete(type, type)}
-                      title={isUsed ? `Удалить ${getTypeLabel()} (используется в вездеходах)` : `Удалить ${getTypeLabel()}`}
+                      title={`Удалить ${getTypeLabel()}`}
                     >
                       <FaTrash />
                     </button>
@@ -251,9 +227,6 @@ function VehicleTypesManagement() {
             <h4>Типы местности</h4>
             <p>Определяют условия эксплуатации вездеходов (снег, болото, вода, горы и т.д.)</p>
           </div>
-        </div>
-        <div className="warning">
-          <p><strong>⚠️ Внимание:</strong> Удаление типа местности, который используется в существующих вездеходах, может привести к ошибкам отображения. Система автоматически предупредит вас о связанных вездеходах перед удалением.</p>
         </div>
       </div>
     </div>

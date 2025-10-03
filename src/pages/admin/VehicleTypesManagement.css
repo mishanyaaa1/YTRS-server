@@ -310,16 +310,6 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* Стили для карточек с используемыми типами */
-.type-card.type-in-use {
-  border-color: rgba(255, 193, 7, 0.5);
-  background: rgba(255, 193, 7, 0.05);
-}
-
-.type-card.type-in-use:hover {
-  border-color: #ffc107;
-  background: rgba(255, 193, 7, 0.1);
-}
 
 .type-content {
   display: flex;
@@ -385,31 +375,6 @@
   transform: scale(1.1);
 }
 
-/* Кнопка удаления с предупреждением */
-.delete-btn.delete-warning {
-  background: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
-  border: 1px solid rgba(255, 193, 7, 0.4);
-  animation: pulse-warning 2s infinite;
-}
-
-.delete-btn.delete-warning:hover {
-  background: rgba(255, 193, 7, 0.3);
-  border-color: #ffc107;
-  transform: scale(1.1);
-}
-
-@keyframes pulse-warning {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 6px rgba(255, 193, 7, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
-  }
-}
 
 /* Информация об использовании */
 .usage-info {
