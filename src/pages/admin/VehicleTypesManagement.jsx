@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminData } from '../../context/AdminDataContext';
 import { FaPlus, FaEdit, FaTrash, FaTruck, FaMountain } from 'react-icons/fa';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import './VehicleTypesManagement.css';
 
 function VehicleTypesManagement() {
@@ -21,6 +22,12 @@ function VehicleTypesManagement() {
   const [editingType, setEditingType] = useState(null);
   const [formData, setFormData] = useState({
     name: ''
+  });
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    type: '',
+    name: '',
+    items: []
   });
 
 
@@ -61,16 +68,54 @@ function VehicleTypesManagement() {
     setIsAddingType(true);
   };
 
+  // Функция для проверки использования типа в товарах
+  const getProductsUsingType = (typeName) => {
+    if (activeTab === 'vehicleTypes') {
+      return vehicles.filter(vehicle => vehicle.type === typeName);
+    } else {
+      return vehicles.filter(vehicle => vehicle.terrain === typeName);
+    }
+  };
+
   const handleDelete = (type, name) => {
     const typeName = activeTab === 'vehicleTypes' ? 'тип вездехода' : 'тип местности';
+    const productsUsingType = getProductsUsingType(name);
     
-    if (window.confirm(`Вы уверены, что хотите удалить ${typeName} "${name}"?`)) {
-      if (activeTab === 'vehicleTypes') {
-        deleteVehicleType(name);
-      } else {
-        deleteTerrainType(name);
+    if (productsUsingType.length > 0) {
+      // Показываем модальное окно с предупреждением
+      setDeleteModal({
+        isOpen: true,
+        type: typeName,
+        name: name,
+        items: productsUsingType.map(product => product.name)
+      });
+    } else {
+      // Обычное подтверждение, если тип не используется
+      if (window.confirm(`Вы уверены, что хотите удалить ${typeName} "${name}"?`)) {
+        if (activeTab === 'vehicleTypes') {
+          deleteVehicleType(name);
+        } else {
+          deleteTerrainType(name);
+        }
       }
     }
+  };
+
+  const handleConfirmDelete = () => {
+    if (activeTab === 'vehicleTypes') {
+      deleteVehicleType(deleteModal.name);
+    } else {
+      deleteTerrainType(deleteModal.name);
+    }
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      type: '',
+      name: '',
+      items: []
+    });
   };
 
   const resetForm = () => {
@@ -229,6 +274,17 @@ function VehicleTypesManagement() {
           </div>
         </div>
       </div>
+
+      {/* Модальное окно подтверждения удаления */}
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title={`Удаление ${deleteModal.type}`}
+        message={`Вы действительно хотите удалить ${deleteModal.type} "${deleteModal.name}"?`}
+        items={deleteModal.items}
+        type="товар"
+      />
     </div>
   );
 }

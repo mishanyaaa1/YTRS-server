@@ -8,6 +8,7 @@ import {
   FaList
 } from 'react-icons/fa';
 import { useAdminData } from '../../context/AdminDataContext';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 import './CategoryManagement.css';
 
 function CategoryManagement() {
@@ -31,6 +32,12 @@ function CategoryManagement() {
   const [editingSubcategory, setEditingSubcategory] = useState(null);
   const [editSubcategoryName, setEditSubcategoryName] = useState('');
   const [selectedCategoryForSub, setSelectedCategoryForSub] = useState('');
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    type: '',
+    name: '',
+    items: []
+  });
 
 
   // Добавление новой категории
@@ -77,10 +84,35 @@ function CategoryManagement() {
     setEditCategoryName('');
   };
 
+  // Функция для проверки использования категории в товарах
+  const getProductsUsingCategory = (categoryName) => {
+    return data.products.filter(product => product.category === categoryName);
+  };
+
+  // Функция для проверки использования подкатегории в товарах
+  const getProductsUsingSubcategory = (categoryName, subcategoryName) => {
+    return data.products.filter(product => 
+      product.category === categoryName && product.subcategory === subcategoryName
+    );
+  };
+
   // Удалить категорию
   const handleDeleteCategory = (categoryName) => {
-    if (confirm(`Удалить категорию "${categoryName}" и все её товары?`)) {
-      deleteCategory(categoryName);
+    const productsUsingCategory = getProductsUsingCategory(categoryName);
+    
+    if (productsUsingCategory.length > 0) {
+      // Показываем модальное окно с предупреждением
+      setDeleteModal({
+        isOpen: true,
+        type: 'категорию',
+        name: categoryName,
+        items: productsUsingCategory.map(product => product.name)
+      });
+    } else {
+      // Обычное подтверждение, если категория не используется
+      if (confirm(`Удалить категорию "${categoryName}"?`)) {
+        deleteCategory(categoryName);
+      }
     }
   };
 
@@ -116,9 +148,40 @@ function CategoryManagement() {
 
   // Удалить подкатегорию
   const handleDeleteSubcategory = (categoryName, subcategoryName) => {
-    if (confirm(`Удалить подкатегорию "${subcategoryName}" и все её товары?`)) {
+    const productsUsingSubcategory = getProductsUsingSubcategory(categoryName, subcategoryName);
+    
+    if (productsUsingSubcategory.length > 0) {
+      // Показываем модальное окно с предупреждением
+      setDeleteModal({
+        isOpen: true,
+        type: 'подкатегорию',
+        name: `${categoryName} > ${subcategoryName}`,
+        items: productsUsingSubcategory.map(product => product.name)
+      });
+    } else {
+      // Обычное подтверждение, если подкатегория не используется
+      if (confirm(`Удалить подкатегорию "${subcategoryName}"?`)) {
+        deleteSubcategory(categoryName, subcategoryName);
+      }
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteModal.type === 'категорию') {
+      deleteCategory(deleteModal.name);
+    } else if (deleteModal.type === 'подкатегорию') {
+      const [categoryName, subcategoryName] = deleteModal.name.split(' > ');
       deleteSubcategory(categoryName, subcategoryName);
     }
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      type: '',
+      name: '',
+      items: []
+    });
   };
 
 
@@ -289,6 +352,17 @@ function CategoryManagement() {
         </div>
 
       </div>
+
+      {/* Модальное окно подтверждения удаления */}
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title={`Удаление ${deleteModal.type}`}
+        message={`Вы действительно хотите удалить ${deleteModal.type} "${deleteModal.name}"?`}
+        items={deleteModal.items}
+        type="товар"
+      />
     </div>
   );
 }
