@@ -13,7 +13,8 @@ import './CategoryManagement.css';
 
 function CategoryManagement() {
   const { 
-    data, 
+    products,
+    categories,
     addCategory, 
     updateCategory, 
     deleteCategory,
@@ -86,12 +87,12 @@ function CategoryManagement() {
 
   // Функция для проверки использования категории в товарах
   const getProductsUsingCategory = (categoryName) => {
-    return data.products.filter(product => product.category === categoryName);
+    return products.filter(product => product.category === categoryName);
   };
 
   // Функция для проверки использования подкатегории в товарах
   const getProductsUsingSubcategory = (categoryName, subcategoryName) => {
-    return data.products.filter(product => 
+    return products.filter(product => 
       product.category === categoryName && product.subcategory === subcategoryName
     );
   };
@@ -249,10 +250,10 @@ function CategoryManagement() {
         {/* Список категорий */}
         <div className="section">
           <h3>
-            <FaList /> Категории ({Object.keys(data.categoryStructure).length})
+            <FaList /> Категории ({Object.keys(categories).length})
           </h3>
           <div className="categories-list">
-            {Object.entries(data.categoryStructure).map(([categoryName, subcategories]) => (
+            {Object.entries(categories).map(([categoryName, subcategories]) => (
               <div key={categoryName} className="category-item">
                 <div className="category-header">
                   <div className="category-info">
