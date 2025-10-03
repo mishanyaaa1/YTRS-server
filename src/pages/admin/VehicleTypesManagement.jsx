@@ -70,17 +70,10 @@ function VehicleTypesManagement() {
 
   // Функция для проверки использования типа в товарах
   const getProductsUsingType = (typeName) => {
-    console.log('Поиск товаров для типа:', typeName, 'активная вкладка:', activeTab);
-    console.log('Все вездеходы:', vehicles);
-    
     if (activeTab === 'vehicleTypes') {
-      const found = vehicles.filter(vehicle => vehicle.type === typeName);
-      console.log('Найдено вездеходов с типом:', found.length);
-      return found;
+      return vehicles.filter(vehicle => vehicle.type === typeName);
     } else {
-      const found = vehicles.filter(vehicle => vehicle.terrain === typeName);
-      console.log('Найдено вездеходов с местностью:', found.length);
-      return found;
+      return vehicles.filter(vehicle => vehicle.terrain === typeName);
     }
   };
 

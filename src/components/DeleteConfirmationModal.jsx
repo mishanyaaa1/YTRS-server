@@ -13,8 +13,6 @@ function DeleteConfirmationModal({
 }) {
   if (!isOpen) return null;
 
-  console.log('DeleteConfirmationModal props:', { title, message, items, type });
-
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -50,14 +48,11 @@ function DeleteConfirmationModal({
             <div className="delete-modal-items">
               <h4>Связанные {type === 'item' ? 'товары' : 'элементы'}:</h4>
               <div className="items-list">
-                {items.map((item, index) => {
-                  console.log('Отображаем элемент:', item, 'индекс:', index);
-                  return (
-                    <div key={index} className="item-chip">
-                      {item}
-                    </div>
-                  );
-                })}
+                {items.map((item, index) => (
+                  <div key={index} className="item-chip">
+                    {item}
+                  </div>
+                ))}
               </div>
             </div>
           )}

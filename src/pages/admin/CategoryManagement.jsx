@@ -40,24 +40,6 @@ function CategoryManagement() {
     items: []
   });
 
-  // Отладочная информация
-  console.log('CategoryManagement - products:', products);
-  console.log('CategoryManagement - categories:', categories);
-
-  // Тестовая функция для проверки поиска товаров
-  const testProductSearch = () => {
-    console.log('=== ТЕСТ ПОИСКА ТОВАРОВ ===');
-    console.log('Всего товаров:', products.length);
-    console.log('Все товары:', products);
-    
-    // Проверяем первую категорию
-    const firstCategory = Object.keys(categories)[0];
-    if (firstCategory) {
-      console.log('Тестируем категорию:', firstCategory);
-      const foundProducts = getProductsUsingCategory(firstCategory);
-      console.log('Найдено товаров в категории:', foundProducts.length);
-    }
-  };
 
   // Добавление новой категории
   const handleAddCategory = () => {
@@ -105,33 +87,19 @@ function CategoryManagement() {
 
   // Функция для проверки использования категории в товарах
   const getProductsUsingCategory = (categoryName) => {
-    console.log('Поиск товаров в категории:', categoryName);
-    console.log('Все товары:', products);
-    const foundProducts = products.filter(product => {
-      console.log('Проверяем товар:', product.title, 'категория:', product.category);
-      return product.category === categoryName;
-    });
-    console.log('Найдено товаров:', foundProducts.length);
-    return foundProducts;
+    return products.filter(product => product.category === categoryName);
   };
 
   // Функция для проверки использования подкатегории в товарах
   const getProductsUsingSubcategory = (categoryName, subcategoryName) => {
-    console.log('Поиск товаров в подкатегории:', categoryName, '>', subcategoryName);
-    const foundProducts = products.filter(product => {
-      console.log('Проверяем товар:', product.title, 'категория:', product.category, 'подкатегория:', product.subcategory);
-      return product.category === categoryName && product.subcategory === subcategoryName;
-    });
-    console.log('Найдено товаров в подкатегории:', foundProducts.length);
-    return foundProducts;
+    return products.filter(product => 
+      product.category === categoryName && product.subcategory === subcategoryName
+    );
   };
 
   // Удалить категорию
   const handleDeleteCategory = (categoryName) => {
     const productsUsingCategory = getProductsUsingCategory(categoryName);
-    
-    console.log('Товары в категории для удаления:', productsUsingCategory);
-    console.log('Названия товаров:', productsUsingCategory.map(product => product.title || product.name));
     
     if (productsUsingCategory.length > 0) {
       // Показываем модальное окно с предупреждением
@@ -183,9 +151,6 @@ function CategoryManagement() {
   const handleDeleteSubcategory = (categoryName, subcategoryName) => {
     const productsUsingSubcategory = getProductsUsingSubcategory(categoryName, subcategoryName);
     
-    console.log('Товары в подкатегории для удаления:', productsUsingSubcategory);
-    console.log('Названия товаров:', productsUsingSubcategory.map(product => product.title || product.name));
-    
     if (productsUsingSubcategory.length > 0) {
       // Показываем модальное окно с предупреждением
       setDeleteModal({
@@ -225,9 +190,6 @@ function CategoryManagement() {
     <div className="category-management">
       <div className="page-header">
         <p>Добавляйте, редактируйте и удаляйте категории и подкатегории товаров</p>
-        <button onClick={testProductSearch} style={{marginTop: '10px', padding: '5px 10px', background: '#e6a34a', color: '#000', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>
-          Тест поиска товаров
-        </button>
       </div>
 
       <div className="category-content">
