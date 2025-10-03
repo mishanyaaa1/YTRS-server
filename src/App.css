@@ -65,7 +65,7 @@ html {
   align-items: center;
   background: 
     linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url('/img/vizual.jpg'),
+    url('/vizual.jpg'),
     linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 30%, #2a2a2a 70%, #0a0a0a 100%);
   background-size: cover;
   background-position: center;
