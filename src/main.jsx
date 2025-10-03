@@ -15,6 +15,7 @@ import About from './pages/About.jsx'
 import Promotions from './pages/Promotions.jsx'
 import VehiclesPage from './pages/VehiclesPage.jsx'
 import VehicleDetailPage from './pages/VehicleDetailPage.jsx'
+import NotFoundPage from './pages/NotFoundPage.jsx'
 import SimpleAdminDashboard from './pages/admin/SimpleAdminDashboard.jsx'
 import AdvancedAdminDashboard from './pages/admin/AdvancedAdminDashboard.jsx'
 import { CartProvider } from './context/CartContext.jsx'
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
       {
         path: "vehicle/:id",
         element: <VehicleDetailPage />
+      },
+      {
+        path: "*",
+        element: <NotFoundPage />
       }
     ]
   },
