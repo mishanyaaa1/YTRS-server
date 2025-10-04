@@ -1256,7 +1256,7 @@ export default function ContentManagement() {
                   type="text"
                   value={formData.footer.contactsSection.address}
                   onChange={(e) => handleFooterChange('contactsSection', 'address', e.target.value)}
-                  placeholder="г. Москва, ул. Примерная, 123"
+                  placeholder="Челябинск, ул. Примерная, 123, 454000"
                 />
               </div>
             </div>

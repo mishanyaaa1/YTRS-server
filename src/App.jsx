@@ -22,6 +22,7 @@ import './global-input-styles.css';
 import BrandLogo from './components/BrandLogo';
 import AdvertisingScripts from './components/AdvertisingScripts';
 import ScrollToTop from './components/ScrollToTop';
+import DynamicMetaTags from './components/DynamicMetaTags';
 
 function App() {
   const location = useLocation();
@@ -158,6 +159,7 @@ function App() {
 
   return (
     <div className="app">
+      <DynamicMetaTags />
       <AdvertisingScripts />
       <header className="header">
         <div className="container">
