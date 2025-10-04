@@ -5,12 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate": "node migrate.js",
-    "seed": "node seed/seed.js",
     "start": "node index.js",
-    "dev": "node index.js",
-    "normalize:products": "node scripts/normalize_products.js",
-    "set-admin-pass": "node scripts/set_admin_password.js"
+    "dev": "node index.js"
   },
   "keywords": [],
   "author": "",
