@@ -125,11 +125,15 @@
   padding: 10px 0;
 }
 
-.logout-container {
+.admin-actions {
   padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.logout-container .admin-logout-button {
+.admin-actions .admin-logout-button,
+.admin-actions .change-password-button {
   width: 100%;
   justify-content: center;
   margin: 0;

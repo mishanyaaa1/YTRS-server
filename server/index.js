@@ -163,14 +163,91 @@ async function ensureFilterSettingsTable() {
   console.log('Initialized filter settings');
 }
 
+// Создаем таблицу для настроек админа
+async function ensureAdminSettingsTable() {
+  await run(
+    `CREATE TABLE IF NOT EXISTS admin_settings (
+      id SERIAL PRIMARY KEY,
+      setting_key VARCHAR(255) NOT NULL UNIQUE,
+      setting_value TEXT,
+      created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    )`
+  );
+  console.log('Initialized admin settings table');
+}
+
 
 
 // Healthcheck
 
 // Admin me endpoint
-
 app.get("/api/admin/me", (req, res) => {
   res.json({ username: "admin", id: 1 });
+});
+
+// Admin password change endpoint
+app.post('/api/admin/change-password', async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Текущий и новый пароли обязательны' });
+    }
+    
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Новый пароль должен содержать минимум 6 символов' });
+    }
+    
+    // Получаем текущий пароль из базы данных
+    const currentSettings = await get(`SELECT setting_value FROM admin_settings WHERE setting_key = 'password'`);
+    
+    // Если пароль не установлен в БД, используем дефолтный
+    const storedPassword = currentSettings ? currentSettings.setting_value : 'admin31827';
+    
+    // Проверяем текущий пароль
+    if (currentPassword !== storedPassword) {
+      return res.status(401).json({ error: 'Неверный текущий пароль' });
+    }
+    
+    // Сохраняем новый пароль в базу данных
+    await run(`
+      INSERT INTO admin_settings (setting_key, setting_value, updated_at) 
+      VALUES ('password', $1, CURRENT_TIMESTAMP)
+      ON CONFLICT (setting_key) 
+      DO UPDATE SET setting_value = $1, updated_at = CURRENT_TIMESTAMP
+    `, [newPassword]);
+    
+    res.json({ success: true, message: 'Пароль успешно изменен' });
+  } catch (err) {
+    console.error('Failed to change password:', err);
+    res.status(500).json({ error: 'Ошибка при смене пароля' });
+  }
+});
+
+// Admin password verification endpoint
+app.post('/api/admin/verify-password', async (req, res) => {
+  try {
+    const { password } = req.body;
+    
+    if (!password) {
+      return res.status(400).json({ error: 'Пароль обязателен' });
+    }
+    
+    // Получаем текущий пароль из базы данных
+    const currentSettings = await get(`SELECT setting_value FROM admin_settings WHERE setting_key = 'password'`);
+    
+    // Если пароль не установлен в БД, используем дефолтный
+    const storedPassword = currentSettings ? currentSettings.setting_value : 'admin31827';
+    
+    // Проверяем пароль
+    const isValid = password === storedPassword;
+    
+    res.json({ valid: isValid });
+  } catch (err) {
+    console.error('Failed to verify password:', err);
+    res.status(500).json({ error: 'Ошибка при проверке пароля' });
+  }
 });
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
@@ -1775,7 +1852,8 @@ app.get('/api/_debug/routes', (req, res) => {
 console.log('Starting server initialization...');
 Promise.all([
   ensureBotSettingsTable(),
-  ensureFilterSettingsTable()
+  ensureFilterSettingsTable(),
+  ensureAdminSettingsTable()
 ])
   .then(() => {
     console.log('Tables initialized successfully');

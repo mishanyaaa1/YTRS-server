@@ -59,24 +59,52 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = (username, password) => {
-    if (username === AUTH_CONFIG.login && password === AUTH_CONFIG.password) {
-      const authData = {
-        authenticated: true,
-        timestamp: Date.now(),
-        username: username
-      };
-      
-      try {
+  const login = async (username, password) => {
+    if (username !== AUTH_CONFIG.login) {
+      return { success: false, error: 'Неверный логин или пароль' };
+    }
+
+    try {
+      // Проверяем пароль через API
+      const response = await fetch('/api/admin/verify-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const result = await response.json();
+
+      if (result.valid) {
+        const authData = {
+          authenticated: true,
+          timestamp: Date.now(),
+          username: username
+        };
+        
         localStorage.setItem(AUTH_CONFIG.sessionKey, JSON.stringify(authData));
         setIsAuthenticated(true);
         return { success: true };
-      } catch (error) {
-        console.error('Ошибка сохранения авторизации:', error);
-        return { success: false, error: 'Ошибка сохранения сессии' };
+      } else {
+        return { success: false, error: 'Неверный логин или пароль' };
       }
-    } else {
-      return { success: false, error: 'Неверный логин или пароль' };
+    } catch (error) {
+      console.error('Ошибка проверки пароля:', error);
+      // Fallback на старую проверку для совместимости
+      if (password === AUTH_CONFIG.password) {
+        const authData = {
+          authenticated: true,
+          timestamp: Date.now(),
+          username: username
+        };
+        
+        localStorage.setItem(AUTH_CONFIG.sessionKey, JSON.stringify(authData));
+        setIsAuthenticated(true);
+        return { success: true };
+      } else {
+        return { success: false, error: 'Неверный логин или пароль' };
+      }
     }
   };
 
@@ -125,12 +153,36 @@ export const AuthProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      const response = await fetch('/api/admin/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        return { success: true, message: result.message };
+      } else {
+        return { success: false, error: result.error || 'Ошибка при смене пароля' };
+      }
+    } catch (error) {
+      console.error('Ошибка смены пароля:', error);
+      return { success: false, error: 'Ошибка соединения с сервером' };
+    }
+  };
+
   const value = {
     isAuthenticated,
     isLoading,
     login,
     logout,
-    extendSession
+    extendSession,
+    changePassword
   };
 
   return (

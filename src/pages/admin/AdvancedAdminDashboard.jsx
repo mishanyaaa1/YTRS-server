@@ -20,6 +20,7 @@ import { FaHome, FaBox, FaTags, FaUsers, FaChartBar, FaSignOutAlt, FaEdit, FaSta
 import './AdvancedAdminDashboard.css';
 import BrandLogo from '../../components/BrandLogo';
 import AdminLogout from '../../components/AdminLogout';
+import ChangePasswordButton from '../../components/ChangePasswordButton';
 
 function AdvancedAdminDashboard() {
   const navigate = useNavigate();
@@ -232,7 +233,8 @@ function AdvancedAdminDashboard() {
             <FaHome />
             <span>На сайт</span>
           </Link>
-          <div className="logout-container">
+          <div className="admin-actions">
+            <ChangePasswordButton />
             <AdminLogout />
           </div>
         </div>
