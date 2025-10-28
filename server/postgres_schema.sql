@@ -226,17 +226,6 @@ CREATE TABLE IF NOT EXISTS vehicle_images (
   FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
 );
 
--- Связь многие-ко-многим между вездеходами и типами местности
-CREATE TABLE IF NOT EXISTS vehicle_terrains (
-  id SERIAL PRIMARY KEY,
-  vehicle_id INTEGER NOT NULL,
-  terrain_name VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
-  FOREIGN KEY (terrain_name) REFERENCES terrain_types(name) ON DELETE CASCADE,
-  UNIQUE(vehicle_id, terrain_name)
-);
-
 -- Настройки бота
 CREATE TABLE IF NOT EXISTS bot_settings (
   id SERIAL PRIMARY KEY,
@@ -263,8 +252,6 @@ CREATE INDEX IF NOT EXISTS idx_advertising_events_type ON advertising_events(eve
 CREATE INDEX IF NOT EXISTS idx_advertising_events_created ON advertising_events(created_at);
 CREATE INDEX IF NOT EXISTS idx_vehicles_type ON vehicles(type);
 CREATE INDEX IF NOT EXISTS idx_vehicles_terrain ON vehicles(terrain);
-CREATE INDEX IF NOT EXISTS idx_vehicle_terrains_vehicle_id ON vehicle_terrains(vehicle_id);
-CREATE INDEX IF NOT EXISTS idx_vehicle_terrains_terrain_name ON vehicle_terrains(terrain_name);
 CREATE INDEX IF NOT EXISTS idx_vehicles_available ON vehicles(available);
 CREATE INDEX IF NOT EXISTS idx_site_content_key ON site_content(content_key);
 CREATE INDEX IF NOT EXISTS idx_popular_products_sort_order ON popular_products(sort_order);

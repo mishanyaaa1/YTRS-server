@@ -209,21 +209,10 @@ function VehicleDetailPage() {
 
             <div className="vehicle-meta">
               <span className="type">{vehicle.type}</span>
-              <div className="terrain-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-                {(() => {
-                  // Поддержка множественных типов местности
-                  const terrains = Array.isArray(vehicle.terrains) && vehicle.terrains.length > 0
-                    ? vehicle.terrains
-                    : (vehicle.terrain ? [vehicle.terrain] : []);
-                  
-                  return terrains.length > 0 ? terrains.map((terrain, index) => (
-                    <span key={index} className="terrain" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      {getTerrainIcon(terrain)}
-                      {terrain}
-                    </span>
-                  )) : null;
-                })()}
-              </div>
+              <span className="terrain">
+                {getTerrainIcon(vehicle.terrain)}
+                {vehicle.terrain}
+              </span>
               <span className={`availability ${vehicle.available ? 'in-stock' : 'out-of-stock'}`}>
                 {vehicle.available ? <FaCheckCircle /> : <FaTimesCircle />}
                 {vehicle.available ? `В наличии: ${vehicle.quantity || 0} шт` : 'Нет в наличии'}

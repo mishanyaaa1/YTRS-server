@@ -1330,39 +1330,26 @@ app.get('/api/vehicles', async (req, res) => {
     });
     
     const rows = await all(
-      `SELECT v.*, vt.name AS vehicle_type_name
+      `SELECT v.*, vt.name AS vehicle_type_name, tt.name AS terrain_type_name
        FROM vehicles v
        LEFT JOIN vehicle_types vt ON v.type = vt.name
+       LEFT JOIN terrain_types tt ON v.terrain = tt.name
        ORDER BY v.name ASC`
     );
     
-    // Получаем типы местности для каждого вездехода
-    const result = await Promise.all(rows.map(async (r) => {
-      // Получаем массив типов местности из связующей таблицы
-      const terrainRows = await all(
-        `SELECT terrain_name FROM vehicle_terrains WHERE vehicle_id = $1 ORDER BY terrain_name ASC`,
-        [r.id]
-      );
-      const terrains = terrainRows.map(tr => tr.terrain_name);
-      
-      // Для обратной совместимости оставляем поле terrain (первый тип или старый)
-      const terrain = terrains.length > 0 ? terrains[0] : r.terrain;
-      
-      return {
-        id: r.id,
-        name: r.name,
-        type: r.type,
-        terrain: terrain, // Обратная совместимость
-        terrains: terrains, // Новое поле с массивом типов местности
-        price: r.price,
-        image: r.image,
-        description: r.description,
-        specs: r.specs_json ? JSON.parse(r.specs_json) : {},
-        available: !!r.available,
-        quantity: r.quantity,
-        createdAt: r.created_at,
-        updatedAt: r.updated_at
-      };
+    const result = rows.map(r => ({
+      id: r.id,
+      name: r.name,
+      type: r.type,
+      terrain: r.terrain,
+      price: r.price,
+      image: r.image,
+      description: r.description,
+      specs: r.specs_json ? JSON.parse(r.specs_json) : {},
+      available: !!r.available,
+      quantity: r.quantity,
+      createdAt: r.created_at,
+      updatedAt: r.updated_at
     }));
     
     res.json(result);
@@ -1374,50 +1361,17 @@ app.get('/api/vehicles', async (req, res) => {
 
 app.post('/api/vehicles', async (req, res) => {
   try {
-    const { name, type, terrain, terrains, price, image, description, specs, available = true, quantity = 0 } = req.body;
-    
-    // Поддержка как старого поля terrain, так и нового terrains (массив)
-    const terrainArray = Array.isArray(terrains) && terrains.length > 0 
-      ? terrains 
-      : (terrain ? [terrain] : []);
-    
-    // Для обратной совместимости сохраняем первый тип в поле terrain
-    const firstTerrain = terrainArray.length > 0 ? terrainArray[0] : (terrain || '');
+    const { name, type, terrain, price, image, description, specs, available = true, quantity = 0 } = req.body;
     
     const specsJson = specs ? JSON.stringify(specs) : null;
     
     const r = await run(
       `INSERT INTO vehicles (name, type, terrain, price, image, description, specs_json, available, quantity)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
-      [name, type, firstTerrain, price, image, description, specsJson, available ? 1 : 0, quantity]
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity]
     );
     
-    const vehicleId = r.lastID;
-    
-    // Сохраняем типы местности в связующую таблицу
-    if (terrainArray.length > 0) {
-      // Удаляем старые связи (если есть)
-      await run(`DELETE FROM vehicle_terrains WHERE vehicle_id = $1`, [vehicleId]);
-      
-      // Добавляем новые связи
-      for (const terrainName of terrainArray) {
-        if (terrainName && terrainName.trim()) {
-          try {
-            await run(
-              `INSERT INTO vehicle_terrains (vehicle_id, terrain_name) VALUES ($1, $2)`,
-              [vehicleId, terrainName.trim()]
-            );
-          } catch (err) {
-            // Игнорируем ошибки дублирования
-            if (!err.message || !err.message.includes('unique constraint')) {
-              console.error('Error inserting terrain:', err);
-            }
-          }
-        }
-      }
-    }
-    
-    res.status(201).json({ id: vehicleId });
+    res.status(201).json({ id: r.lastID });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to create vehicle' });
@@ -1427,45 +1381,14 @@ app.post('/api/vehicles', async (req, res) => {
 app.put('/api/vehicles/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { name, type, terrain, terrains, price, image, description, specs, available = true, quantity = 0 } = req.body;
-    
-    // Поддержка как старого поля terrain, так и нового terrains (массив)
-    const terrainArray = Array.isArray(terrains) && terrains.length > 0 
-      ? terrains 
-      : (terrain ? [terrain] : []);
-    
-    // Для обратной совместимости сохраняем первый тип в поле terrain
-    const firstTerrain = terrainArray.length > 0 ? terrainArray[0] : (terrain || '');
+    const { name, type, terrain, price, image, description, specs, available = true, quantity = 0 } = req.body;
     
     const specsJson = specs ? JSON.stringify(specs) : null;
     
     await run(
       `UPDATE vehicles SET name=$1, type=$2, terrain=$3, price=$4, image=$5, description=$6, specs_json=$7, available=$8, quantity=$9, updated_at = CURRENT_TIMESTAMP WHERE id=$10`,
-      [name, type, firstTerrain, price, image, description, specsJson, available ? 1 : 0, quantity, id]
+      [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity, id]
     );
-    
-    // Обновляем типы местности в связующей таблице
-    // Удаляем старые связи
-    await run(`DELETE FROM vehicle_terrains WHERE vehicle_id = $1`, [id]);
-    
-    // Добавляем новые связи
-    if (terrainArray.length > 0) {
-      for (const terrainName of terrainArray) {
-        if (terrainName && terrainName.trim()) {
-          try {
-            await run(
-              `INSERT INTO vehicle_terrains (vehicle_id, terrain_name) VALUES ($1, $2)`,
-              [id, terrainName.trim()]
-            );
-          } catch (err) {
-            // Игнорируем ошибки дублирования
-            if (!err.message || !err.message.includes('unique constraint')) {
-              console.error('Error inserting terrain:', err);
-            }
-          }
-        }
-      }
-    }
     
     res.json({ ok: true });
   } catch (err) {
