@@ -173,8 +173,9 @@ export default function PromotionManagement() {
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Подробное описание акции"
+                placeholder="Подробное описание акции. Для переноса строк и создания отступов используйте Enter."
                 rows="3"
+                style={{ whiteSpace: 'pre-wrap' }}
               />
             </div>
 

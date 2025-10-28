@@ -261,8 +261,9 @@ export default function ProductManagement() {
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Описание товара"
+                placeholder="Описание товара. Для переноса строк и создания отступов используйте Enter."
                 rows="3"
+                style={{ whiteSpace: 'pre-wrap' }}
               />
             </div>
 
@@ -527,8 +528,9 @@ export default function ProductManagement() {
                               name="description"
                               value={formData.description}
                               onChange={handleInputChange}
-                              placeholder="Описание товара"
+                              placeholder="Описание товара. Для переноса строк и создания отступов используйте Enter."
                               rows="3"
+                              style={{ whiteSpace: 'pre-wrap' }}
                             />
                           </div>
 

@@ -236,8 +236,9 @@ function VehiclesManagement() {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Описание вездехода..."
+                  placeholder="Описание вездехода. Для переноса строк и создания отступов используйте Enter."
                   rows="3"
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
 

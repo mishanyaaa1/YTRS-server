@@ -151,18 +151,8 @@ export default function About() {
                   return title;
                 })()}
               </h1>
-              <div className="about-description">
-                {(() => {
-                  const description = aboutContent.description || "Мы специализируемся на поставке качественных запчастей для вездеходов всех типов и марок. Наша цель — обеспечить вас надежными комплектующими для безопасной и комфортной эксплуатации вашей техники.";
-                  if (description.includes('\n')) {
-                    return description.split('\n').map((line, index) => (
-                      <p key={index} style={{ margin: index > 0 ? '0.05em 0 0 0' : '0' }}>
-                        {line}
-                      </p>
-                    ));
-                  }
-                  return <p>{description}</p>;
-                })()}
+              <div className="about-description" style={{ whiteSpace: 'pre-line' }}>
+                {aboutContent.description || "Мы специализируемся на поставке качественных запчастей для вездеходов всех типов и марок. Наша цель — обеспечить вас надежными комплектующими для безопасной и комфортной эксплуатации вашей техники."}
               </div>
             </div>
           </Reveal>

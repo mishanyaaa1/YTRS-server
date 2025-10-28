@@ -613,8 +613,9 @@ export default function ContentManagement() {
                   <textarea
                     value={advantage.description}
                     onChange={(e) => updateAdvantage(index, 'description', e.target.value)}
-                    placeholder="Подробное описание преимущества"
+                    placeholder="Подробное описание преимущества. Для переноса строк и создания отступов используйте Enter."
                     rows={3}
+                    style={{ whiteSpace: 'pre-wrap' }}
                   />
                 </div>
               </div>
@@ -677,8 +678,9 @@ export default function ContentManagement() {
                   <textarea
                     value={item.description}
                     onChange={(e) => updateWhyChooseUs(index, 'description', e.target.value)}
-                    placeholder="Подробное описание"
+                    placeholder="Подробное описание. Для переноса строк и создания отступов используйте Enter."
                     rows={3}
+                    style={{ whiteSpace: 'pre-wrap' }}
                   />
                 </div>
               </div>
@@ -783,10 +785,11 @@ export default function ContentManagement() {
                 <div className="form-group">
                   <label>Описание:</label>
                   <textarea
-                    value={member.description}
+                    value={member.description || ''}
                     onChange={(e) => updateTeamMember(index, 'description', e.target.value)}
-                    placeholder="Краткое описание сотрудника и его роли"
+                    placeholder="Краткое описание сотрудника и его роли. Для переноса строк и создания отступов используйте Enter."
                     rows={3}
+                    style={{ whiteSpace: 'pre-wrap' }}
                   />
                 </div>
               </div>
@@ -816,8 +819,9 @@ export default function ContentManagement() {
                 name="content"
                 value={formData.history.content}
                 onChange={handleHistoryChange}
-                placeholder="Расскажите историю вашей компании..."
+                placeholder="Расскажите историю вашей компании... Для переноса строк и создания отступов используйте Enter."
                 rows={6}
+                style={{ whiteSpace: 'pre-wrap' }}
               />
             </div>
             
@@ -872,8 +876,9 @@ export default function ContentManagement() {
                     <textarea
                       value={milestone.description}
                       onChange={(e) => updateMilestone(index, 'description', e.target.value)}
-                      placeholder="Подробное описание события"
+                      placeholder="Подробное описание события. Для переноса строк и создания отступов используйте Enter."
                       rows={2}
+                      style={{ whiteSpace: 'pre-wrap' }}
                     />
                   </div>
                 </div>
@@ -998,7 +1003,8 @@ export default function ContentManagement() {
                           steps: prev.deliveryAndPayment.steps.map((s, i) => i === index ? { ...s, description: e.target.value } : s)
                         }
                       }))}
-                      placeholder="Кратко опишите, что происходит на этом этапе"
+                      placeholder="Кратко опишите, что происходит на этом этапе. Для переноса строк и создания отступов используйте Enter."
+                      style={{ whiteSpace: 'pre-wrap' }}
                     />
                   </div>
                 </div>
@@ -1063,7 +1069,8 @@ export default function ContentManagement() {
                           deliveryMethods: prev.deliveryAndPayment.deliveryMethods.map((m, i) => i === index ? { ...m, description: e.target.value } : m)
                         }
                       }))}
-                      placeholder="Краткое описание способа доставки (отображается под заголовком)"
+                      placeholder="Краткое описание способа доставки (отображается под заголовком). Для переноса строк и создания отступов используйте Enter."
+                      style={{ whiteSpace: 'pre-wrap' }}
                     />
                   </div>
                   <div className="links-section">
@@ -1127,7 +1134,8 @@ export default function ContentManagement() {
                     ...prev,
                     deliveryAndPayment: { ...prev.deliveryAndPayment, deliveryNote: e.target.value }
                   }))}
-                  placeholder="Опишите общий подход к подбору маршрута и срокам доставки"
+                  placeholder="Опишите общий подход к подбору маршрута и срокам доставки. Для переноса строк и создания отступов используйте Enter."
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
             </div>
@@ -1143,6 +1151,8 @@ export default function ContentManagement() {
                     ...prev,
                     deliveryAndPayment: { ...prev.deliveryAndPayment, payment: { ...prev.deliveryAndPayment.payment, whyPrepay: e.target.value } }
                   }))}
+                  placeholder="Для переноса строк и создания отступов используйте Enter."
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
               <div className="form-group">
@@ -1154,6 +1164,8 @@ export default function ContentManagement() {
                     ...prev,
                     deliveryAndPayment: { ...prev.deliveryAndPayment, payment: { ...prev.deliveryAndPayment.payment, whyPrepayExtra: e.target.value } }
                   }))}
+                  placeholder="Для переноса строк и создания отступов используйте Enter."
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
               <div className="form-group">
@@ -1165,6 +1177,8 @@ export default function ContentManagement() {
                     ...prev,
                     deliveryAndPayment: { ...prev.deliveryAndPayment, payment: { ...prev.deliveryAndPayment.payment, trust: e.target.value } }
                   }))}
+                  placeholder="Для переноса строк и создания отступов используйте Enter."
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
               <div className="form-group">
@@ -1176,6 +1190,8 @@ export default function ContentManagement() {
                     ...prev,
                     deliveryAndPayment: { ...prev.deliveryAndPayment, payment: { ...prev.deliveryAndPayment.payment, trustExtra: e.target.value } }
                   }))}
+                  placeholder="Для переноса строк и создания отступов используйте Enter."
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
               <div className="form-group">
@@ -1187,6 +1203,8 @@ export default function ContentManagement() {
                     ...prev,
                     deliveryAndPayment: { ...prev.deliveryAndPayment, payment: { ...prev.deliveryAndPayment.payment, requisites: e.target.value } }
                   }))}
+                  placeholder="Для переноса строк и создания отступов используйте Enter."
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
             </div>
@@ -1213,8 +1231,9 @@ export default function ContentManagement() {
                 <textarea
                   value={formData.footer.aboutSection.description}
                   onChange={(e) => handleFooterChange('aboutSection', 'description', e.target.value)}
-                  placeholder="Краткое описание компании"
+                  placeholder="Краткое описание компании. Для переноса строк и создания отступов используйте Enter."
                   rows={3}
+                  style={{ whiteSpace: 'pre-wrap' }}
                 />
               </div>
             </div>

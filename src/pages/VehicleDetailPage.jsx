@@ -226,17 +226,8 @@ function VehicleDetailPage() {
             </Reveal>
 
             <Reveal type="up" delay={0.05}>
-              <div className="vehicle-description">
-                {(() => {
-                  if (vehicle.description && vehicle.description.includes('\n')) {
-                    return vehicle.description.split('\n').map((line, index) => (
-                      <h4 key={index} style={{ margin: index > 0 ? '0.05em 0 0 0' : '0' }}>
-                        {line}
-                      </h4>
-                    ));
-                  }
-                  return <h4>{vehicle.description}</h4>;
-                })()}
+              <div className="vehicle-description" style={{ whiteSpace: 'pre-line' }}>
+                <h4>{vehicle.description || ''}</h4>
               </div>
             </Reveal>
 

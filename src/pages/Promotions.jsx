@@ -147,7 +147,7 @@ function Promotions() {
                 
                 <div className="promo-content">
                   <h3>{promo.title}</h3>
-                  <p>{promo.description}</p>
+                  <p style={{ whiteSpace: 'pre-line' }}>{promo.description}</p>
                   
                   {promo.discount && (
                     <div className="discount-badge">
@@ -257,7 +257,7 @@ function Promotions() {
                   
                   <div className="promo-info">
                     <h3>{promo.title}</h3>
-                    <p>{promo.description}</p>
+                    <p style={{ whiteSpace: 'pre-line' }}>{promo.description}</p>
                     
                     <div className="promo-meta">
                       <div className="promo-expires-small">
