@@ -22,13 +22,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 app.set('trust proxy', 1);
 
-// Оптимизация производительности
-app.set('x-powered-by', false); // Убираем заголовок для безопасности
-
-// Увеличиваем лимиты для больших запросов (изображения)
-app.use(express.json({ limit: '25mb' }));
-app.use(express.urlencoded({ extended: true, limit: '25mb' }));
-
 // Security headers
 app.use(
   helmet({
@@ -72,7 +65,7 @@ app.use(
 );
 
 app.use(cookieParser());
-// Body parser уже настроен выше (строки 29-30)
+app.use(express.json({ limit: '25mb' }));
 
 // Статическая раздача загруженных файлов
 const uploadsDir = path.join(__dirname, 'uploads');
