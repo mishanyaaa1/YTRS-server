@@ -95,9 +95,12 @@ export default function SearchModal({ isOpen, onClose }) {
         return false;
       }
 
-      // Фильтр по местности
-      if (selectedTerrain !== 'all' && vehicle.terrain !== selectedTerrain) {
-        return false;
+      // Фильтр по местности - работает с массивом
+      if (selectedTerrain !== 'all') {
+        const vehicleTerrain = Array.isArray(vehicle.terrain) ? vehicle.terrain : (vehicle.terrain ? [vehicle.terrain] : []);
+        if (!vehicleTerrain.includes(selectedTerrain)) {
+          return false;
+        }
       }
 
       // Поиск по названию
@@ -106,8 +109,9 @@ export default function SearchModal({ isOpen, onClose }) {
       // Поиск по типу
       if (vehicle.type?.toLowerCase().includes(query)) return true;
       
-      // Поиск по местности
-      if (vehicle.terrain?.toLowerCase().includes(query)) return true;
+      // Поиск по местности (в массиве)
+      const vehicleTerrain = Array.isArray(vehicle.terrain) ? vehicle.terrain : (vehicle.terrain ? [vehicle.terrain] : []);
+      if (vehicleTerrain.some(t => t?.toLowerCase().includes(query))) return true;
       
       // Поиск по описанию
       if (vehicle.description?.toLowerCase().includes(query)) return true;
@@ -384,7 +388,12 @@ export default function SearchModal({ isOpen, onClose }) {
                               <h4>{item.name}</h4>
                               <div className="result-meta">
                                 <span className="result-category">{item.type}</span>
-                                <span className="result-subcategory"> • {item.terrain}</span>
+                                {(() => {
+                                  const terrainArray = Array.isArray(item.terrain) ? item.terrain : (item.terrain ? [item.terrain] : []);
+                                  return terrainArray.length > 0 ? (
+                                    <span className="result-subcategory"> • {terrainArray.join(', ')}</span>
+                                  ) : null;
+                                })()}
                                 {item.specs?.engine && (
                                   <span className="result-brand"> • {item.specs.engine}</span>
                                 )}

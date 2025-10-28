@@ -84,14 +84,22 @@ function VehicleModal({ vehicle, isOpen, onClose }) {
                     <span className="price-large">{formatPrice(vehicle.price)} ₽</span>
                   </div>
                   
-                  {((vehicle.terrain && vehicle.terrain.trim()) || (vehicle.brand && vehicle.brand.trim())) && (
-                    <div className="vehicle-terrain-large">
-                      <span className="terrain-badge-large">
-                        {getTerrainIcon(vehicle.terrain || vehicle.brand)}
-                        {vehicle.terrain || vehicle.brand}
-                      </span>
-                    </div>
-                  )}
+                  {(() => {
+                    const terrainArray = Array.isArray(vehicle.terrain) 
+                      ? vehicle.terrain 
+                      : (vehicle.terrain ? [vehicle.terrain] : (vehicle.brand ? [vehicle.brand] : []));
+                    
+                    return terrainArray.length > 0 ? (
+                      <div className="vehicle-terrain-large" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {terrainArray.map((terrain, index) => (
+                          <span key={index} className="terrain-badge-large">
+                            {getTerrainIcon(terrain)}
+                            {terrain}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null;
+                  })()}
                   
                   <div className="vehicle-description-large" style={{ whiteSpace: 'pre-line' }}>
                     {vehicle.description || ''}

@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   type VARCHAR(255) NOT NULL,
-  terrain VARCHAR(255) NOT NULL,
+  terrain TEXT NOT NULL, -- Изменено на TEXT для хранения JSON массива типов местности
   price INTEGER NOT NULL,
   image TEXT,
   description TEXT,
@@ -159,8 +159,8 @@ CREATE TABLE IF NOT EXISTS vehicles (
   quantity INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  FOREIGN KEY (type) REFERENCES vehicle_types(name) ON DELETE SET NULL,
-  FOREIGN KEY (terrain) REFERENCES terrain_types(name) ON DELETE SET NULL
+  FOREIGN KEY (type) REFERENCES vehicle_types(name) ON DELETE SET NULL
+  -- Удален FOREIGN KEY для terrain, так как теперь храним массив в JSON
 );
 
 -- Контент сайта
