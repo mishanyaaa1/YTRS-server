@@ -4,7 +4,8 @@ import {
   initialProducts, 
   initialBrands, 
   initialPromotions, 
-  initialAboutContent
+  initialAboutContent,
+  initialVehicles
 } from '../data/initialData.js';
 import { migrateProductImages } from '../utils/imageHelpers';
 
@@ -127,7 +128,7 @@ export const AdminDataProvider = ({ children }) => {
   });
 
   const [vehicles, setVehicles] = useState(() => {
-    const result = safeParseFromStorage('adminVehicles', []);
+    const result = safeParseFromStorage('adminVehicles', initialVehicles);
     console.log('AdminDataContext: Initial vehicles state:', result.length, 'vehicles from localStorage');
     return result;
   });
@@ -1227,7 +1228,7 @@ export const AdminDataProvider = ({ children }) => {
         fetch('/api/promocodes', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
         fetch('/api/terrain-types', { credentials: 'include' }).then(r => r.ok ? r.json() : ['Снег', 'Болото', 'Вода', 'Горы', 'Лес', 'Пустыня']),
         fetch('/api/vehicle-types', { credentials: 'include' }).then(r => r.ok ? r.json() : ['Гусеничный', 'Колесный', 'Плавающий']),
-        fetch('/api/vehicles', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
+        fetch('/api/vehicles', { credentials: 'include' }).then(r => r.ok ? r.json() : initialVehicles),
         fetch('/api/content', { credentials: 'include' }).then(r => r.ok ? r.json() : {})
       ]);
       
@@ -1244,7 +1245,7 @@ export const AdminDataProvider = ({ children }) => {
       setPromocodes(pc.value);
       setTerrainTypes(t.value);
       setVehicleTypes(v.value);
-      setVehicles(vehicles.value || []);
+      setVehicles(vehicles.value || initialVehicles);
       
       // Обновляем контент
       if (content.value && content.value.about_content) {
@@ -1258,7 +1259,7 @@ export const AdminDataProvider = ({ children }) => {
       localStorage.setItem('adminPromocodes', JSON.stringify(pc.value));
       localStorage.setItem('adminTerrainTypes', JSON.stringify(t.value));
       localStorage.setItem('adminVehicleTypes', JSON.stringify(v.value));
-      localStorage.setItem('adminVehicles', JSON.stringify(vehicles.value || []));
+      localStorage.setItem('adminVehicles', JSON.stringify(vehicles.value || initialVehicles));
       if (content.value && content.value.about_content) {
         localStorage.setItem('adminAboutContent', JSON.stringify(content.value.about_content));
       }

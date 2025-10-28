@@ -12,6 +12,7 @@ services:
       POSTGRES_PASSWORD: Thereisnospoon31827
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./server/postgres_schema.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5433:5432"
     networks:

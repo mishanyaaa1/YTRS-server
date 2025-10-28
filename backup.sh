@@ -22,7 +22,7 @@ fi
 
 # Создаем бэкап базы данных
 echo "📋 Создаем дамп базы данных..."
-docker-compose exec -T postgres pg_dump -U ytors -d ytorsweb > "$BACKUP_DIR/$BACKUP_FILE"
+docker-compose exec -T postgres pg_dump -U postgres -d ytorsweb > "$BACKUP_DIR/$BACKUP_FILE"
 
 # Сжимаем бэкап
 echo "🗜️  Сжимаем резервную копию..."
