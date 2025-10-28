@@ -305,52 +305,11 @@ export const AdminDataProvider = ({ children }) => {
   }, []);
 
   // Сохраняем вездеходы в localStorage при изменении
-  // НЕ сохраняем большие изображения (base64) чтобы не переполнять localStorage
   useEffect(() => {
     try {
-      // Убираем большие base64 изображения перед сохранением
-      const vehiclesForStorage = vehicles.map(vehicle => {
-        const { image, ...rest } = vehicle;
-        // Сохраняем только URL или маленькие изображения, но не большие base64
-        const cleanedVehicle = { ...rest };
-        if (image && typeof image === 'string') {
-          // Сохраняем только если это URL (не base64) или очень маленький base64 (< 10KB)
-          if (!image.startsWith('data:image') || image.length < 10000) {
-            cleanedVehicle.image = image;
-          }
-          // Для больших base64 просто не сохраняем - они будут загружены с API
-        }
-        return cleanedVehicle;
-      });
-      
-      localStorage.setItem('adminVehicles', JSON.stringify(vehiclesForStorage));
+      localStorage.setItem('adminVehicles', JSON.stringify(vehicles));
     } catch (e) {
-      if (e.name === 'QuotaExceededError') {
-        console.warn('AdminDataContext: Cannot save vehicles to localStorage - quota exceeded. Clearing large data...');
-        // Попытаемся сохранить без изображений
-        try {
-          const vehiclesWithoutImages = vehicles.map(({ image, ...rest }) => rest);
-          localStorage.setItem('adminVehicles', JSON.stringify(vehiclesWithoutImages));
-          console.log('AdminDataContext: Saved vehicles without images');
-        } catch (e2) {
-          console.error('AdminDataContext: Still cannot save vehicles, clearing old non-critical data...');
-          // Очищаем старые некритичные данные
-          ['adminAboutContent', 'adminPromotions'].forEach(key => {
-            try {
-              localStorage.removeItem(key);
-            } catch {}
-          });
-          // Пробуем еще раз без изображений
-          try {
-            const vehiclesWithoutImages = vehicles.map(({ image, ...rest }) => rest);
-            localStorage.setItem('adminVehicles', JSON.stringify(vehiclesWithoutImages));
-          } catch (e3) {
-            console.error('AdminDataContext: Failed to save vehicles to localStorage');
-          }
-        }
-      } else {
-        console.error('AdminDataContext: Error saving vehicles:', e);
-      }
+      // ignore storage errors
     }
   }, [vehicles]);
 
@@ -688,22 +647,17 @@ export const AdminDataProvider = ({ children }) => {
         credentials: 'include',
         body: JSON.stringify(vehicle)
       });
-      
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Failed to create vehicle:', errorData);
-        throw new Error(errorData.error || `Server returned ${res.status}`);
-      }
-      
-      const result = await res.json();
-      console.log('Vehicle created successfully:', result);
+      if (!res.ok) throw new Error('Failed to create vehicle');
       await refreshFromApi();
     } catch (e) {
-      console.error('Error adding vehicle:', e);
-      alert(`Ошибка при создании вездехода: ${e.message || 'Неизвестная ошибка'}`);
-      
-      // Fallback локально только если нет сети, но не сохраняем в localStorage чтобы не переполнить
-      // Данные должны загрузиться при следующем обновлении страницы с API
+      // Fallback локально
+      const newVehicle = {
+        ...vehicle,
+        id: vehicles.length ? Math.max(...vehicles.map(v => v.id)) + 1 : 1
+      };
+      const updatedVehicles = [...vehicles, newVehicle];
+      setVehicles(updatedVehicles);
+      localStorage.setItem('adminVehicles', JSON.stringify(updatedVehicles));
     }
   };
 
@@ -715,33 +669,14 @@ export const AdminDataProvider = ({ children }) => {
         credentials: 'include',
         body: JSON.stringify(updatedVehicle)
       });
-      
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Failed to update vehicle:', errorData);
-        throw new Error(errorData.error || `Server returned ${res.status}`);
-      }
-      
-      console.log('Vehicle updated successfully');
+      if (!res.ok) throw new Error('Failed to update vehicle');
       await refreshFromApi();
     } catch (e) {
-      console.error('Error updating vehicle:', e);
-      alert(`Ошибка при обновлении вездехода: ${e.message || 'Неизвестная ошибка'}`);
-      
-      // Fallback локально только если нет сети
-      // Но не сохраняем в localStorage чтобы не переполнить - данные загрузятся при следующем обновлении
       const updatedVehicles = vehicles.map(vehicle => 
         vehicle.id === id ? { ...vehicle, ...updatedVehicle } : vehicle
       );
       setVehicles(updatedVehicles);
-      
-      // Пробуем сохранить без изображений
-      try {
-        const vehiclesWithoutImages = updatedVehicles.map(({ image, ...rest }) => rest);
-        localStorage.setItem('adminVehicles', JSON.stringify(vehiclesWithoutImages));
-      } catch (storageError) {
-        console.warn('Cannot save to localStorage:', storageError);
-      }
+      localStorage.setItem('adminVehicles', JSON.stringify(updatedVehicles));
     }
   };
 
