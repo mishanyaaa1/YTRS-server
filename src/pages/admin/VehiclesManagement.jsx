@@ -33,26 +33,19 @@ function VehiclesManagement() {
     if (name === 'terrain') {
       setFormData(prev => {
         const currentTerrain = Array.isArray(prev.terrain) ? prev.terrain : [];
-        let newTerrain;
-        
         if (checked) {
-          // Добавляем выбранный тип местности (если еще нет)
-          if (!currentTerrain.includes(value)) {
-            newTerrain = [...currentTerrain, value];
-          } else {
-            newTerrain = currentTerrain;
-          }
+          // Добавляем выбранный тип местности
+          return {
+            ...prev,
+            terrain: [...currentTerrain, value]
+          };
         } else {
           // Удаляем тип местности из массива
-          newTerrain = currentTerrain.filter(t => t !== value);
+          return {
+            ...prev,
+            terrain: currentTerrain.filter(t => t !== value)
+          };
         }
-        
-        console.log('Terrain changed:', { value, checked, currentTerrain, newTerrain });
-        
-        return {
-          ...prev,
-          terrain: newTerrain
-        };
       });
       return;
     }
@@ -109,16 +102,11 @@ function VehiclesManagement() {
       // Берем первое изображение из массива images
       const mainImage = formData.images && formData.images.length > 0 ? formData.images[0].data : null;
       
-      // Формируем vehicleData, убирая лишние поля и сохраняя terrain как массив
       const vehicleData = {
-        name: formData.name,
-        type: formData.type,
-        terrain: Array.isArray(formData.terrain) ? formData.terrain : [], // Явно сохраняем массив
+        ...formData,
         price: price,
         quantity: parseInt(formData.quantity) || 1,
-        image: mainImage,
-        description: formData.description || '',
-        available: formData.available !== undefined ? formData.available : true,
+        image: mainImage, // Добавляем поле image
         specs: {
           engine: formData.engine,
           weight: formData.weight,
@@ -126,9 +114,6 @@ function VehiclesManagement() {
           maxSpeed: formData.maxSpeed
         }
       };
-
-      console.log('Saving vehicle data:', JSON.stringify(vehicleData, null, 2));
-      console.log('Terrain array:', vehicleData.terrain);
 
       if (editingVehicle) {
         console.log('Updating existing vehicle:', editingVehicle.id, vehicleData);
