@@ -84,14 +84,25 @@ function VehicleModal({ vehicle, isOpen, onClose }) {
                     <span className="price-large">{formatPrice(vehicle.price)} ₽</span>
                   </div>
                   
-                  {((vehicle.terrain && vehicle.terrain.trim()) || (vehicle.brand && vehicle.brand.trim())) && (
-                    <div className="vehicle-terrain-large">
-                      <span className="terrain-badge-large">
-                        {getTerrainIcon(vehicle.terrain || vehicle.brand)}
-                        {vehicle.terrain || vehicle.brand}
-                      </span>
-                    </div>
-                  )}
+                  {(() => {
+                    // Получаем массив типов местности
+                    const terrains = Array.isArray(vehicle.terrains) && vehicle.terrains.length > 0
+                      ? vehicle.terrains
+                      : (vehicle.terrain ? [vehicle.terrain] : (vehicle.brand ? [vehicle.brand] : []));
+                    
+                    if (terrains.length === 0) return null;
+                    
+                    return (
+                      <div className="vehicle-terrain-large">
+                        {terrains.map((terrain, index) => (
+                          <span key={index} className="terrain-badge-large">
+                            {getTerrainIcon(terrain)}
+                            {terrain}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  })()}
                   
                   <div className="vehicle-description-large" style={{ whiteSpace: 'pre-line' }}>
                     {vehicle.description || ''}

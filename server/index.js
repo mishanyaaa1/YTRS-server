@@ -1330,18 +1330,39 @@ app.get('/api/vehicles', async (req, res) => {
     });
     
     const rows = await all(
-      `SELECT v.*, vt.name AS vehicle_type_name, tt.name AS terrain_type_name
+      `SELECT v.*, vt.name AS vehicle_type_name
        FROM vehicles v
        LEFT JOIN vehicle_types vt ON v.type = vt.name
-       LEFT JOIN terrain_types tt ON v.terrain = tt.name
        ORDER BY v.name ASC`
     );
+    
+    // Для каждого вездехода получаем массив типов местности
+    const vehicleIds = rows.map(r => r.id);
+    let terrains = [];
+    if (vehicleIds.length > 0) {
+      terrains = await all(
+        `SELECT vehicle_id, terrain_name 
+         FROM vehicle_terrain 
+         WHERE vehicle_id IN (${vehicleIds.map((_, i) => '$' + (i + 1)).join(',')})`,
+        vehicleIds
+      );
+    }
+    
+    // Группируем типы местности по vehicle_id
+    const vehicleTerrains = new Map();
+    for (const t of terrains) {
+      if (!vehicleTerrains.has(t.vehicle_id)) {
+        vehicleTerrains.set(t.vehicle_id, []);
+      }
+      vehicleTerrains.get(t.vehicle_id).push(t.terrain_name);
+    }
     
     const result = rows.map(r => ({
       id: r.id,
       name: r.name,
       type: r.type,
-      terrain: r.terrain,
+      terrain: r.terrain, // Оставляем для обратной совместимости
+      terrains: vehicleTerrains.get(r.id) || [], // Новое поле - массив типов местности
       price: r.price,
       image: r.image,
       description: r.description,
@@ -1361,17 +1382,32 @@ app.get('/api/vehicles', async (req, res) => {
 
 app.post('/api/vehicles', async (req, res) => {
   try {
-    const { name, type, terrain, price, image, description, specs, available = true, quantity = 0 } = req.body;
+    const { name, type, terrain, terrains, price, image, description, specs, available = true, quantity = 0 } = req.body;
     
     const specsJson = specs ? JSON.stringify(specs) : null;
     
+    // Создаем вездеход
     const r = await run(
       `INSERT INTO vehicles (name, type, terrain, price, image, description, specs_json, available, quantity)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity]
+      [name, type, terrain || null, price, image, description, specsJson, available ? 1 : 0, quantity]
     );
     
-    res.status(201).json({ id: r.lastID });
+    const vehicleId = r.lastID;
+    
+    // Добавляем типы местности в связующую таблицу
+    const terrainList = Array.isArray(terrains) ? terrains : (terrain ? [terrain] : []);
+    if (terrainList.length > 0) {
+      for (const terrainName of terrainList) {
+        await run(
+          `INSERT INTO vehicle_terrain (vehicle_id, terrain_name) VALUES ($1, $2)
+           ON CONFLICT (vehicle_id, terrain_name) DO NOTHING`,
+          [vehicleId, terrainName]
+        );
+      }
+    }
+    
+    res.status(201).json({ id: vehicleId });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to create vehicle' });
@@ -1381,14 +1417,30 @@ app.post('/api/vehicles', async (req, res) => {
 app.put('/api/vehicles/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { name, type, terrain, price, image, description, specs, available = true, quantity = 0 } = req.body;
+    const { name, type, terrain, terrains, price, image, description, specs, available = true, quantity = 0 } = req.body;
     
     const specsJson = specs ? JSON.stringify(specs) : null;
     
+    // Обновляем основную информацию о вездеходе
     await run(
       `UPDATE vehicles SET name=$1, type=$2, terrain=$3, price=$4, image=$5, description=$6, specs_json=$7, available=$8, quantity=$9, updated_at = CURRENT_TIMESTAMP WHERE id=$10`,
-      [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity, id]
+      [name, type, terrain || null, price, image, description, specsJson, available ? 1 : 0, quantity, id]
     );
+    
+    // Обновляем типы местности: сначала удаляем все старые связи
+    await run(`DELETE FROM vehicle_terrain WHERE vehicle_id = $1`, [id]);
+    
+    // Затем добавляем новые
+    const terrainList = Array.isArray(terrains) ? terrains : (terrain ? [terrain] : []);
+    if (terrainList.length > 0) {
+      for (const terrainName of terrainList) {
+        await run(
+          `INSERT INTO vehicle_terrain (vehicle_id, terrain_name) VALUES ($1, $2)
+           ON CONFLICT (vehicle_id, terrain_name) DO NOTHING`,
+          [id, terrainName]
+        );
+      }
+    }
     
     res.json({ ok: true });
   } catch (err) {

@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   type VARCHAR(255) NOT NULL,
-  terrain VARCHAR(255) NOT NULL,
+  terrain VARCHAR(255), -- Оставлено для обратной совместимости, больше не используется
   price INTEGER NOT NULL,
   image TEXT,
   description TEXT,
@@ -159,8 +159,18 @@ CREATE TABLE IF NOT EXISTS vehicles (
   quantity INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  FOREIGN KEY (type) REFERENCES vehicle_types(name) ON DELETE SET NULL,
-  FOREIGN KEY (terrain) REFERENCES terrain_types(name) ON DELETE SET NULL
+  FOREIGN KEY (type) REFERENCES vehicle_types(name) ON DELETE SET NULL
+);
+
+-- Связующая таблица для отношения многие-ко-многим между вездеходами и типами местности
+CREATE TABLE IF NOT EXISTS vehicle_terrain (
+  id SERIAL PRIMARY KEY,
+  vehicle_id INTEGER NOT NULL,
+  terrain_name VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
+  FOREIGN KEY (terrain_name) REFERENCES terrain_types(name) ON DELETE CASCADE,
+  UNIQUE(vehicle_id, terrain_name)
 );
 
 -- Контент сайта
@@ -251,8 +261,9 @@ CREATE INDEX IF NOT EXISTS idx_advertising_events_platform ON advertising_events
 CREATE INDEX IF NOT EXISTS idx_advertising_events_type ON advertising_events(event_type);
 CREATE INDEX IF NOT EXISTS idx_advertising_events_created ON advertising_events(created_at);
 CREATE INDEX IF NOT EXISTS idx_vehicles_type ON vehicles(type);
-CREATE INDEX IF NOT EXISTS idx_vehicles_terrain ON vehicles(terrain);
 CREATE INDEX IF NOT EXISTS idx_vehicles_available ON vehicles(available);
+CREATE INDEX IF NOT EXISTS idx_vehicle_terrain_vehicle_id ON vehicle_terrain(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_terrain_terrain_name ON vehicle_terrain(terrain_name);
 CREATE INDEX IF NOT EXISTS idx_site_content_key ON site_content(content_key);
 CREATE INDEX IF NOT EXISTS idx_popular_products_sort_order ON popular_products(sort_order);
 CREATE INDEX IF NOT EXISTS idx_filter_settings_key ON filter_settings(setting_key);

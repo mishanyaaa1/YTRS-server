@@ -139,6 +139,9 @@
 
 .vehicle-terrain-large {
   margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .terrain-badge-large {

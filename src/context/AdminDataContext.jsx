@@ -637,11 +637,18 @@ export const AdminDataProvider = ({ children }) => {
   // Функции для работы с вездеходами
   const addVehicle = async (vehicle) => {
     try {
+      // Подготавливаем данные с массивом типов местности
+      const vehicleData = {
+        ...vehicle,
+        terrains: Array.isArray(vehicle.terrains) ? vehicle.terrains : (vehicle.terrain ? [vehicle.terrain] : []),
+        terrain: Array.isArray(vehicle.terrains) && vehicle.terrains.length > 0 ? vehicle.terrains[0] : vehicle.terrain
+      };
+      
       const res = await fetch('/api/vehicles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(vehicle)
+        body: JSON.stringify(vehicleData)
       });
       if (!res.ok) throw new Error('Failed to create vehicle');
       await refreshFromApi();
@@ -649,7 +656,8 @@ export const AdminDataProvider = ({ children }) => {
       // Fallback локально
       const newVehicle = {
         ...vehicle,
-        id: vehicles.length ? Math.max(...vehicles.map(v => v.id)) + 1 : 1
+        id: vehicles.length ? Math.max(...vehicles.map(v => v.id)) + 1 : 1,
+        terrains: Array.isArray(vehicle.terrains) ? vehicle.terrains : (vehicle.terrain ? [vehicle.terrain] : [])
       };
       const updatedVehicles = [...vehicles, newVehicle];
       setVehicles(updatedVehicles);
@@ -659,17 +667,28 @@ export const AdminDataProvider = ({ children }) => {
 
   const updateVehicle = async (id, updatedVehicle) => {
     try {
+      // Подготавливаем данные с массивом типов местности
+      const vehicleData = {
+        ...updatedVehicle,
+        terrains: Array.isArray(updatedVehicle.terrains) ? updatedVehicle.terrains : (updatedVehicle.terrain ? [updatedVehicle.terrain] : []),
+        terrain: Array.isArray(updatedVehicle.terrains) && updatedVehicle.terrains.length > 0 ? updatedVehicle.terrains[0] : updatedVehicle.terrain
+      };
+      
       const res = await fetch(`/api/vehicles/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(updatedVehicle)
+        body: JSON.stringify(vehicleData)
       });
       if (!res.ok) throw new Error('Failed to update vehicle');
       await refreshFromApi();
     } catch (e) {
       const updatedVehicles = vehicles.map(vehicle => 
-        vehicle.id === id ? { ...vehicle, ...updatedVehicle } : vehicle
+        vehicle.id === id ? { 
+          ...vehicle, 
+          ...updatedVehicle,
+          terrains: Array.isArray(updatedVehicle.terrains) ? updatedVehicle.terrains : (updatedVehicle.terrain ? [updatedVehicle.terrain] : [])
+        } : vehicle
       );
       setVehicles(updatedVehicles);
       localStorage.setItem('adminVehicles', JSON.stringify(updatedVehicles));
