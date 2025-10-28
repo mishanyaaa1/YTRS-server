@@ -4,8 +4,7 @@ import {
   initialProducts, 
   initialBrands, 
   initialPromotions, 
-  initialAboutContent,
-  initialVehicles
+  initialAboutContent
 } from '../data/initialData.js';
 import { migrateProductImages } from '../utils/imageHelpers';
 
@@ -128,9 +127,41 @@ export const AdminDataProvider = ({ children }) => {
   });
 
   const [vehicles, setVehicles] = useState(() => {
-    const result = safeParseFromStorage('adminVehicles', initialVehicles);
-    console.log('AdminDataContext: Initial vehicles state:', result.length, 'vehicles from localStorage');
-    return result;
+    // Используем данные из localStorage при первой загрузке, если они есть
+    // НО: проверяем, не являются ли они тестовыми данными
+    const stored = localStorage.getItem('adminVehicles');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Проверяем, не являются ли это тестовые данные
+          // Тестовые данные имеют характерные названия и ID от 1 до 6
+          const testVehicleNames = ['Вездеход "Буран"', 'Вездеход "Трэкол"', 'Вездеход "Амфибия"', 
+                                   'Вездеход "Горный"', 'Вездеход "Лесник"', 'Вездеход "Арктик"'];
+          
+          // Если все вездеходы - тестовые (по названиям или ID от 1-6) И их ровно 6, игнорируем
+          const allAreTestData = parsed.length === 6 && parsed.every(v => 
+            (v.id >= 1 && v.id <= 6) || 
+            testVehicleNames.includes(v.name)
+          );
+          
+          if (allAreTestData) {
+            // Это тестовые данные - игнорируем
+            console.log('AdminDataContext: Detected test data in localStorage, ignoring. Will load from API.');
+            localStorage.removeItem('adminVehicles'); // Удаляем тестовые данные
+            return [];
+          } else {
+            // Это реальные данные, используем их
+            console.log('AdminDataContext: Initial vehicles state:', parsed.length, 'vehicles from localStorage');
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.warn('AdminDataContext: Failed to parse vehicles from localStorage:', e);
+      }
+    }
+    console.log('AdminDataContext: Initial vehicles state: 0 (will load from API)');
+    return [];
   });
 
   // Типы местности и вездеходов
@@ -273,7 +304,7 @@ export const AdminDataProvider = ({ children }) => {
     }
   }, []);
 
-  // Сохраняем вездеходы в localStorage
+  // Сохраняем вездеходы в localStorage при изменении
   useEffect(() => {
     try {
       localStorage.setItem('adminVehicles', JSON.stringify(vehicles));
@@ -322,16 +353,7 @@ export const AdminDataProvider = ({ children }) => {
         // Определяем мобильное устройство один раз
         const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
-        // АГРЕССИВНАЯ очистка localStorage на мобильных устройствах
-        if (isMobileDevice) {
-          try {
-            localStorage.clear();
-          } catch (e) {
-            // Игнорируем ошибки очистки
-          }
-        }
-        
-        // Проверяем и очищаем localStorage если он переполнен
+        // Проверяем и очищаем localStorage только если он переполнен
         try {
           localStorage.setItem('test', 'test');
           localStorage.removeItem('test');
@@ -343,7 +365,7 @@ export const AdminDataProvider = ({ children }) => {
             if (isMobileDevice) {
               localStorage.clear();
             } else {
-              // На десктопе очищаем только старые admin данные
+              // На десктопе очищаем только старые admin данные, но сохраняем критичные
               const criticalKeys = ['adminVehicles', 'adminProducts', 'adminCategories', 'adminBrands'];
               const allKeys = Object.keys(localStorage);
               allKeys.forEach(key => {
@@ -353,26 +375,6 @@ export const AdminDataProvider = ({ children }) => {
               });
             }
           }
-        }
-        
-        // Очищаем localStorage перед загрузкой новых данных на мобильных устройствах
-        if (isMobileDevice) {
-          console.log('AdminDataContext: Mobile device detected, clearing localStorage before loading...');
-          
-          // Очищаем ВСЕ admin данные на мобильных устройствах для экономии места
-          const allKeys = Object.keys(localStorage);
-          allKeys.forEach(key => {
-            if (key.startsWith('admin')) {
-              localStorage.removeItem(key);
-            }
-          });
-          
-          // Очищаем также другие большие данные
-          ['cart', 'wishlist', 'user_preferences'].forEach(key => {
-            if (localStorage.getItem(key)) {
-              localStorage.removeItem(key);
-            }
-          });
         }
         const [apiProductsRes, apiCategoriesRes, apiBrandsRes, apiPromosRes, apiTerrainTypesRes, apiVehicleTypesRes, apiVehiclesRes, apiContentRes, apiPopularProductsRes, apiFilterSettingsRes] = await Promise.allSettled([
           fetch('/api/products', { credentials: 'include' }),
@@ -497,6 +499,7 @@ export const AdminDataProvider = ({ children }) => {
           console.log('AdminDataContext: API vehicles response:', apiVehicles);
           if (Array.isArray(apiVehicles)) {
             console.log('AdminDataContext: Loaded', apiVehicles.length, 'vehicles from API');
+            // Просто обновляем данные с API - React оптимизирует рендеринг
             setVehicles(apiVehicles);
             safeSetItem('adminVehicles', apiVehicles);
           } else {
@@ -507,6 +510,7 @@ export const AdminDataProvider = ({ children }) => {
           if (apiVehiclesRes.status === 'rejected') {
             console.error('AdminDataContext: Vehicles API error:', apiVehiclesRes.reason);
           }
+          // Если загрузка не удалась, но в localStorage есть данные - оставляем их
         }
 
         if (apiContentRes.status === 'fulfilled' && apiContentRes.value.ok) {
@@ -1228,7 +1232,7 @@ export const AdminDataProvider = ({ children }) => {
         fetch('/api/promocodes', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
         fetch('/api/terrain-types', { credentials: 'include' }).then(r => r.ok ? r.json() : ['Снег', 'Болото', 'Вода', 'Горы', 'Лес', 'Пустыня']),
         fetch('/api/vehicle-types', { credentials: 'include' }).then(r => r.ok ? r.json() : ['Гусеничный', 'Колесный', 'Плавающий']),
-        fetch('/api/vehicles', { credentials: 'include' }).then(r => r.ok ? r.json() : initialVehicles),
+        fetch('/api/vehicles', { credentials: 'include' }).then(r => r.ok ? r.json() : []),
         fetch('/api/content', { credentials: 'include' }).then(r => r.ok ? r.json() : {})
       ]);
       
@@ -1245,7 +1249,7 @@ export const AdminDataProvider = ({ children }) => {
       setPromocodes(pc.value);
       setTerrainTypes(t.value);
       setVehicleTypes(v.value);
-      setVehicles(vehicles.value || initialVehicles);
+      setVehicles(vehicles.value || []);
       
       // Обновляем контент
       if (content.value && content.value.about_content) {
@@ -1259,7 +1263,7 @@ export const AdminDataProvider = ({ children }) => {
       localStorage.setItem('adminPromocodes', JSON.stringify(pc.value));
       localStorage.setItem('adminTerrainTypes', JSON.stringify(t.value));
       localStorage.setItem('adminVehicleTypes', JSON.stringify(v.value));
-      localStorage.setItem('adminVehicles', JSON.stringify(vehicles.value || initialVehicles));
+      localStorage.setItem('adminVehicles', JSON.stringify(vehicles.value || []));
       if (content.value && content.value.about_content) {
         localStorage.setItem('adminAboutContent', JSON.stringify(content.value.about_content));
       }
