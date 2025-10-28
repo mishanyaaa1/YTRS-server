@@ -1383,16 +1383,31 @@ app.post('/api/vehicles', async (req, res) => {
       terrainType: typeof terrain,
       isArray: Array.isArray(terrain),
       price,
+      priceType: typeof price,
       available,
-      quantity
+      quantity,
+      quantityType: typeof quantity
     });
+    
+    // Валидация обязательных полей
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return res.status(400).json({ error: 'Name is required and must be a non-empty string' });
+    }
+    
+    if (!type || typeof type !== 'string' || type.trim().length === 0) {
+      return res.status(400).json({ error: 'Type is required and must be a non-empty string' });
+    }
+    
+    if (typeof price !== 'number' || isNaN(price) || price < 0) {
+      return res.status(400).json({ error: 'Price must be a valid positive number' });
+    }
     
     const specsJson = specs ? JSON.stringify(specs) : null;
     
     // Преобразуем terrain в JSON: если это массив - сериализуем, если строка - конвертируем в массив
     let terrainJson;
     if (Array.isArray(terrain)) {
-      terrainJson = JSON.stringify(terrain.filter(t => t)); // Фильтруем пустые значения
+      terrainJson = JSON.stringify(terrain.filter(t => t && typeof t === 'string')); // Фильтруем пустые значения
       console.log('Terrain as array, converted to JSON:', terrainJson);
     } else if (typeof terrain === 'string' && terrain.trim()) {
       terrainJson = JSON.stringify([terrain.trim()]);
@@ -1402,16 +1417,21 @@ app.post('/api/vehicles', async (req, res) => {
       console.warn('Terrain is empty or invalid, using empty array');
     }
     
+    // Нормализуем quantity
+    const quantityInt = parseInt(quantity) || 0;
+    const availableBool = available === true || available === 1 || available === 'true' || available === '1';
+    
     const r = await run(
       `INSERT INTO vehicles (name, type, terrain, price, image, description, specs_json, available, quantity)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [name, type, terrainJson, price, image, description, specsJson, available ? 1 : 0, quantity]
+      [name.trim(), type.trim(), terrainJson, price, image || null, description || null, specsJson, availableBool ? 1 : 0, quantityInt]
     );
     
     console.log('Vehicle created successfully with ID:', r.lastID);
     res.status(201).json({ id: r.lastID });
   } catch (err) {
     console.error('Error creating vehicle:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).json({ error: 'Failed to create vehicle', details: err.message });
   }
 });
@@ -1419,6 +1439,10 @@ app.post('/api/vehicles', async (req, res) => {
 app.put('/api/vehicles/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
+    if (!id || isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid vehicle ID' });
+    }
+    
     const { name, type, terrain, price, image, description, specs, available = true, quantity = 0 } = req.body;
     
     console.log('PUT /api/vehicles/:id - Received data:', {
@@ -1429,16 +1453,31 @@ app.put('/api/vehicles/:id', async (req, res) => {
       terrainType: typeof terrain,
       isArray: Array.isArray(terrain),
       price,
+      priceType: typeof price,
       available,
-      quantity
+      quantity,
+      quantityType: typeof quantity
     });
+    
+    // Валидация обязательных полей
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return res.status(400).json({ error: 'Name is required and must be a non-empty string' });
+    }
+    
+    if (!type || typeof type !== 'string' || type.trim().length === 0) {
+      return res.status(400).json({ error: 'Type is required and must be a non-empty string' });
+    }
+    
+    if (typeof price !== 'number' || isNaN(price) || price < 0) {
+      return res.status(400).json({ error: 'Price must be a valid positive number' });
+    }
     
     const specsJson = specs ? JSON.stringify(specs) : null;
     
     // Преобразуем terrain в JSON: если это массив - сериализуем, если строка - конвертируем в массив
     let terrainJson;
     if (Array.isArray(terrain)) {
-      terrainJson = JSON.stringify(terrain.filter(t => t)); // Фильтруем пустые значения
+      terrainJson = JSON.stringify(terrain.filter(t => t && typeof t === 'string')); // Фильтруем пустые значения
       console.log('Terrain as array, converted to JSON:', terrainJson);
     } else if (typeof terrain === 'string' && terrain.trim()) {
       terrainJson = JSON.stringify([terrain.trim()]);
@@ -1448,15 +1487,20 @@ app.put('/api/vehicles/:id', async (req, res) => {
       console.warn('Terrain is empty or invalid, using empty array');
     }
     
+    // Нормализуем quantity
+    const quantityInt = parseInt(quantity) || 0;
+    const availableBool = available === true || available === 1 || available === 'true' || available === '1';
+    
     await run(
       `UPDATE vehicles SET name=$1, type=$2, terrain=$3, price=$4, image=$5, description=$6, specs_json=$7, available=$8, quantity=$9, updated_at = CURRENT_TIMESTAMP WHERE id=$10`,
-      [name, type, terrainJson, price, image, description, specsJson, available ? 1 : 0, quantity, id]
+      [name.trim(), type.trim(), terrainJson, price, image || null, description || null, specsJson, availableBool ? 1 : 0, quantityInt, id]
     );
     
     console.log('Vehicle updated successfully');
     res.json({ ok: true });
   } catch (err) {
     console.error('Error updating vehicle:', err);
+    console.error('Error stack:', err.stack);
     res.status(500).json({ error: 'Failed to update vehicle', details: err.message });
   }
 });
