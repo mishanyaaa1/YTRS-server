@@ -1376,16 +1376,30 @@ app.post('/api/vehicles', async (req, res) => {
   try {
     const { name, type, terrain, price, image, description, specs, available = true, quantity = 0 } = req.body;
     
+    console.log('POST /api/vehicles - Received data:', {
+      name,
+      type,
+      terrain,
+      terrainType: typeof terrain,
+      isArray: Array.isArray(terrain),
+      price,
+      available,
+      quantity
+    });
+    
     const specsJson = specs ? JSON.stringify(specs) : null;
     
     // Преобразуем terrain в JSON: если это массив - сериализуем, если строка - конвертируем в массив
     let terrainJson;
     if (Array.isArray(terrain)) {
       terrainJson = JSON.stringify(terrain.filter(t => t)); // Фильтруем пустые значения
+      console.log('Terrain as array, converted to JSON:', terrainJson);
     } else if (typeof terrain === 'string' && terrain.trim()) {
       terrainJson = JSON.stringify([terrain.trim()]);
+      console.log('Terrain as string, converted to JSON:', terrainJson);
     } else {
       terrainJson = JSON.stringify([]);
+      console.warn('Terrain is empty or invalid, using empty array');
     }
     
     const r = await run(
@@ -1394,10 +1408,11 @@ app.post('/api/vehicles', async (req, res) => {
       [name, type, terrainJson, price, image, description, specsJson, available ? 1 : 0, quantity]
     );
     
+    console.log('Vehicle created successfully with ID:', r.lastID);
     res.status(201).json({ id: r.lastID });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to create vehicle' });
+    console.error('Error creating vehicle:', err);
+    res.status(500).json({ error: 'Failed to create vehicle', details: err.message });
   }
 });
 
@@ -1406,16 +1421,31 @@ app.put('/api/vehicles/:id', async (req, res) => {
     const id = Number(req.params.id);
     const { name, type, terrain, price, image, description, specs, available = true, quantity = 0 } = req.body;
     
+    console.log('PUT /api/vehicles/:id - Received data:', {
+      id,
+      name,
+      type,
+      terrain,
+      terrainType: typeof terrain,
+      isArray: Array.isArray(terrain),
+      price,
+      available,
+      quantity
+    });
+    
     const specsJson = specs ? JSON.stringify(specs) : null;
     
     // Преобразуем terrain в JSON: если это массив - сериализуем, если строка - конвертируем в массив
     let terrainJson;
     if (Array.isArray(terrain)) {
       terrainJson = JSON.stringify(terrain.filter(t => t)); // Фильтруем пустые значения
+      console.log('Terrain as array, converted to JSON:', terrainJson);
     } else if (typeof terrain === 'string' && terrain.trim()) {
       terrainJson = JSON.stringify([terrain.trim()]);
+      console.log('Terrain as string, converted to JSON:', terrainJson);
     } else {
       terrainJson = JSON.stringify([]);
+      console.warn('Terrain is empty or invalid, using empty array');
     }
     
     await run(
@@ -1423,10 +1453,11 @@ app.put('/api/vehicles/:id', async (req, res) => {
       [name, type, terrainJson, price, image, description, specsJson, available ? 1 : 0, quantity, id]
     );
     
+    console.log('Vehicle updated successfully');
     res.json({ ok: true });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to update vehicle' });
+    console.error('Error updating vehicle:', err);
+    res.status(500).json({ error: 'Failed to update vehicle', details: err.message });
   }
 });
 
