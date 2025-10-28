@@ -165,7 +165,13 @@ function VehiclesPage() {
   // Фильтрация вездеходов
   const filteredVehicles = vehicles.filter(vehicle => {
     const matchesType = !filterSettings.showCategoryFilter || selectedType === 'Все' || vehicle.type === selectedType;
-    const matchesTerrain = !filterSettings.showSubcategoryFilter || selectedTerrain === 'Все' || vehicle.terrain === selectedTerrain;
+    
+    // Поддержка множественных типов местности
+    const vehicleTerrains = Array.isArray(vehicle.terrains) && vehicle.terrains.length > 0
+      ? vehicle.terrains
+      : (vehicle.terrain ? [vehicle.terrain] : []);
+    const matchesTerrain = !filterSettings.showSubcategoryFilter || selectedTerrain === 'Все' || vehicleTerrains.includes(selectedTerrain);
+    
     const matchesPrice = !filterSettings.showPriceFilter || (vehicle.price >= priceRange[0] && (priceRange[1] === 0 || vehicle.price <= priceRange[1]));
     const matchesStock = !filterSettings.showStockFilter || !inStock || vehicle.available;
     

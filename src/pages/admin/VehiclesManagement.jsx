@@ -12,7 +12,7 @@ function VehiclesManagement() {
   const [formData, setFormData] = useState({
     name: '',
     type: 'Гусеничный',
-    terrain: 'Снег',
+    terrains: ['Снег'],
     price: '',
     description: '',
     engine: '',
@@ -33,6 +33,14 @@ function VehiclesManagement() {
       [name]: type === 'checkbox' ? checked : value
     }));
   };
+
+  const handleTerrainsChange = (e) => {
+      const options = Array.from(e.target.selectedOptions, option => option.value);
+      setFormData(prev => ({
+        ...prev,
+        terrains: options
+      }));
+    };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -80,6 +88,9 @@ function VehiclesManagement() {
         price: price,
         quantity: parseInt(formData.quantity) || 1,
         image: mainImage, // Добавляем поле image
+        terrains: Array.isArray(formData.terrains) && formData.terrains.length > 0 
+          ? formData.terrains 
+          : (formData.terrain ? [formData.terrain] : []), // Поддержка массива типов местности
         specs: {
           engine: formData.engine,
           weight: formData.weight,
@@ -113,10 +124,15 @@ function VehiclesManagement() {
     // Для вездеходов создаем массив images из поля image
     const images = vehicle.image ? [{ data: vehicle.image, isMain: true }] : [];
     
+    // Поддержка как нового поля terrains (массив), так и старого terrain
+    const terrains = Array.isArray(vehicle.terrains) && vehicle.terrains.length > 0
+      ? vehicle.terrains
+      : (vehicle.terrain ? [vehicle.terrain] : ['Снег']);
+    
     setFormData({
       name: vehicle.name,
       type: vehicle.type,
-      terrain: vehicle.terrain,
+      terrains: terrains,
       price: vehicle.price.toString(),
       description: vehicle.description,
       engine: vehicle.specs?.engine || '',
@@ -140,7 +156,7 @@ function VehiclesManagement() {
     setFormData({
       name: '',
       type: 'Гусеничный',
-      terrain: 'Снег',
+      terrains: ['Снег'],
       price: '',
       description: '',
       engine: '',
@@ -211,12 +227,24 @@ function VehiclesManagement() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Тип местности</label>
-                  <select name="terrain" value={formData.terrain} onChange={handleInputChange}>
+                  <label>Типы местности (можно выбрать несколько, зажмите Ctrl/Cmd)</label>
+                  <select 
+                    name="terrains" 
+                    multiple
+                    size={Math.min(terrainTypes.length, 6)}
+                    value={formData.terrains || []} 
+                    onChange={handleTerrainsChange}
+                    style={{ minHeight: '120px' }}
+                  >
                     {terrainTypes.map(terrain => (
                       <option key={terrain} value={terrain}>{terrain}</option>
                     ))}
                   </select>
+                  {formData.terrains && formData.terrains.length > 0 && (
+                    <div style={{ marginTop: '8px', fontSize: '0.85em', color: '#666' }}>
+                      Выбрано: {formData.terrains.join(', ')}
+                    </div>
+                  )}
                 </div>
                 <div className="form-group">
                   <label>Цена (₽)</label>
@@ -394,7 +422,14 @@ function VehiclesManagement() {
                     <td>
                       <span className="vehicle-type-badge">{vehicle.type}</span>
                     </td>
-                    <td>{vehicle.terrain}</td>
+                    <td>
+                      {(() => {
+                        const terrains = Array.isArray(vehicle.terrains) && vehicle.terrains.length > 0
+                          ? vehicle.terrains
+                          : (vehicle.terrain ? [vehicle.terrain] : []);
+                        return terrains.length > 0 ? terrains.join(', ') : '-';
+                      })()}
+                    </td>
                     <td>{formatPrice(vehicle.price)} ₽</td>
                     <td>{vehicle.specs?.engine || '-'}</td>
                     <td>{vehicle.specs?.capacity || '-'}</td>

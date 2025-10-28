@@ -95,8 +95,13 @@ export default function SearchModal({ isOpen, onClose }) {
         return false;
       }
 
-      // Фильтр по местности
-      if (selectedTerrain !== 'all' && vehicle.terrain !== selectedTerrain) {
+      // Получаем типы местности один раз для вездехода
+      const vehicleTerrains = Array.isArray(vehicle.terrains) && vehicle.terrains.length > 0
+        ? vehicle.terrains
+        : (vehicle.terrain ? [vehicle.terrain] : []);
+
+      // Фильтр по местности (поддержка множественных типов местности)
+      if (selectedTerrain !== 'all' && !vehicleTerrains.includes(selectedTerrain)) {
         return false;
       }
 
@@ -106,8 +111,8 @@ export default function SearchModal({ isOpen, onClose }) {
       // Поиск по типу
       if (vehicle.type?.toLowerCase().includes(query)) return true;
       
-      // Поиск по местности
-      if (vehicle.terrain?.toLowerCase().includes(query)) return true;
+      // Поиск по местности (поддержка множественных типов местности)
+      if (vehicleTerrains.some(t => t.toLowerCase().includes(query))) return true;
       
       // Поиск по описанию
       if (vehicle.description?.toLowerCase().includes(query)) return true;
@@ -384,7 +389,15 @@ export default function SearchModal({ isOpen, onClose }) {
                               <h4>{item.name}</h4>
                               <div className="result-meta">
                                 <span className="result-category">{item.type}</span>
-                                <span className="result-subcategory"> • {item.terrain}</span>
+                                {(() => {
+                                  // Поддержка множественных типов местности
+                                  const terrains = Array.isArray(item.terrains) && item.terrains.length > 0
+                                    ? item.terrains
+                                    : (item.terrain ? [item.terrain] : []);
+                                  return terrains.length > 0 ? (
+                                    <span className="result-subcategory"> • {terrains.join(', ')}</span>
+                                  ) : null;
+                                })()}
                                 {item.specs?.engine && (
                                   <span className="result-brand"> • {item.specs.engine}</span>
                                 )}
