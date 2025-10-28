@@ -1330,40 +1330,27 @@ app.get('/api/vehicles', async (req, res) => {
     });
     
     const rows = await all(
-      `SELECT v.*, vt.name AS vehicle_type_name
+      `SELECT v.*, vt.name AS vehicle_type_name, tt.name AS terrain_type_name
        FROM vehicles v
        LEFT JOIN vehicle_types vt ON v.type = vt.name
+       LEFT JOIN terrain_types tt ON v.terrain = tt.name
        ORDER BY v.name ASC`
     );
     
-    const result = rows.map(r => {
-      // Парсим terrain: может быть JSON массивом или строкой (для обратной совместимости)
-      let terrain = r.terrain;
-      try {
-        const parsed = JSON.parse(r.terrain);
-        if (Array.isArray(parsed)) {
-          terrain = parsed;
-        }
-      } catch (e) {
-        // Если не JSON, значит это строка (старый формат) - возвращаем как массив с одним элементом
-        terrain = r.terrain ? [r.terrain] : [];
-      }
-      
-      return {
-        id: r.id,
-        name: r.name,
-        type: r.type,
-        terrain: terrain,
-        price: r.price,
-        image: r.image,
-        description: r.description,
-        specs: r.specs_json ? JSON.parse(r.specs_json) : {},
-        available: !!r.available,
-        quantity: r.quantity,
-        createdAt: r.created_at,
-        updatedAt: r.updated_at
-      };
-    });
+    const result = rows.map(r => ({
+      id: r.id,
+      name: r.name,
+      type: r.type,
+      terrain: r.terrain,
+      price: r.price,
+      image: r.image,
+      description: r.description,
+      specs: r.specs_json ? JSON.parse(r.specs_json) : {},
+      available: !!r.available,
+      quantity: r.quantity,
+      createdAt: r.created_at,
+      updatedAt: r.updated_at
+    }));
     
     res.json(result);
   } catch (err) {
@@ -1378,20 +1365,10 @@ app.post('/api/vehicles', async (req, res) => {
     
     const specsJson = specs ? JSON.stringify(specs) : null;
     
-    // Преобразуем terrain в JSON: если это массив - сериализуем, если строка - конвертируем в массив
-    let terrainJson;
-    if (Array.isArray(terrain)) {
-      terrainJson = JSON.stringify(terrain.filter(t => t)); // Фильтруем пустые значения
-    } else if (typeof terrain === 'string' && terrain.trim()) {
-      terrainJson = JSON.stringify([terrain.trim()]);
-    } else {
-      terrainJson = JSON.stringify([]);
-    }
-    
     const r = await run(
       `INSERT INTO vehicles (name, type, terrain, price, image, description, specs_json, available, quantity)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [name, type, terrainJson, price, image, description, specsJson, available ? 1 : 0, quantity]
+      [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity]
     );
     
     res.status(201).json({ id: r.lastID });
@@ -1408,19 +1385,9 @@ app.put('/api/vehicles/:id', async (req, res) => {
     
     const specsJson = specs ? JSON.stringify(specs) : null;
     
-    // Преобразуем terrain в JSON: если это массив - сериализуем, если строка - конвертируем в массив
-    let terrainJson;
-    if (Array.isArray(terrain)) {
-      terrainJson = JSON.stringify(terrain.filter(t => t)); // Фильтруем пустые значения
-    } else if (typeof terrain === 'string' && terrain.trim()) {
-      terrainJson = JSON.stringify([terrain.trim()]);
-    } else {
-      terrainJson = JSON.stringify([]);
-    }
-    
     await run(
       `UPDATE vehicles SET name=$1, type=$2, terrain=$3, price=$4, image=$5, description=$6, specs_json=$7, available=$8, quantity=$9, updated_at = CURRENT_TIMESTAMP WHERE id=$10`,
-      [name, type, terrainJson, price, image, description, specsJson, available ? 1 : 0, quantity, id]
+      [name, type, terrain, price, image, description, specsJson, available ? 1 : 0, quantity, id]
     );
     
     res.json({ ok: true });

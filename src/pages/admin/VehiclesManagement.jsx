@@ -12,7 +12,7 @@ function VehiclesManagement() {
   const [formData, setFormData] = useState({
     name: '',
     type: 'Гусеничный',
-    terrain: [], // Изменено на массив для множественного выбора
+    terrain: 'Снег',
     price: '',
     description: '',
     engine: '',
@@ -28,28 +28,6 @@ function VehiclesManagement() {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
-    // Обработка множественного выбора типов местности
-    if (name === 'terrain') {
-      setFormData(prev => {
-        const currentTerrain = Array.isArray(prev.terrain) ? prev.terrain : [];
-        if (checked) {
-          // Добавляем выбранный тип местности
-          return {
-            ...prev,
-            terrain: [...currentTerrain, value]
-          };
-        } else {
-          // Удаляем тип местности из массива
-          return {
-            ...prev,
-            terrain: currentTerrain.filter(t => t !== value)
-          };
-        }
-      });
-      return;
-    }
-    
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -64,11 +42,6 @@ function VehiclesManagement() {
     // Валидация обязательных полей
     if (!formData.name) {
       alert('Заполните обязательное поле: название вездехода!');
-      return;
-    }
-
-    if (!Array.isArray(formData.terrain) || formData.terrain.length === 0) {
-      alert('Выберите хотя бы один тип местности!');
       return;
     }
 
@@ -140,15 +113,10 @@ function VehiclesManagement() {
     // Для вездеходов создаем массив images из поля image
     const images = vehicle.image ? [{ data: vehicle.image, isMain: true }] : [];
     
-    // Нормализуем terrain: если это массив - используем его, если строка - конвертируем в массив
-    const terrainArray = Array.isArray(vehicle.terrain) 
-      ? vehicle.terrain 
-      : (vehicle.terrain ? [vehicle.terrain] : []);
-    
     setFormData({
       name: vehicle.name,
       type: vehicle.type,
-      terrain: terrainArray,
+      terrain: vehicle.terrain,
       price: vehicle.price.toString(),
       description: vehicle.description,
       engine: vehicle.specs?.engine || '',
@@ -172,7 +140,7 @@ function VehiclesManagement() {
     setFormData({
       name: '',
       type: 'Гусеничный',
-      terrain: [], // Изменено на пустой массив
+      terrain: 'Снег',
       price: '',
       description: '',
       engine: '',
@@ -243,36 +211,12 @@ function VehiclesManagement() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Типы местности (можно выбрать несколько)</label>
-                  <div className="terrain-checkboxes" style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', 
-                    gap: '10px',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    maxHeight: '200px',
-                    overflowY: 'auto'
-                  }}>
+                  <label>Тип местности</label>
+                  <select name="terrain" value={formData.terrain} onChange={handleInputChange}>
                     {terrainTypes.map(terrain => (
-                      <label key={terrain} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          name="terrain"
-                          value={terrain}
-                          checked={Array.isArray(formData.terrain) && formData.terrain.includes(terrain)}
-                          onChange={handleInputChange}
-                          style={{ marginRight: '8px', cursor: 'pointer' }}
-                        />
-                        <span>{terrain}</span>
-                      </label>
+                      <option key={terrain} value={terrain}>{terrain}</option>
                     ))}
-                  </div>
-                  {formData.terrain.length === 0 && (
-                    <small style={{ color: '#ff6b6b', marginTop: '5px', display: 'block' }}>
-                      Выберите хотя бы один тип местности
-                    </small>
-                  )}
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Цена (₽)</label>
@@ -450,11 +394,7 @@ function VehiclesManagement() {
                     <td>
                       <span className="vehicle-type-badge">{vehicle.type}</span>
                     </td>
-                    <td>
-                      {Array.isArray(vehicle.terrain) 
-                        ? vehicle.terrain.join(', ') 
-                        : (vehicle.terrain || '-')}
-                    </td>
+                    <td>{vehicle.terrain}</td>
                     <td>{formatPrice(vehicle.price)} ₽</td>
                     <td>{vehicle.specs?.engine || '-'}</td>
                     <td>{vehicle.specs?.capacity || '-'}</td>

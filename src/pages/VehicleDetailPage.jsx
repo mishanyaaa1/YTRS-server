@@ -209,17 +209,10 @@ function VehicleDetailPage() {
 
             <div className="vehicle-meta">
               <span className="type">{vehicle.type}</span>
-              <div className="terrain-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {(() => {
-                  const terrainArray = Array.isArray(vehicle.terrain) ? vehicle.terrain : (vehicle.terrain ? [vehicle.terrain] : []);
-                  return terrainArray.map((terrain, index) => (
-                    <span key={index} className="terrain">
-                      {getTerrainIcon(terrain)}
-                      {terrain}
-                    </span>
-                  ));
-                })()}
-              </div>
+              <span className="terrain">
+                {getTerrainIcon(vehicle.terrain)}
+                {vehicle.terrain}
+              </span>
               <span className={`availability ${vehicle.available ? 'in-stock' : 'out-of-stock'}`}>
                 {vehicle.available ? <FaCheckCircle /> : <FaTimesCircle />}
                 {vehicle.available ? `В наличии: ${vehicle.quantity || 0} шт` : 'Нет в наличии'}
