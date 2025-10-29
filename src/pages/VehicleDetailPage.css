@@ -394,10 +394,6 @@
     font-size: 2rem;
   }
   
-  .main-image {
-    height: 450px;
-  }
-  
   .vehicle-detail-image {
     object-fit: contain !important;
   }
@@ -427,10 +423,6 @@
   
   .current-price {
     font-size: 1.75rem;
-  }
-  
-  .main-image {
-    height: 400px;
   }
   
   .vehicle-detail-image {
