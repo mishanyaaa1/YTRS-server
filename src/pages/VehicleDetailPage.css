@@ -394,6 +394,16 @@
     font-size: 2rem;
   }
   
+  .image-container {
+    height: auto;
+    min-height: 350px;
+    max-height: 75vh;
+  }
+  
+  .vehicle-detail-image {
+    object-fit: contain !important;
+  }
+  
   .action-buttons {
     flex-direction: column;
   }
@@ -422,7 +432,13 @@
   }
   
   .image-container {
-    height: 250px;
+    height: auto;
+    min-height: 300px;
+    max-height: 70vh;
+  }
+  
+  .vehicle-detail-image {
+    object-fit: contain !important;
   }
   
   .vehicle-placeholder-large {
