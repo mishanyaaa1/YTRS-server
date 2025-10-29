@@ -394,14 +394,6 @@
     font-size: 2rem;
   }
   
-  .image-container {
-    height: 400px;
-  }
-  
-  .vehicle-detail-image {
-    object-fit: contain !important;
-  }
-  
   .action-buttons {
     flex-direction: column;
   }
@@ -430,11 +422,7 @@
   }
   
   .image-container {
-    height: 400px;
-  }
-  
-  .vehicle-detail-image {
-    object-fit: contain !important;
+    height: 250px;
   }
   
   .vehicle-placeholder-large {
