@@ -121,6 +121,7 @@
   border-radius: 20px;
   padding: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  aspect-ratio: 16 / 9;
 }
 
 .image-placeholder {
@@ -165,7 +166,9 @@
 .image-container {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: auto;
+  max-height: 400px;
+  aspect-ratio: inherit;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -710,7 +713,8 @@ input[type="number"].quantity-input,
   }
   
   .image-container {
-    height: 200px;
+    height: auto;
+    max-height: 200px;
     margin-top: -60px;
   }
 }
