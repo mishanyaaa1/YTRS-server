@@ -421,12 +421,8 @@
     font-size: 1.75rem;
   }
   
-  .main-image {
-    height: 400px;
-  }
-  
   .image-container {
-    height: 400px;
+    height: 250px;
   }
   
   .vehicle-placeholder-large {
