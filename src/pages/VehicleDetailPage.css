@@ -411,6 +411,10 @@
     height: 220px;
     margin-top: -30px;
   }
+  
+  .vehicle-badge-large {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
