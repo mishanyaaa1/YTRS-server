@@ -82,14 +82,11 @@
 
 .main-image {
   position: relative;
-  aspect-ratio: 16 / 9;
 }
 
 .image-container {
   position: relative;
-  height: auto;
-  max-height: 300px;
-  aspect-ratio: inherit;
+  height: 300px;
   background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
   border-radius: 16px;
   display: flex;
@@ -372,8 +369,7 @@
   }
   
   .image-container {
-    height: auto;
-    max-height: 300px;
+    height: 300px;
   }
   
   .vehicle-placeholder-large {
@@ -412,8 +408,7 @@
   }
   
   .image-container {
-    height: auto;
-    max-height: 150px;
+    height: 150px;
     margin-top: -50px;
   }
 }
@@ -432,8 +427,7 @@
   }
   
   .image-container {
-    height: auto;
-    max-height: 125px;
+    height: 125px;
     margin-top: -40px;
   }
   
