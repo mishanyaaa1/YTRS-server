@@ -425,6 +425,10 @@
     height: 400px;
   }
   
+  .image-container {
+    height: 400px;
+  }
+  
   .vehicle-placeholder-large {
     font-size: 5rem;
   }
