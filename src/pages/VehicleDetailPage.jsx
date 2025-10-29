@@ -184,7 +184,7 @@ function VehicleDetailPage() {
                         style={{
                           width: '100%',
                           height: '100%',
-                          objectFit: 'contain',
+                          objectFit: 'cover',
                           borderRadius: '14px',
                           cursor: 'pointer'
                         }}
