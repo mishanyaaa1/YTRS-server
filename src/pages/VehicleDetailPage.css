@@ -406,6 +406,11 @@
   .specs-grid {
     grid-template-columns: 1fr;
   }
+  
+  .image-container {
+    height: 150px;
+    margin-top: -50px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -422,7 +427,8 @@
   }
   
   .image-container {
-    height: 250px;
+    height: 125px;
+    margin-top: -40px;
   }
   
   .vehicle-placeholder-large {

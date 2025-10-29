@@ -708,4 +708,9 @@ input[type="number"].quantity-input,
     align-items: flex-start;
     gap: 0.5rem;
   }
+  
+  .image-container {
+    height: 200px;
+    margin-top: -60px;
+  }
 }
