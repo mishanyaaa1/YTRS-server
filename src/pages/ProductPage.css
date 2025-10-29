@@ -693,10 +693,6 @@ input[type="number"].quantity-input,
     height: 400px;
   }
   
-  .image-container {
-    height: 400px;
-  }
-  
   .product-header {
     flex-direction: column;
     align-items: flex-start;
