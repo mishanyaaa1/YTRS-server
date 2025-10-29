@@ -409,6 +409,7 @@
   
   .image-container {
     height: 220px;
+    margin-top: -30px;
   }
 }
 
@@ -427,6 +428,7 @@
   
   .image-container {
     height: 180px;
+    margin-top: -25px;
   }
   
   .vehicle-placeholder-large {

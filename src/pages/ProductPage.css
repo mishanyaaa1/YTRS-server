@@ -711,5 +711,6 @@ input[type="number"].quantity-input,
   
   .image-container {
     height: 280px;
+    margin-top: -40px;
   }
 }
