@@ -72,7 +72,7 @@ export default function ContentManagement() {
       },
       footer: aboutContent.footer || {
         aboutSection: { title: '', description: '' },
-        contactsSection: { title: '', phone: '', email: '', address: '' },
+        contactsSection: { title: '', phone: '', email: '', address: '', addressLink: '' },
         informationSection: { title: '', links: { title: 'Полезные ссылки', items: [] } },
         socialSection: { title: '', links: [] },
         copyright: ''
@@ -920,9 +920,20 @@ export default function ContentManagement() {
               <input
                 type="text"
                 name="address"
-                value={formData.contacts.address}
+                value={formData.contacts.address || ''}
                 onChange={handleContactChange}
                 placeholder="г. Москва, ул. Примерная, д. 123"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Ссылка на адрес (для карты):</label>
+              <input
+                type="text"
+                name="addressLink"
+                value={formData.contacts.addressLink || ''}
+                onChange={handleContactChange}
+                placeholder="https://yandex.ru/maps/..."
               />
             </div>
             
@@ -1273,9 +1284,18 @@ export default function ContentManagement() {
                 <label>Адрес:</label>
                 <input
                   type="text"
-                  value={formData.footer.contactsSection.address}
+                  value={formData.footer.contactsSection.address || ''}
                   onChange={(e) => handleFooterChange('contactsSection', 'address', e.target.value)}
                   placeholder="Челябинск, ул. Примерная, 123, 454000"
+                />
+              </div>
+              <div className="form-group">
+                <label>Ссылка на адрес (для карты):</label>
+                <input
+                  type="text"
+                  value={formData.footer.contactsSection.addressLink || ''}
+                  onChange={(e) => handleFooterChange('contactsSection', 'addressLink', e.target.value)}
+                  placeholder="https://yandex.ru/maps/..."
                 />
               </div>
             </div>

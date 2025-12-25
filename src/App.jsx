@@ -126,6 +126,7 @@ function App() {
         phone: '+7 (800) 123-45-67',
         email: 'info@vezdehod-zapchasti.ru',
         address: '40-летия Победы, 16а, Курчатовский район, Челябинск, 454100',
+        addressLink: 'https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17',
         ...footer.contactsSection
       },
       informationSection: {
@@ -268,10 +269,10 @@ function App() {
                 <FaEnvelope /> {footerData.contactsSection?.email || 'info@vezdehod-zapchasti.ru'}
               </a>
               <a 
-                href="#" 
+                href={footerData.contactsSection?.addressLink || 'https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17'} 
                 onClick={(e) => {
                   e.preventDefault();
-                  window.open('https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17', '_blank');
+                  window.open(footerData.contactsSection?.addressLink || 'https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17', '_blank');
                 }}
                 style={{ cursor: 'pointer' }}
               >

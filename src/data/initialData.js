@@ -722,6 +722,7 @@ export const initialAboutContent = {
     phone: '+7 (800) 123-45-67',
     email: 'info@vezdehod-zapchasti.ru',
     address: '40-летия Победы, 16а, Курчатовский район, Челябинск, 454100',
+    addressLink: 'https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17',
     workingHours: 'Пн-Пт: 9:00-18:00, Сб: 10:00-16:00',
     additionalPhones: [
       '+7 (351) 123-45-67',
@@ -985,7 +986,8 @@ export const initialAboutContent = {
       title: 'Контакты',
       phone: '+7 (800) 123-45-67',
       email: 'info@vezdehod-zapchasti.ru',
-      address: '40-летия Победы, 16а, Курчатовский район, Челябинск, 454100'
+      address: '40-летия Победы, 16а, Курчатовский район, Челябинск, 454100',
+      addressLink: 'https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17'
     },
     informationSection: {
       title: 'Информация',

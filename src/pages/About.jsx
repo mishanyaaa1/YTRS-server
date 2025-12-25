@@ -101,7 +101,7 @@ export default function About() {
       icon: <FaMapMarkerAlt />,
       title: "Адрес",
       info: contactsData.address || "40-летия Победы, 16а, Курчатовский район, Челябинск, 454100",
-      link: "#"
+      link: contactsData.addressLink || "https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17"
     },
     {
       icon: <FaPhone />,
@@ -538,13 +538,11 @@ export default function About() {
                 viewport={{ once: true }}
                 whileHover={{ y: -5 }}
                 onClick={() => {
-                  if (contact.title === "Адрес") {
-                    window.open('https://yandex.ru/maps/org/yutors/164193756613/?indoorLevel=1&ll=61.295870%2C55.187646&z=17', '_blank');
-                  } else if (contact.link) {
+                  if (contact.link) {
                     window.open(contact.link, '_blank');
                   }
                 }}
-                style={{ cursor: contact.link || contact.title === "Адрес" ? 'pointer' : 'default' }}
+                style={{ cursor: contact.link ? 'pointer' : 'default' }}
               >
                 <div className="contact-icon">
                   {contact.icon}
