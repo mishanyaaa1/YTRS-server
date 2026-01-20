@@ -279,33 +279,52 @@ function ProductPage() {
         <div className="product-content">
           <div className="product-images">
             <div className="main-image">
-              <motion.div 
-                className="image-container"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-                onClick={handleImageClick}
-                style={{ cursor: 'pointer' }}
-              >
-                {allImages && allImages.length > 0 && allImages[safeSelectedIndex] ? (
-                  allImages[safeSelectedIndex].data && (
-                    allImages[safeSelectedIndex].data.startsWith('data:image') ||
-                    isImageUrl(allImages[safeSelectedIndex].data)
-                  ) ? (
-                    <img
-                      src={allImages[safeSelectedIndex].data}
-                      alt={product.title}
-                      className="product-main-image"
-                    />
-                  ) : (
-                    <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <BrandMark alt={product.title} style={{ height: 200 }} />
-                    </span>
-                  )
-                ) : (
-                  <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <BrandMark alt={product.title} style={{ height: 200 }} />
-                  </span>
-                )}
+              {(() => {
+                const mainImage = allImages && allImages.length > 0 && allImages[safeSelectedIndex] 
+                  ? allImages[safeSelectedIndex].data 
+                  : null;
+                
+                // Проверяем, есть ли валидное изображение
+                const hasValidImage = mainImage && 
+                    typeof mainImage === 'string' && 
+                    (mainImage.startsWith('data:image') || isImageUrl(mainImage));
+                
+                // Проверяем, что это НЕ изображение "фотография отсутствует"
+                let isValid = hasValidImage;
+                if (hasValidImage) {
+                  const imageData = mainImage.toLowerCase();
+                  if (imageData.includes('фотография отсутствует') || 
+                      imageData.includes('фото отсутствует') || 
+                      imageData.includes('нет фото') ||
+                      imageData.includes('no-image') ||
+                      imageData.includes('placeholder') ||
+                      imageData.includes('отсутствует')) {
+                    isValid = false;
+                  }
+                }
+                
+                return (
+                  <motion.div 
+                    className={`image-container ${!isValid ? 'has-placeholder' : ''}`}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                    onClick={handleImageClick}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {isValid ? (
+                      <img
+                        src={mainImage}
+                        alt={product.title}
+                        className="product-main-image"
+                      />
+                    ) : (
+                      <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                        <BrandMark alt={product.title} style={{ height: 200, width: 'auto' }} />
+                      </span>
+                    )}
+                  </motion.div>
+                );
+              })()}
               </motion.div>
               
               {allImages && allImages.length > 1 && (
