@@ -248,14 +248,37 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  padding: 15px;
+  padding: 12px 15px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: auto;
+  max-height: none;
 }
 
 .product-item .product-icon {
   font-size: 20px;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  max-width: 40px !important;
+  max-height: 40px !important;
+  flex-shrink: 0;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden;
+}
+
+.product-item .product-icon svg,
+.product-item .product-icon picture,
+.product-item .product-icon img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
 }
 
 /* Стили применяются ТОЛЬКО внутри админских компонентов */

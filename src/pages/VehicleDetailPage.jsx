@@ -216,7 +216,7 @@ function VehicleDetailPage() {
                   />
                 ) : (
                   <div className="vehicle-placeholder-large">
-                    <BrandMark alt={vehicle.name} style={{ height: 300, width: 'auto', maxWidth: '70%', display: 'block' }} />
+                    <BrandMark alt={vehicle.name} style={{ height: 200, width: 'auto', maxWidth: '70%', display: 'block' }} />
                   </div>
                 )}
               </motion.div>
