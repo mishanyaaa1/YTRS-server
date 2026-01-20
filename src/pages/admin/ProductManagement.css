@@ -217,14 +217,15 @@
 
 .product-management .product-icon picture,
 .product-management .product-icon img {
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
   object-fit: contain !important;
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
+  margin: auto !important;
 }
 
 .product-management .product-icon picture {
@@ -341,7 +342,7 @@
 }
 
 /* КРИТИЧЕСКИ ВАЖНО: Стили для отображения логотипов - должны быть в конце файла */
-/* Эти стили должны перекрыть все остальные и гарантировать отображение логотипов */
+/* Эти стили должны перекрыть все остальные и гарантировать отображение логотипов размером 24x24px */
 .product-management .products-table .product-icon picture,
 .product-management .products-table .product-icon picture img,
 .product-management .product-title .product-icon picture,
@@ -351,13 +352,14 @@
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
   object-fit: contain !important;
   position: relative !important;
   z-index: 10 !important;
+  margin: auto !important;
 }
 
 .product-management .products-table .product-icon picture,
@@ -368,6 +370,7 @@
   justify-content: center !important;
   width: 100% !important;
   height: 100% !important;
+  margin: auto !important;
 }
 
 /* Убеждаемся, что все дочерние элементы видны */
@@ -439,11 +442,12 @@
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
   object-fit: contain !important;
+  margin: auto !important;
 }
 
 .product-management .product-icon > picture {
@@ -452,6 +456,7 @@
   justify-content: center !important;
   width: 100% !important;
   height: 100% !important;
+  margin: auto !important;
 }
 
 /* КРИТИЧЕСКИ ВАЖНО: Финальные стили для гарантии отображения логотипов */
@@ -463,13 +468,14 @@
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
   object-fit: contain !important;
   position: static !important;
   z-index: auto !important;
+  margin: auto !important;
 }
 
 .product-management .products-table tbody tr td div.product-title span.product-icon picture,
@@ -479,4 +485,5 @@
   justify-content: center !important;
   width: 100% !important;
   height: 100% !important;
+  margin: auto !important;
 }
