@@ -139,26 +139,6 @@
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Список товаров */
-.products-list h2 {
-  font-size: 1.5rem;
-  color: #ffffff;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.no-products {
-  text-align: center;
-  padding: 40px 20px;
-  color: #cccccc;
-}
-
-.no-products p {
-  font-size: 1.1rem;
-  margin: 0;
-}
-
 .products-table {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
@@ -291,13 +271,13 @@
 }
 
 .status-available {
-  color: #10b981;
-  font-weight: 600;
+  color: #28e07a;
+  font-weight: 500;
 }
 
 .status-unavailable {
-  color: #ef4444;
-  font-weight: 600;
+  color: #ff6b7d;
+  font-weight: 500;
 }
 
 .product-edit-form {
@@ -330,10 +310,6 @@
 }
 
 @media (max-width: 768px) {
-  .product-management {
-    padding: 1rem;
-  }
-  
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -344,41 +320,11 @@
     align-items: stretch;
   }
   
-  .products-list h2 {
-    font-size: 1.2rem;
-  }
-  
   .products-table {
     overflow-x: auto;
   }
   
-  .products-table table {
-    min-width: 600px;
-  }
-  
-  .products-table th,
-  .products-table td {
-    padding: 10px 8px;
-    font-size: 14px;
-  }
-  
-  .product-title {
-    gap: 8px;
-  }
-  
-  .product-image,
-  .product-icon {
-    width: 30px;
-    height: 30px;
-  }
-  
   .action-buttons {
-    gap: 4px;
-  }
-  
-  .btn-edit,
-  .btn-delete {
-    padding: 4px 8px;
-    font-size: 11px;
+    flex-direction: column;
   }
 }
