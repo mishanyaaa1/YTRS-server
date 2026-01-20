@@ -20,15 +20,26 @@
 
 .product-management .products-table .product-image img,
 .product-management .products-table .product-icon img,
+.product-management .products-table .product-icon picture,
+.product-management .products-table .product-icon picture img,
 .advanced-admin-dashboard .product-list .product-image img,
 .advanced-admin-dashboard .product-list .product-icon img,
+.advanced-admin-dashboard .product-list .product-icon picture,
+.advanced-admin-dashboard .product-list .product-icon picture img,
 .popular-products-management .products-list .product-image img,
 .popular-products-management .products-list .product-icon img,
+.popular-products-management .products-list .product-icon picture,
+.popular-products-management .products-list .product-icon picture img,
 .admin-dashboard .product-list .product-image img,
-.admin-dashboard .product-list .product-icon img {
+.admin-dashboard .product-list .product-icon img,
+.admin-dashboard .product-list .product-icon picture,
+.admin-dashboard .product-list .product-icon picture img {
   max-width: 100% !important;
   max-height: 100% !important;
-  object-fit: cover !important;
+  object-fit: contain !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Принудительно белый цвет для всех label */

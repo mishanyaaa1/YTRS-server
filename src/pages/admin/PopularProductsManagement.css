@@ -122,6 +122,8 @@
   max-height: 100% !important;
   object-fit: contain !important;
   display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .popular-products-management .product-image .product-icon picture {
@@ -130,6 +132,11 @@
   justify-content: center !important;
   width: 100% !important;
   height: 100% !important;
+}
+
+.popular-products-management .product-image .product-icon > * {
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .product-info h4 { margin: 0 0 0.25rem 0; color: #ffffff; }
