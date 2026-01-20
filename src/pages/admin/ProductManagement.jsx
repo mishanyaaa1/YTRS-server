@@ -386,7 +386,7 @@ export default function ProductManagement() {
                             imageData.includes('отсутствует')) {
                           return (
                             <span className="product-icon">
-                              <BrandMark alt={product.title} style={{ height: '24px', maxHeight: '24px', maxWidth: '24px', width: 'auto', display: 'block' }} />
+                              <BrandMark alt={product.title} style={{ height: '24px', maxHeight: '24px', maxWidth: '24px', width: 'auto' }} />
                             </span>
                           );
                         }
@@ -395,7 +395,7 @@ export default function ProductManagement() {
                       }
                       return (
                         <span className="product-icon">
-                          <BrandMark alt={product.title} style={{ height: '24px', maxHeight: '24px', maxWidth: '24px', width: 'auto', display: 'block' }} />
+                          <BrandMark alt={product.title} style={{ height: '24px', maxHeight: '24px', maxWidth: '24px', width: 'auto' }} />
                         </span>
                       );
                       })()}
