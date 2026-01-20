@@ -425,8 +425,8 @@ function VehiclesManagement() {
                             return <img src={vehicle.image} alt={vehicle.name} className="vehicle-image" />;
                           }
                           return (
-                            <span className="vehicle-icon">
-                              <BrandMark alt={vehicle.name} />
+                            <span className="vehicle-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <BrandMark alt={vehicle.name} style={{ height: 24 }} />
                             </span>
                           );
                         })()}
