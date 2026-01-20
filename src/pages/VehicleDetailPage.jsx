@@ -145,12 +145,36 @@ function VehicleDetailPage() {
   };
 
   // Проверка наличия валидного изображения
-  const hasValidImage = vehicle.image && 
-    typeof vehicle.image === 'string' && 
-    (vehicle.image.startsWith('data:image') || 
-     vehicle.image.startsWith('http') || 
-     vehicle.image.startsWith('/img/vehicles/') ||
-     vehicle.image.startsWith('/uploads/'));
+  const hasValidImage = (() => {
+    if (!vehicle.image || typeof vehicle.image !== 'string' || vehicle.image.trim() === '') {
+      console.log('🚫 Нет изображения для вездехода:', vehicle.name);
+      return false;
+    }
+    
+    // Проверяем, что это не строка-заглушка
+    const imageData = vehicle.image.toLowerCase();
+    if (imageData.includes('фотография отсутствует') || 
+        imageData.includes('фото отсутствует') || 
+        imageData.includes('нет фото') ||
+        imageData.includes('no-image') ||
+        imageData.includes('placeholder') ||
+        imageData.includes('отсутствует')) {
+      console.log('🚫 Изображение-заглушка для вездехода:', vehicle.name);
+      return false;
+    }
+    
+    // Проверяем валидные форматы
+    const isValid = vehicle.image.startsWith('data:image') || 
+                    vehicle.image.startsWith('http') || 
+                    vehicle.image.startsWith('/img/vehicles/') ||
+                    vehicle.image.startsWith('/uploads/');
+    
+    if (!isValid) {
+      console.log('🚫 Невалидный формат изображения для вездехода:', vehicle.name, vehicle.image);
+    }
+    
+    return isValid;
+  })();
 
   return (
     <motion.div 
@@ -192,7 +216,7 @@ function VehicleDetailPage() {
                   />
                 ) : (
                   <div className="vehicle-placeholder-large">
-                    <BrandMark alt={vehicle.name} style={{ height: 250, width: 'auto', maxWidth: '80%' }} />
+                    <BrandMark alt={vehicle.name} style={{ height: 300, width: 'auto', maxWidth: '70%', display: 'block' }} />
                   </div>
                 )}
                 <div className="vehicle-badge-large">{vehicle.type}</div>

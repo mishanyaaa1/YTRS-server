@@ -87,6 +87,10 @@
   height: auto;
 }
 
+.main-image .image-container.has-placeholder {
+  width: 100% !important;
+}
+
 .image-container {
   position: relative;
   width: fit-content;
@@ -104,9 +108,13 @@
 
 /* Фиксированный размер контейнера когда внутри placeholder */
 .image-container.has-placeholder {
-  width: 100%;
-  height: 400px;
-  min-height: 400px;
+  width: 100% !important;
+  height: 400px !important;
+  min-height: 400px !important;
+  max-width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .vehicle-detail-image {
@@ -119,12 +127,22 @@
 }
 
 .vehicle-placeholder-large {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
   padding: 2rem;
+}
+
+.vehicle-placeholder-large picture,
+.vehicle-placeholder-large img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 80% !important;
+  max-height: 80% !important;
+  object-fit: contain !important;
 }
 
 .vehicle-badge-large {
