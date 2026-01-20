@@ -119,13 +119,14 @@
 }
 
 .main-image {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  background: transparent;
   border-radius: 20px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: auto;
+  border: none;
+  width: fit-content;
   max-width: 100%;
-  display: inline-block;
+  display: block;
+  height: auto;
 }
 
 .image-placeholder {
@@ -169,10 +170,12 @@
 /* Новые стили для галереи */
 .image-container {
   position: relative;
-  width: auto;
-  height: auto;
+  width: fit-content !important;
+  height: fit-content !important;
   max-width: 100%;
-  display: inline-block;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: block !important;
   overflow: visible;
   border-radius: 15px;
   cursor: pointer;
@@ -192,11 +195,15 @@
   border-radius: 15px;
   object-fit: contain !important;
   object-position: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .image-navigation {
   position: absolute;
   top: 50%;
+  left: 0;
+  right: 0;
   transform: translateY(-50%);
   width: 100%;
   display: flex;
@@ -726,9 +733,15 @@ input[type="number"].quantity-input,
   }
   
   .image-container {
-    width: 100%;
-    height: auto;
+    width: 100% !important;
+    height: auto !important;
     margin-top: 0;
+    min-height: 0 !important;
+  }
+  
+  .main-image {
+    width: 100% !important;
+    height: auto !important;
   }
   
   .product-main-image {
