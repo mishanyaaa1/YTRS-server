@@ -3,6 +3,29 @@
 
 /* Общие стили для всех админских компонентов */
 
+/* Общие стили для изображений товаров в админке - предотвращение огромных размеров */
+/* Ограничиваем максимальный размер для всех изображений товаров в таблицах и списках */
+.products-table .product-image,
+.products-table .product-icon,
+.product-list .product-image,
+.product-list .product-icon,
+.products-list .product-image,
+.products-list .product-icon {
+  max-width: 60px !important;
+  max-height: 60px !important;
+}
+
+.products-table .product-image img,
+.products-table .product-icon img,
+.product-list .product-image img,
+.product-list .product-icon img,
+.products-list .product-image img,
+.products-list .product-icon img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+}
+
 /* Принудительно белый цвет для всех label */
 .admin-dashboard label,
 .promocode-management label,

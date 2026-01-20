@@ -70,7 +70,7 @@ export default function PopularProductsManagement() {
                     {(() => {
                       const d = getMainImage(product)?.data;
                       if (d && typeof d === 'string' && (d.startsWith('data:image') || d.startsWith('/uploads/') || d.startsWith('http'))) {
-                        return <img src={d} alt={product.title} />;
+                        return <img src={d} alt={product.title} className="product-image-inner" />;
                       }
                       return (
                         <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -129,7 +129,7 @@ export default function PopularProductsManagement() {
                     {(() => {
                       const d = getMainImage(product)?.data;
                       if (d && typeof d === 'string' && (d.startsWith('data:image') || d.startsWith('/uploads/') || d.startsWith('http'))) {
-                        return <img src={d} alt={product.title} />;
+                        return <img src={d} alt={product.title} className="product-image-inner" />;
                       }
                       return (
                         <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
