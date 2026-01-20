@@ -182,9 +182,10 @@ function VehicleDetailPage() {
                         className="vehicle-detail-image"
                         onClick={handleImageClick}
                         style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
+                          maxWidth: '100%',
+                          width: 'auto',
+                          height: 'auto',
+                          objectFit: 'contain',
                           borderRadius: '14px',
                           cursor: 'pointer'
                         }}
