@@ -338,23 +338,31 @@ export default function ProductManagement() {
         </div>
       )}
 
-      <div className="products-table">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Название</th>
-              <th>Цена</th>
-              <th>Количество</th>
-              <th>Категория</th>
-              <th>Подкатегория</th>
-              <th>Производитель</th>
-              <th>Наличие</th>
-              <th>Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map(product => (
+      <div className="products-list">
+        <h2>Список товаров ({products.length})</h2>
+        
+        {products.length === 0 ? (
+          <div className="no-products">
+            <p>Товары не найдены. Добавьте первый товар!</p>
+          </div>
+        ) : (
+          <div className="products-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Название</th>
+                  <th>Цена</th>
+                  <th>Количество</th>
+                  <th>Категория</th>
+                  <th>Подкатегория</th>
+                  <th>Производитель</th>
+                  <th>Наличие</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(product => (
               <React.Fragment key={product.id}>
                 <tr>
                   <td>{product.id}</td>
@@ -607,9 +615,11 @@ export default function ProductManagement() {
                   </tr>
                 )}
               </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
