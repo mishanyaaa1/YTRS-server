@@ -384,3 +384,27 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Финальные стили для гарантии отображения логотипов */
+.advanced-admin-dashboard .product-list .product-item .product-icon picture,
+.advanced-admin-dashboard .product-list .product-item .product-icon picture img,
+.admin-dashboard .product-list .product-item .product-icon picture,
+.admin-dashboard .product-list .product-item .product-icon picture img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+.advanced-admin-dashboard .product-list .product-item .product-icon picture,
+.admin-dashboard .product-list .product-item .product-icon picture {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}

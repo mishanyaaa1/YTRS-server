@@ -364,32 +364,41 @@ export default function ProductManagement() {
                         const migratedProduct = migrateProductImages(product);
                         const mainImage = getMainImage(migratedProduct);
                         
-                        if (mainImage?.data && 
+                        // Проверяем наличие валидного изображения
+                        const hasValidImage = mainImage?.data && 
                           typeof mainImage.data === 'string' && 
-                          (mainImage.data.startsWith('data:image') || mainImage.data.startsWith('/uploads/') || mainImage.data.startsWith('/img/vehicles/') || mainImage.data.startsWith('http'))) {
+                          (mainImage.data.startsWith('data:image') || 
+                           mainImage.data.startsWith('/uploads/') || 
+                           mainImage.data.startsWith('/img/vehicles/') || 
+                           mainImage.data.startsWith('http'));
                         
-                        // Проверяем, что это НЕ изображение "фотография отсутствует"
-                        const imageData = mainImage.data.toLowerCase();
-                        if (imageData.includes('фотография отсутствует') || 
-                            imageData.includes('фото отсутствует') || 
-                            imageData.includes('нет фото') ||
-                            imageData.includes('no-image') ||
-                            imageData.includes('placeholder') ||
-                            imageData.includes('отсутствует')) {
-                          return (
-                            <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <BrandMark alt={product.title} style={{ height: 24 }} />
-                            </span>
-                          );
+                        if (hasValidImage) {
+                          // Проверяем, что это НЕ изображение "фотография отсутствует"
+                          const imageData = mainImage.data.toLowerCase();
+                          const isPlaceholder = imageData.includes('фотография отсутствует') || 
+                                              imageData.includes('фото отсутствует') || 
+                                              imageData.includes('нет фото') ||
+                                              imageData.includes('no-image') ||
+                                              imageData.includes('placeholder') ||
+                                              imageData.includes('отсутствует');
+                          
+                          if (isPlaceholder) {
+                            return (
+                              <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <BrandMark alt={product.title} style={{ height: 24 }} />
+                              </span>
+                            );
+                          }
+                          
+                          return <img src={mainImage.data} alt={product.title} className="product-image" />;
                         }
                         
-                        return <img src={mainImage.data} alt={product.title} className="product-image" />;
-                      }
-                      return (
-                        <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <BrandMark alt={product.title} style={{ height: 24 }} />
-                        </span>
-                      );
+                        // Если нет изображения - показываем логотип
+                        return (
+                          <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <BrandMark alt={product.title} style={{ height: 24 }} />
+                          </span>
+                        );
                       })()}
                       {product.title}
                     </div>

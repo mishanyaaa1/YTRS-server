@@ -174,3 +174,24 @@
 .info-panel li { margin-bottom: 0.35rem; }
 
 @media (max-width: 1024px) { .management-content { grid-template-columns: 1fr; } }
+
+/* Финальные стили для гарантии отображения логотипов */
+.popular-products-management .products-list .product-item .product-image .product-icon picture,
+.popular-products-management .products-list .product-item .product-image .product-icon picture img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+.popular-products-management .products-list .product-item .product-image .product-icon picture {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}

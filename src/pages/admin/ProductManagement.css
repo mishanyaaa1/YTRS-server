@@ -208,21 +208,31 @@
   background: rgba(255, 255, 255, 0.05);
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  position: relative;
 }
 
 .product-management .product-icon picture,
 .product-management .product-icon img {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.product-management .product-icon picture {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 
@@ -330,6 +340,45 @@
   background: #ffffff !important;
 }
 
+/* КРИТИЧЕСКИ ВАЖНО: Стили для отображения логотипов - должны быть в конце файла */
+/* Эти стили должны перекрыть все остальные и гарантировать отображение логотипов */
+.product-management .products-table .product-icon picture,
+.product-management .products-table .product-icon picture img,
+.product-management .product-title .product-icon picture,
+.product-management .product-title .product-icon picture img,
+.product-management .product-icon picture,
+.product-management .product-icon picture img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.product-management .products-table .product-icon picture,
+.product-management .product-title .product-icon picture,
+.product-management .product-icon picture {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Убеждаемся, что все дочерние элементы видны */
+.product-management .product-icon > *,
+.product-management .products-table .product-icon > *,
+.product-management .product-title .product-icon > * {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
@@ -348,4 +397,86 @@
   .action-buttons {
     flex-direction: column;
   }
+}
+
+/* ФИНАЛЬНЫЕ СТИЛИ ДЛЯ ЛОГОТИПОВ - должны быть в самом конце файла */
+/* Эти стили гарантируют отображение логотипов в заглушках товаров */
+.product-management .products-table tbody tr td .product-title .product-icon,
+.product-management .products-table .product-icon {
+  position: relative;
+}
+
+.product-management .products-table tbody tr td .product-title .product-icon picture,
+.product-management .products-table tbody tr td .product-title .product-icon picture img,
+.product-management .products-table .product-icon picture,
+.product-management .products-table .product-icon picture img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.product-management .products-table tbody tr td .product-title .product-icon picture,
+.product-management .products-table .product-icon picture {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Дополнительные стили для гарантии отображения */
+.product-management .product-icon picture,
+.product-management .product-icon picture img,
+.product-management .product-icon > picture,
+.product-management .product-icon > picture > img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+.product-management .product-icon > picture {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* КРИТИЧЕСКИ ВАЖНО: Финальные стили для гарантии отображения логотипов */
+/* Эти стили должны быть в самом конце файла с максимальной специфичностью */
+.product-management .products-table tbody tr td div.product-title span.product-icon picture,
+.product-management .products-table tbody tr td div.product-title span.product-icon picture img,
+.product-management .products-table tbody tr td div.product-title span.product-icon > picture,
+.product-management .products-table tbody tr td div.product-title span.product-icon > picture > img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  position: static !important;
+  z-index: auto !important;
+}
+
+.product-management .products-table tbody tr td div.product-title span.product-icon picture,
+.product-management .products-table tbody tr td div.product-title span.product-icon > picture {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
 }
