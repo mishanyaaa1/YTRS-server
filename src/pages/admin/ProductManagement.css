@@ -4,33 +4,6 @@
 /* Импорт общих стилей для иконок в админке */
 @import './AdminCommon.css';
 
-/* КРИТИЧЕСКИ ВАЖНО: Стили для отображения логотипов в заглушках товаров */
-/* Эти стили должны перекрывать все остальные стили */
-.product-management .products-table td .product-title .product-icon picture,
-.product-management .products-table td .product-title .product-icon picture img {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  height: 100% !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 999 !important;
-}
-
-.product-management .products-table td .product-title .product-icon picture img {
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: contain !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 999 !important;
-}
 
 /* Стили для управления продуктами */
 .product-management {
@@ -244,72 +217,14 @@
 }
 
 .product-management .product-icon picture,
-.product-management .product-icon img,
-.product-management .product-icon svg,
-.product-management .products-table .product-icon picture,
-.product-management .products-table .product-icon img,
-.product-management .products-table .product-icon svg,
-.product-management .products-table td .product-icon picture,
-.product-management .products-table td .product-icon img,
-.product-management .products-table td .product-icon svg {
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: contain !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  flex-shrink: 0 !important;
+.product-management .product-icon img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
-/* Стили для BrandMark компонента внутри product-icon */
-.product-management .product-icon > *,
-.product-management .products-table .product-icon > *,
-.product-management .products-table td .product-icon > * {
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-/* Принудительное отображение picture внутри product-icon */
-.product-management .product-icon picture,
-.product-management .products-table .product-icon picture,
-.product-management .products-table td .product-icon picture {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  height: 100% !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 1 !important;
-  flex-shrink: 0 !important;
-}
-
-/* Принудительное отображение img внутри picture */
-.product-management .product-icon picture img,
-.product-management .products-table .product-icon picture img,
-.product-management .products-table td .product-icon picture img {
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: contain !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 1 !important;
-  flex-shrink: 0 !important;
-}
 
 
 .action-buttons {
