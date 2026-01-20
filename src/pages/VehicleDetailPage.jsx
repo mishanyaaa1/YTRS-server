@@ -194,7 +194,7 @@ function VehicleDetailPage() {
                   }
                   return (
                     <div className="vehicle-placeholder-large">
-                      <FaTruck />
+                      <BrandMark alt={vehicle.name} style={{ height: 200, width: 'auto' }} />
                     </div>
                   );
                 })()}
