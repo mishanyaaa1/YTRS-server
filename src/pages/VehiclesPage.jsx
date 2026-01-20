@@ -296,8 +296,8 @@ function VehiclesPage() {
                             imageData.includes('отсутствует')) {
                           console.log('🚫 Пропускаем изображение "фотография отсутствует" для вездехода:', vehicle.name);
                           return (
-                            <span className="catalog-card-icon">
-                              <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64, width: 'auto' }} />
+                            <span className="catalog-card-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64 }} />
                             </span>
                           );
                         }
@@ -317,9 +317,9 @@ function VehiclesPage() {
                             />
                             <span 
                               className="catalog-card-icon brand-mark-fallback" 
-                              style={{ display: 'none' }}
+                              style={{ display: 'none', alignItems: 'center', justifyContent: 'center' }}
                             >
-                              <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64, width: 'auto' }} />
+                              <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64 }} />
                             </span>
                           </>
                         );
@@ -327,8 +327,8 @@ function VehiclesPage() {
                       
                       // Если нет изображения, показываем логотип компании
                       return (
-                        <span className="catalog-card-icon">
-                          <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64, width: 'auto' }} />
+                        <span className="catalog-card-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64 }} />
                         </span>
                       );
                     })()}
