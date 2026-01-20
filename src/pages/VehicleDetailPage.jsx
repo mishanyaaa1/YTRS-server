@@ -144,6 +144,14 @@ function VehicleDetailPage() {
     return new Intl.NumberFormat('ru-RU').format(price);
   };
 
+  // Проверка наличия валидного изображения
+  const hasValidImage = vehicle.image && 
+    typeof vehicle.image === 'string' && 
+    (vehicle.image.startsWith('data:image') || 
+     vehicle.image.startsWith('http') || 
+     vehicle.image.startsWith('/img/vehicles/') ||
+     vehicle.image.startsWith('/uploads/'));
+
   return (
     <motion.div 
       className="vehicle-detail-page"
@@ -163,41 +171,30 @@ function VehicleDetailPage() {
           <div className="vehicle-images">
             <div className="main-image">
               <motion.div 
-                className="image-container"
+                className={`image-container ${!hasValidImage ? 'has-placeholder' : ''}`}
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
               >
-                {(() => {
-                  // Для вездеходов используем поле image напрямую
-                  if (vehicle.image && 
-                      typeof vehicle.image === 'string' && 
-                      (vehicle.image.startsWith('data:image') || 
-                       vehicle.image.startsWith('http') || 
-                       vehicle.image.startsWith('/img/vehicles/') ||
-                       vehicle.image.startsWith('/uploads/'))) {
-                    return (
-                      <img 
-                        src={vehicle.image} 
-                        alt={vehicle.name} 
-                        className="vehicle-detail-image"
-                        onClick={handleImageClick}
-                        style={{
-                          maxWidth: '100%',
-                          width: 'auto',
-                          height: 'auto',
-                          objectFit: 'contain',
-                          borderRadius: '14px',
-                          cursor: 'pointer'
-                        }}
-                      />
-                    );
-                  }
-                  return (
-                    <div className="vehicle-placeholder-large">
-                      <BrandMark alt={vehicle.name} style={{ height: 200, width: 'auto' }} />
-                    </div>
-                  );
-                })()}
+                {hasValidImage ? (
+                  <img 
+                    src={vehicle.image} 
+                    alt={vehicle.name} 
+                    className="vehicle-detail-image"
+                    onClick={handleImageClick}
+                    style={{
+                      maxWidth: '100%',
+                      width: 'auto',
+                      height: 'auto',
+                      objectFit: 'contain',
+                      borderRadius: '14px',
+                      cursor: 'pointer'
+                    }}
+                  />
+                ) : (
+                  <div className="vehicle-placeholder-large">
+                    <BrandMark alt={vehicle.name} style={{ height: 250, width: 'auto', maxWidth: '80%' }} />
+                  </div>
+                )}
                 <div className="vehicle-badge-large">{vehicle.type}</div>
               </motion.div>
             </div>
