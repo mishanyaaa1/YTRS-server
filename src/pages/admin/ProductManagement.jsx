@@ -364,50 +364,32 @@ export default function ProductManagement() {
                         const migratedProduct = migrateProductImages(product);
                         const mainImage = getMainImage(migratedProduct);
                         
-                        // Если есть изображение и это валидный URL/Base64
                         if (mainImage?.data && 
                           typeof mainImage.data === 'string' && 
-                          (mainImage.data.startsWith('data:image') || 
-                           mainImage.data.startsWith('/uploads/') || 
-                           mainImage.data.startsWith('/img/vehicles/') || 
-                           mainImage.data.startsWith('http'))) {
-                          
-                          // Проверяем, что это НЕ плейсхолдер
-                          const imageData = mainImage.data.toLowerCase();
-                          
-                          // Проверка на текстовые маркеры плейсхолдеров
-                          const hasPlaceholderText = imageData.includes('фотография отсутствует') || 
-                                                     imageData.includes('фото отсутствует') || 
-                                                     imageData.includes('нет фото') ||
-                                                     imageData.includes('no-image') ||
-                                                     imageData.includes('placeholder') ||
-                                                     imageData.includes('отсутствует');
-                          
-                          // Проверка на большие Base64 изображения (вероятно, это логотипы/плейсхолдеры)
-                          // Base64 изображения больше 50KB обычно являются большими логотипами, а не фотографиями товаров
-                          const isLargeBase64 = mainImage.data.startsWith('data:image') && mainImage.data.length > 50000;
-                          
-                          // Проверка на наличие "юторс" в больших Base64 строках
-                          const isLargeBrandLogo = imageData.includes('юторс') && mainImage.data.length > 10000;
-                          
-                          if (hasPlaceholderText || isLargeBase64 || isLargeBrandLogo) {
-                            return (
-                              <span className="product-icon">
-                                <BrandMark alt={product.title} style={{ height: 24 }} />
-                              </span>
-                            );
-                          }
-                          
-                          // Показываем изображение с ограничением размера
-                          return <img src={mainImage.data} alt={product.title} className="product-image" />;
+                          (mainImage.data.startsWith('data:image') || mainImage.data.startsWith('/uploads/') || mainImage.data.startsWith('/img/vehicles/') || mainImage.data.startsWith('http'))) {
+                        
+                        // Проверяем, что это НЕ изображение "фотография отсутствует"
+                        const imageData = mainImage.data.toLowerCase();
+                        if (imageData.includes('фотография отсутствует') || 
+                            imageData.includes('фото отсутствует') || 
+                            imageData.includes('нет фото') ||
+                            imageData.includes('no-image') ||
+                            imageData.includes('placeholder') ||
+                            imageData.includes('отсутствует')) {
+                          return (
+                            <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <BrandMark alt={product.title} style={{ height: 24 }} />
+                            </span>
+                          );
                         }
                         
-                        // Если изображения нет, показываем иконку
-                        return (
-                          <span className="product-icon">
-                            <BrandMark alt={product.title} style={{ height: 24 }} />
-                          </span>
-                        );
+                        return <img src={mainImage.data} alt={product.title} className="product-image" />;
+                      }
+                      return (
+                        <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <BrandMark alt={product.title} style={{ height: 24 }} />
+                        </span>
+                      );
                       })()}
                       {product.title}
                     </div>
