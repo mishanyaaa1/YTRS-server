@@ -377,8 +377,8 @@ export default function ProductManagement() {
                             imageData.includes('placeholder') ||
                             imageData.includes('отсутствует')) {
                           return (
-                            <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <BrandMark alt={product.title} style={{ height: 24 }} />
+                            <span className="product-icon">
+                              <BrandMark alt={product.title} />
                             </span>
                           );
                         }
@@ -386,8 +386,8 @@ export default function ProductManagement() {
                         return <img src={mainImage.data} alt={product.title} className="product-image" />;
                       }
                       return (
-                        <span className="product-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <BrandMark alt={product.title} style={{ height: 24 }} />
+                        <span className="product-icon">
+                          <BrandMark alt={product.title} />
                         </span>
                       );
                       })()}

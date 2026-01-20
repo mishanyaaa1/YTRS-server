@@ -297,7 +297,7 @@ function VehiclesPage() {
                           console.log('🚫 Пропускаем изображение "фотография отсутствует" для вездехода:', vehicle.name);
                           return (
                             <span className="catalog-card-icon">
-                              <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64, width: 'auto' }} />
+                              <BrandMark alt={vehicle.name} style={{ width: 'auto' }} />
                             </span>
                           );
                         }
@@ -319,7 +319,7 @@ function VehiclesPage() {
                               className="catalog-card-icon brand-mark-fallback" 
                               style={{ display: 'none' }}
                             >
-                              <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64, width: 'auto' }} />
+                              <BrandMark alt={vehicle.name} style={{ width: 'auto' }} />
                             </span>
                           </>
                         );
@@ -328,7 +328,7 @@ function VehiclesPage() {
                       // Если нет изображения, показываем логотип компании
                       return (
                         <span className="catalog-card-icon">
-                          <BrandMark alt={vehicle.name} style={{ height: viewMode === 'list' ? 48 : 64, width: 'auto' }} />
+                          <BrandMark alt={vehicle.name} style={{ width: 'auto' }} />
                         </span>
                       );
                     })()}
