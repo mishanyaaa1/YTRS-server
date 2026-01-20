@@ -325,7 +325,6 @@ function ProductPage() {
                   </motion.div>
                 );
               })()}
-              </motion.div>
               
               {allImages && allImages.length > 1 && (
                 <div className="image-navigation">
