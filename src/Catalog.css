@@ -328,6 +328,32 @@ input[type='number'] {
   transition: transform 0.3s ease;
 }
 
+/* Стили для заглушки с логотипом в grid режиме */
+.catalog-card-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, 
+    rgba(40, 40, 40, 0.8) 0%, 
+    rgba(25, 25, 25, 0.9) 100%);
+  border-radius: 24px 24px 0 0;
+  border: 1px solid rgba(230, 163, 74, 0.2);
+  overflow: hidden;
+}
+
+.catalog-card-icon picture,
+.catalog-card-icon img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 60% !important;
+  max-height: 60% !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
 .catalog-card:hover .catalog-product-image {
   transform: scale(1.05);
 }
@@ -591,6 +617,18 @@ input[type='number'] {
     rgba(25, 25, 25, 0.9) 100%);
   border-radius: 12px;
   border: 1px solid rgba(230, 163, 74, 0.2);
+  overflow: hidden;
+}
+
+.catalog-card-list .catalog-card-icon picture,
+.catalog-card-list .catalog-card-icon img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 80% !important;
+  max-height: 80% !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
 }
 
 .catalog-card-list .catalog-card-info {
