@@ -3,6 +3,7 @@ import { useAdminData } from '../../context/AdminDataContext';
 import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import MultiImageUpload from '../../components/MultiImageUpload';
 import { migrateProductImages, getMainImage } from '../../utils/imageHelpers';
+import BrandMark from '../../components/BrandMark';
 import './VehiclesManagement.css';
 
 function VehiclesManagement() {
@@ -424,9 +425,9 @@ function VehiclesManagement() {
                             return <img src={vehicle.image} alt={vehicle.name} className="vehicle-image" />;
                           }
                           return (
-                            <div className="vehicle-icon">
-                              🚗
-                            </div>
+                            <span className="vehicle-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <BrandMark alt={vehicle.name} style={{ height: 24 }} />
+                            </span>
                           );
                         })()}
                         {vehicle.name}

@@ -219,7 +219,6 @@ function VehicleDetailPage() {
                     <BrandMark alt={vehicle.name} style={{ height: 300, width: 'auto', maxWidth: '70%', display: 'block' }} />
                   </div>
                 )}
-                <div className="vehicle-badge-large">{vehicle.type}</div>
               </motion.div>
             </div>
           </div>
