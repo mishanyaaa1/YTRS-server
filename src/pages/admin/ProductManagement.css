@@ -177,13 +177,14 @@
   font-weight: 500;
 }
 
-.product-title img,
-.product-title .product-image,
-.product-title .product-icon {
+.product-management .product-title img,
+.product-management .product-title .product-image,
+.product-management .product-title .product-icon {
   flex-shrink: 0;
 }
 
-.product-image {
+/* Стили применяются ТОЛЬКО внутри .product-management */
+.product-management .product-image {
   width: 40px;
   height: 40px;
   min-width: 40px;
@@ -196,7 +197,7 @@
   display: block;
 }
 
-.product-icon {
+.product-management .product-icon {
   width: 40px;
   height: 40px;
   min-width: 40px;
@@ -213,9 +214,9 @@
   flex-shrink: 0;
 }
 
-.product-icon picture,
-.product-icon img,
-.product-icon svg {
+.product-management .product-icon picture,
+.product-management .product-icon img,
+.product-management .product-icon svg {
   width: auto;
   height: auto;
   max-width: 100%;
