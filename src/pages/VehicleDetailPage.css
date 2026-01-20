@@ -137,12 +137,15 @@
 }
 
 .vehicle-placeholder-large picture,
-.vehicle-placeholder-large img {
+.vehicle-placeholder-large img,
+.vehicle-placeholder-large svg {
   width: auto !important;
   height: auto !important;
   max-width: 70% !important;
   max-height: 70% !important;
   object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
 }
 
 .vehicle-badge-large {

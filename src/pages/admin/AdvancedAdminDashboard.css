@@ -279,6 +279,32 @@
   max-width: 100% !important;
   max-height: 100% !important;
   object-fit: contain !important;
+  display: block !important;
+}
+
+/* Стили для BrandMark компонента внутри product-icon */
+.product-item .product-icon > * {
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+}
+
+.product-item .product-icon picture {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.product-item .product-icon picture img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
 }
 
 /* Стили применяются ТОЛЬКО внутри админских компонентов */
